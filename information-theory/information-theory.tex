@@ -1,0 +1,24 @@
+\documentclass{../cs-classes/cs-classes}
+
+\title{Information theory and coding}
+\author{Bartek Blaszczyszyn\\ Notes by Antoine Groudiev}
+
+\begin{document}
+\section*{Introduction}
+This document is Antoine Groudiev's class notes while following the class \emph{Théorie de l'information et codage} (Information theory and coding) at the Computer Science Department of ENS Ulm. It is freely inspired by Bartek Blaszczyszyn's class notes. 
+
+\section{Entropy and source coding}
+We shall introduce \emph{Shannon’s entropy} of a probability distribution on a discrete space and study its basic properties. Our goal is to prove \emph{Shannon’s source coding theorem} formulated in 1948. It will allow us to interpret the entropy as a notion of the \emph{amount of information} "carried" by random variables of a given distribution.
+
+\subsection{Shannon's entropy}
+Let $\mathcal{X}$ be a finite or countable set, and $p := \{p(x) \: | \: x\in \mathcal{X} \}$ be a probability distribution on $\mathcal{X}$.
+
+\begin{definition}[Shannon's entropy] We define (Shannon's) entropy $H(p)$ of $p$ to be:
+\begin{equation}
+    H(p) := -\sum_{x\in\mathcal{X}}p(x)\log(p(x))
+\end{equation}
+with the convention that $0\log 0 = 0$, and $a\log 0 = -\infty$ for $a>0$.
+    
+\end{definition}
+
+\end{document}
