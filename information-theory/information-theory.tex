@@ -32,7 +32,7 @@ We will later on discuss the base of the logarithm.
     \end{equation}
 \end{definition}
 
-Observe that $0\leq H(p) \leq +\infty$, and that $H(p)=0$ if and only if $X$ is constant almost everywhere.
+Observe that $0\leq H(p) \leq +\infty$, and that $H(p)=0$ if and only if $X$ is constant almost surely.
 
 \begin{property}
     Entropy is invariant with respect to deterministic injective mapping $f: \X \to \mathcal{Y}$:
@@ -90,5 +90,79 @@ The entropy $H(p)$ can be interpreted as the \emph{amount of information} carrie
         H(p) = \log\left(\frac{1-p}{p}\right) - \frac{1}{p}\log(1-p)
     \end{equation*}
 \end{example}
+
+\subsection{Gibbs' inequality}
+\begin{theorem}[Gibbs' inequality]
+    Let $p$ and $q$ be two probability distributions on $\X$. Then:
+    \begin{equation}
+        \label{eq:gibbs}
+        H(p) = -\sum_{x\in\X} p(x)\log p(x)  \leq - \sum_{x\in\X} p(x)\log q(x)
+    \end{equation}
+    Moreover, if $H(p)<\infty$, then there is equality in \eqref{eq:gibbs} if and only if $p=q$.
+\end{theorem}
+The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $p$ and $q$.
+
+\begin{proof}
+    Let $x\sim p$. Gibbs' inequality is equivalent to:
+    \begin{equation*}
+        \E[\log p(X)] \geq \E[\log q(X)]
+    \end{equation*}
+    If $\E[\log q(X)] = -\infty$, the inequality is trivial. Otherwise, since we have $\E[\log q(X)] \leq 0$:
+    \begin{equation*}
+        \begin{aligned}
+            \E[\log q(X)] - \E[\log p(X)] &= \E[\log q(X) - \log p(X)] \\
+            &= \E\left[\log\left(\frac{q(X)}{p(X)}\right)\right]
+        \end{aligned}
+    \end{equation*}
+    $\log$ being concave, by applying Jensen's inequality, we obtain:
+    \begin{equation*}
+        \begin{aligned}
+            \E\left[\log\left(\frac{q(X)}{p(X)}\right)\right] &\leq \log\E\left[\frac{q(X)}{p(X)}\right] \\
+            &= \log\sum_{x\in\X} \frac{q(x)}{p(X)}p(x)\\
+            &= \log\sum_{x\in\X} q(x)\\
+            &= \log 1 = 0
+        \end{aligned}
+    \end{equation*}
+    The equality in Jensen's inequality holds if and only if $\frac{q(X)}{p(X)}$ is almost surely constant, that is $p=\lambda q$ almost surely; furthermore, we must have $\lambda=1$ since both $p$ and $q$ are distributions, hence $p=q$ almost surely. 
+\end{proof}
+
+\begin{corollary}[Uniform distribution maximizes entropy]
+    Let $p$ be a probability distribution on some set $\X$ with $|\X|<\infty$. Then:
+    \begin{equation*}
+        0\leq H(p) \leq \log(|\X|)
+    \end{equation*}
+    and the equality holds if and only if $p$ is uniform on $\X$.
+\end{corollary}
+
+\begin{proof}
+    Let $X \sim p$ and be $q$ the uniform distribution on $\X$. By Gibbs' inequality:
+    \begin{equation*}
+        H(p) \leq -\sum_{x\in\X}p(x)\log\left(\frac{1}{|X|}\right) = \log|X|
+    \end{equation*}
+    Notice that $\log|X|$ is the entropy of the uniform distribution $q$.
+\end{proof}
+
+\begin{corollary}[Geometric distribution maximizes entropy in the set of probability measures on $\N^\star$ having given expectation]
+    Let $p$ be a probability distribution on $\X=\N^\star$ with mean $\mu=\sum_{n\geq 1} np(n) < \infty$. Then:
+    \begin{equation*}
+        H(p)\leq(\mu+1)\log(\mu+1)-\mu\log\mu
+    \end{equation*}
+    where the right-hand-side is the entropy of the geometric distribution with parameter $1/\mu$.
+\end{corollary}
+
+\begin{proof}
+    Let $p$ be a probability distribution on $\X=\N^\star$ with mean $\mu<\infty$, and $q$ the geometric distribution of parameter $1/\mu$. According to Gibbs' inequality,
+    \begin{equation*}
+        \begin{aligned}
+            H(p)&\leq-\sum_{n\geq 1}p(n)\log q(n) \\
+            &=-\sum_{n\geq 1}p(n)\log\left(\frac{1}{\mu}\left(1-\frac{1}{\mu}\right)^{n-1}\right)\\
+            &=\sum_{n\geq 1}p(n)\log \mu - \sum_{n\geq 1}(n-1) p(n)\log\left(1-\frac{1}{\mu}\right) \\
+            &=\log\mu - \log\left(1-\frac{1}{\mu}\right)\left(\mu - 1\right)\\
+            &=\log\mu - \left(\log(\mu-1)-\log\mu\right)\left(\mu - 1\right)\\
+            &=\log\mu + \mu\log\mu - \mu\log(\mu-1) + \log(\mu-1) - \log\mu\\
+            &=\mu\log\mu - (\mu-1)\log(\mu-1) = H(q)
+        \end{aligned}
+    \end{equation*}
+\end{proof}
 
 \end{document}
