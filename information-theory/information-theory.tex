@@ -3,6 +3,10 @@
 \title{Information theory and coding}
 \author{Bartek Blaszczyszyn\\ Notes by Antoine Groudiev}
 
+\renewcommand*{\P}{\mathbb{P}}
+\newcommand*{\E}{\mathbb{E}}
+\newcommand*{\X}{\mathcal{X}}
+
 \begin{document}
 \section*{Introduction}
 This document is Antoine Groudiev's class notes while following the class \emph{Théorie de l'information et codage} (Information theory and coding) at the Computer Science Department of ENS Ulm. It is freely inspired by Bartek Blaszczyszyn's class notes. 
@@ -11,14 +15,80 @@ This document is Antoine Groudiev's class notes while following the class \emph{
 We shall introduce \emph{Shannon’s entropy} of a probability distribution on a discrete space and study its basic properties. Our goal is to prove \emph{Shannon’s source coding theorem} formulated in 1948. It will allow us to interpret the entropy as a notion of the \emph{amount of information} "carried" by random variables of a given distribution.
 
 \subsection{Shannon's entropy}
-Let $\mathcal{X}$ be a finite or countable set, and $p := \{p(x) \: | \: x\in \mathcal{X} \}$ be a probability distribution on $\mathcal{X}$.
+Let $\X$ be a finite or countable set, and $p := \{p(x) \: | \: x\in \X \}$ be a probability distribution on $\mathcal{X}$.
 
 \begin{definition}[Shannon's entropy] We define (Shannon's) entropy $H(p)$ of $p$ to be:
 \begin{equation}
-    H(p) := -\sum_{x\in\mathcal{X}}p(x)\log(p(x))
+    H(p) := -\sum_{x\in\X}p(x)\log p(x)
 \end{equation}
 with the convention that $0\log 0 = 0$, and $a\log 0 = -\infty$ for $a>0$.
-    
+We will later on discuss the base of the logarithm.
 \end{definition}
+
+\begin{definition}[Entropy of a random variable]
+    Let $X$ be a random variable on $\X$ with distribution $p$, that is $\P(X=x) = p(x)$, also denoted $X \sim p$. We define:
+    \begin{equation}
+        H(X) := H(p) = -\E(\log p(X))
+    \end{equation}
+\end{definition}
+
+Observe that $0\leq H(p) \leq +\infty$, and that $H(p)=0$ if and only if $X$ is constant almost everywhere.
+
+\begin{property}
+    Entropy is invariant with respect to deterministic injective mapping $f: \X \to \mathcal{Y}$:
+    \begin{equation*}
+        H(X) = H(f(X))
+    \end{equation*}
+\end{property}
+
+The entropy $H(p)$ can be interpreted as the \emph{amount of information} carried on average by one realization from the distribution $p$. Later in this chapter, we shall prove a result supporting this interpretation. 
+
+\begin{definition}[Entropy units] The unit of the entropy depends on the \emph{base of the logarithm}:
+    \begin{itemize}
+        \item In binary basis, when $\log = \log_2$, we denote $H(p)=H_2(p)$, and its unit is the $[bit/symbol]$ (per realization of $X$).
+        \item In arbitrary basis $b>0$, when $\log = \log_b$, we denote $H(p)=H_b(p)$, and its unit is the $[b-digit/symbol]$ (a $b$-digit is a digit which can take $b$ values).
+        \item In basis $e$, when $\log = \ln$, we denote $H(p)=H_e(p)$, and its unit is the $[nat/symbol]$ (nat is the natural unit of information).
+    \end{itemize}
+    
+    The conversion between units can be done by changing the base of the logarithm:
+    \begin{equation*}
+        H_b(p) = \frac{H_2(p)}{\log_2(b)}
+    \end{equation*}
+\end{definition}
+
+\begin{example}[Bernoulli distribution]
+    Let $\mathcal{X}=\{0, 1\}$, and $p$ the Bernoulli distribution such as
+    \begin{equation*}
+        \begin{cases}
+            p(0) = p\\
+            p(1) = 1 - p
+        \end{cases}
+    \end{equation*}
+    Therefore, we have $H(p)=-p\log(p) - (1-p)\log(1-p)$. The Bernoulli distribution with the maximum entropy is:
+    \begin{equation*}
+        \max_{0\leq p\leq 1} H_2(p) = H_2(1/2) = 1 \: [bit/symbol]
+    \end{equation*}
+\end{example}
+
+\begin{example}[Uniform distribution]
+    Let $\mathcal{X}$ be a finite set, and $p$ the uniform distribution, that is:
+    \begin{equation*}
+        \forall x\in \X, \: p(x) := \frac{1}{|\X|}
+    \end{equation*}
+    Therefore, we have $H(p) = \log(|X|)$.
+\end{example}
+
+\begin{example}[Geometric distribution]
+    Let $\X = \N^\star$ and $p$ the geometric distribution of parameter $p>0$, that is:
+    \begin{equation*}
+        \forall n\in \N^\star, \: p(n) = p(1-p)^{n-1}
+    \end{equation*}
+    Recall that $\E[X] = \frac{1}{p}$ when $X$ follows a geometric law of parameter $p$.
+
+    Therefore, we have:
+    \begin{equation*}
+        H(p) = \log\left(\frac{1-p}{p}\right) - \frac{1}{p}\log(1-p)
+    \end{equation*}
+\end{example}
 
 \end{document}
