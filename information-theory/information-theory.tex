@@ -217,4 +217,26 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
     by Gibbs' inequality, the property is hereditary. Furthermore, there is equality in Gibbs' when $p'=q$, hence when $X_{n+1}$ is independent from $X$, i.e. when $X_1, \dots, X_n, X_{n+1}$ are independent.
 \end{proof}
 
+\subsection{Typical sequences of random variables}
+\begin{definition}[Typical sequences]
+    Let $\X$ be a set with $D:=|\X|<\infty$, and $X=(X_1, \dots, X_n)\in \X^n$ a vector of independent and identically distributed random variables. Let $p$ be the distribution of $X$ on $\X$, with $p(x)=\prod_{i=1}^n p(x_i)$. We denote $H_D:=H_D(p)=-\E[\log_Dp(X)]$, expressed in $D$-digits/symbol.
+
+    For $\epsilon>0$, the following subset of realizations of $\X^n$
+    \begin{equation}
+        A_\epsilon:=\left\{x\in \X^n \: : \: \big| -\frac{1}{n}\sum_{i=1}^n \log_Dp(x_i)-H_D\big|\leq \varepsilon\right\}\subseteq \X^n
+    \end{equation}
+    is called the set of $\epsilon$-typical vectors in $\X^n$ with respect to $p$.
+\end{definition}
+
+\begin{remark}
+    \begin{equation*}
+        \E\left[-\frac{1}{n}\sum_{i=1}^n \log_Dp(X_i)\right] = \E[-\log_Dp(X)]=H_D
+    \end{equation*}
+    and, by the Law of Large Numbers (LNN for short):
+    \begin{equation*}
+        \lim_{n\to\infty}-\frac{1}{n}\sum_{i=1}^n \log_Dp(X_i) = \E[-\log_D p(X)] = H_D
+    \end{equation*}
+    We shall see that the probability distribution of $X$ concentrates on the set of typical sequences, and, dependending on the entropy $H_D$, the dimension of this set can be smaller than $n$ (the dimension of the whole space $\X^n$).
+\end{remark}
+
 \end{document}
