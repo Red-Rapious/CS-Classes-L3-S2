@@ -234,9 +234,73 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
     \end{equation*}
     and, by the Law of Large Numbers (LNN for short):
     \begin{equation*}
-        \lim_{n\to\infty}-\frac{1}{n}\sum_{i=1}^n \log_Dp(X_i) = \E[-\log_D p(X)] = H_D
+        \lim_{n\to+\infty}-\frac{1}{n}\sum_{i=1}^n \log_Dp(X_i) = \E[-\log_D p(X)] = H_D
     \end{equation*}
     We shall see that the probability distribution of $X$ concentrates on the set of typical sequences, and, dependending on the entropy $H_D$, the dimension of this set can be smaller than $n$ (the dimension of the whole space $\X^n$).
 \end{remark}
+
+\begin{property}[Typical sequences concentrate probability]
+    \label{prop:typ-seq-concentrate}
+    Let $X=(X_1, \dots, X_n)$ be a vector of i.i.d. random variables, with $X_i\sim p$ on $\X$, with $D:=|\X|<\infty$. We have:
+    \begin{equation}
+        \label{eq:lim-p-1}
+        \lim_{n\to+\infty}\P(X\in A_\epsilon)=1
+    \end{equation}
+    and
+    \begin{equation}
+        \label{eq:card-A}
+        |A_\epsilon|\leq D^{n(H_D+\epsilon)}
+    \end{equation}
+\end{property}
+
+\begin{proof}
+    \eqref{eq:lim-p-1} follows from the LLN. For \eqref{eq:card-A}, observe that:
+    \begin{equation*}
+        \begin{aligned}
+            x\in A_\epsilon\implies& -\sum_{i=1}^n \log_D p(x_i)\leq n(H_D+\epsilon)\\
+            \iff&\log_D\left(\prod_{i=1}^n p(X_i)\right)\geq -n(H_D+\epsilon)\\
+            \iff&\log_Dp(x)\geq -n(H_D+\epsilon)\\
+            \iff&p(x)\geq D^{-n(H_D+\epsilon)}
+        \end{aligned}
+    \end{equation*}
+    and since:
+    \begin{equation*}
+        \begin{aligned}
+            1\geq \P(X\in A_\epsilon)&=\sum_{x\in A_\epsilon}p(x)\\
+            &\geq |A_\epsilon|D^{-n(H_D+\epsilon)}
+        \end{aligned}
+    \end{equation*}
+    which completes the proof.
+\end{proof}
+
+\begin{property}[$A_\epsilon$ is the smallest set concentrating probability]
+    Under the assumptions of Property \ref{prop:typ-seq-concentrate}, let $B\subseteq \X^n$ and $R>0$ such that
+    \begin{equation*}
+        \lim_{n\to+\infty}\P(X\in B)=1
+    \end{equation*}
+    and
+    \begin{equation*}
+        |B|\leq D^{nR}
+    \end{equation*}
+    Then $R\geq H_D$, that is that $A_\epsilon$ is the smallest set concentrating probability.
+\end{property}
+
+\begin{proof}
+    Let $\epsilon>0$, and assume $D>1$, otherwise the result is trivial. Observe that:
+    \begin{equation*}
+        \begin{aligned}
+            x\in A_\epsilon\implies&-\sum_{i=1}^n \log_D p(X_i)\geq n(H_D-\epsilon)\\
+            \iff& p(x)\leq D^{-n(H_D-\epsilon)}
+        \end{aligned}
+    \end{equation*}
+    Therefore,
+    \begin{equation*}
+        \begin{aligned}
+            \P(X\in A_\epsilon\cap B)&\leq |B|D^{-n(H_D\epsilon)}\\
+            &\leq D^{-n(H_D-R-\epsilon)}
+        \end{aligned}
+    \end{equation*}
+    Since $D>1$ and $\lim_{n\to+\infty}\P(X\in A_\epsilon\cap B)=1$, we must have $H_D-R-\epsilon\leq 0$, meaning that $H_D-\epsilon\leq R$. We complete the proof by letting $\epsilon\to 0$. 
+\end{proof}
 
 \end{document}
