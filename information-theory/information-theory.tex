@@ -145,7 +145,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 \begin{corollary}[Geometric distribution maximizes entropy in the set of probability measures on $\N^\star$ having given expectation]
     Let $p$ be a probability distribution on $\X=\N^\star$ with mean $\mu=\sum_{n\geq 1} np(n) < \infty$. Then:
     \begin{equation*}
-        H(p)\leq(\mu+1)\log(\mu+1)-\mu\log\mu
+        H(p)\leq\mu\log(\mu)-(\mu-1)\log(\mu-1)
     \end{equation*}
     where the right-hand-side is the entropy of the geometric distribution with parameter $1/\mu$.
 \end{corollary}
@@ -163,6 +163,58 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
             &=\mu\log\mu - (\mu-1)\log(\mu-1) = H(q)
         \end{aligned}
     \end{equation*}
+\end{proof}
+
+\subsection{Entropy of random vectors}
+\begin{definition}[Entropy of random vectors]
+    Let $X:=(X_1, \dots, X_n)$ be a random vector on $\X=\X_1\times \dots \times \X_n$, for some $n\geq 1$, with distribution
+    \begin{equation*}
+        p(x_1^n)=p(x_1, \dots, x_n) = \P(X_1=x_1, \dots, X_n=x_n)
+    \end{equation*}
+    The entropy of $X$ is defined as the entropy of its distribution:
+    \begin{equation}
+        H(X)=-\sum_{x\in \X}p(x)\log p(x) = -\E[\log p(X)]
+    \end{equation}
+\end{definition}
+
+\begin{property}[Entropy of independent variables]
+    Let $X:=(X_1, \dots, X_n)$ be a vector of \emph{idenpendent}, random variables. Then:
+    \begin{equation}
+        H(X)=\sum_{i=1}^n H(X_i)
+    \end{equation}
+\end{property}
+
+\begin{proof}
+    Let $p$ be the joint distribution of $X$. By independence, $p(x)=\prod_{i=1}^n p_i(x_i)$. Hence:
+    \begin{equation*}
+        \begin{aligned}
+            H(X)&=-\E[\log p(X)]\\
+            &=-\E\left[\log\prod_{i=1}^n p_i(X_i)\right]\\
+            &=-\E\left[\sum_{i=1}^n\log p_i(X_i)\right]\\
+            &=\sum_{i=1}^n-\E[\log p_i(X_i)]\\
+            &=\sum_{i=1}^n H(X_i)
+        \end{aligned}
+    \end{equation*}
+\end{proof}
+
+\begin{property}[Independence maximizes entropy]
+    Let $X:=(X_1, \dots, X_n)$ be a vector of (arbitrary) random variables for some $n\geq 1$. Then:
+    \begin{equation}
+        H(X)\leq \sum_{i=1}^n H(X_i)
+    \end{equation}
+    Moreover, the equality holds if and only if $X_1, \dots, X_n$ are independent.
+\end{property}
+
+\begin{proof}
+    By induction. If $n=1$, the results holds. Let $X$ be an $n$-vector of random variables and $X_{n+1}$ another random variable. Denote $q(x, y)=p(x)p_{n+1}(y)$, where $X\sim p$ and $X_{n+1}\sim p_{n+1}$, and $(X_1, \dots, X_n, X_{n+1})\sim p'$. Since:
+    \begin{equation*}
+        \begin{aligned}
+            H(X) + H(X_{n+1}) &= -\E[\log p(X)+\log p_{n+1}(X_{n+1})]\\
+            &=-\E[\log q(X, X_{n+1})]\\
+            &\geq -\E[\log p'(X, X_{n+1})] = H(X_1, \dots, X_n, X_{n+1})
+        \end{aligned}
+    \end{equation*}
+    by Gibbs' inequality, the property is hereditary. Furthermore, there is equality in Gibbs' when $p'=q$, hence when $X_{n+1}$ is independent from $X$, i.e. when $X_1, \dots, X_n, X_{n+1}$ are independent.
 \end{proof}
 
 \end{document}
