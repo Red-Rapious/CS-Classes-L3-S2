@@ -260,7 +260,17 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
         \label{eq:card-A}
         |A_\epsilon^{(n)}|\leq D^{n(H_D+\epsilon)}
     \end{equation}
-    % TODO: graph 
+    \begin{figure}
+        \center
+        \begin{tikzpicture}
+            \draw [thick, fill=gray, fill opacity=0.2, text opacity=1] (0, 0) rectangle (5, 5) node [above=50pt, pos=0.5] {$\X^n$: all realizations};
+            \draw [thick, color=blue, fill=blue, fill opacity=0.2, text opacity=1] (2.5, 2.5) circle[radius=1.5] node [color=blue] {$A_\epsilon^{(n)}$};
+            \draw [thick, <-] (3.2, 2.5) -- (5.5, 3) node [right] {probable realizations};
+            \node[draw] at (7.5, 4.5) {$|\X^n|=D^n$};
+            \node[draw] at (7.5, 2.2) {$|A_\epsilon^{(n)}|\leq D^{n(H_D+\epsilon)}$};
+        \end{tikzpicture}
+        \caption{Representation of $A_\epsilon^{(n)}$}
+    \end{figure}
 \end{property}
 
 \begin{proof}
@@ -410,7 +420,6 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
         H_D(p)\log_bD = H_b(p) \: \textnormal{[$b$-digit/(source) symbol]}
     \end{equation*}
     is the \emph{infimum of coding rates over asymptotically error-free source coding}.
-    % TODO: graph
     \begin{figure}[!ht]
         \center
         \begin{tikzpicture}
