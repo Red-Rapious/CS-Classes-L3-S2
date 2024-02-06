@@ -11,6 +11,8 @@
 \section*{Introduction}
 This document is Antoine Groudiev's class notes while following the class \emph{Théorie de l'information et codage} (Information theory and coding) at the Computer Science Department of ENS Ulm. It is freely inspired by Bartek Blaszczyszyn's class notes. 
 
+This class contains two main parts: information theory, and coding theory. Information theory gives mathematical basis to build a notion of \emph{information quantity}: given a text, how to "weight" the information contained in the sequence of characters? Some languages are more concise, but still provide the same quantity of information. Coding theory aims at finding the most concise way to represent information, with the smallest number of characters. Such theory -- \emph{source coding} -- has many applications (storage, \dots). Another branch of coding is \emph{canal coding} -- allowing "repetition" in a message to avoid the loss of information in a canal.
+
 \section{Entropy and source coding}
 We shall introduce \emph{Shannon’s entropy} of a probability distribution on a discrete space and study its basic properties. Our goal is to prove \emph{Shannon’s source coding theorem} formulated in 1948. It will allow us to interpret the entropy as a notion of the \emph{amount of information} "carried" by random variables of a given distribution.
 
@@ -24,6 +26,10 @@ Let $\X$ be a finite or countable set, and $p := \{p(x) \: | \: x\in \X \}$ be a
 with the convention that $0\log 0 = 0$, and $a\log 0 = -\infty$ for $a>0$.
 We will later on discuss the base of the logarithm.
 \end{definition}
+
+\begin{remark}
+    In this mathematical generalisation, $\X$ is the equivalent of a symbol alphabet, and $p$ represents the text. The nature of the elements of $\X$ is not important: the entropy, the average, \dots depend only on $\X$ and on the distribution $p$. Therefore, we can re-label the elements of $\X$.
+\end{remark}
 
 \begin{definition}[Entropy of a random variable]
     Let $X$ be a random variable on $\X$ with distribution $p$, that is $\P(X=x) = p(x)$, also denoted $X \sim p$. We define:
@@ -223,9 +229,11 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 
     For $\epsilon>0$, the following subset of realizations of $\X^n$
     \begin{equation}
-        A_\epsilon:=\left\{x\in \X^n \: : \: \big| -\frac{1}{n}\sum_{i=1}^n \log_Dp(x_i)-H_D\big|\leq \varepsilon\right\}\subseteq \X^n
+        A_\epsilon^{(n)}:=\left\{x\in \X^n \: : \: \big| -\frac{1}{n}\sum_{i=1}^n \log_Dp(x_i)-H_D\big|\leq \varepsilon\right\}\subseteq \X^n
     \end{equation}
     is called the set of $\epsilon$-typical vectors in $\X^n$ with respect to $p$.
+
+    Intuitively, the typical vectors are the vectors that probabilistically appear a lot, and that we need to represent faithfully.
 \end{definition}
 
 \begin{remark}
@@ -241,15 +249,15 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 
 \begin{property}[Typical sequences concentrate probability]
     \label{prop:typ-seq-concentrate}
-    Let $X=(X_1, \dots, X_n)$ be a vector of i.i.d. random variables, with $X_i\sim p$ on $\X$, with $D:=|\X|<\infty$. We have:
+    Let $X=(X_1, \dots, X_n)$ be a vector of i.i.d. random variables, with $X_i\sim p$ on $\X$, and $D:=|\X|<\infty$. We have:
     \begin{equation}
         \label{eq:lim-p-1}
-        \lim_{n\to+\infty}\P(X\in A_\epsilon)=1
+        \lim_{n\to+\infty}\P(X\in A_\epsilon^{(n)})=1
     \end{equation}
     and
     \begin{equation}
         \label{eq:card-A}
-        |A_\epsilon|\leq D^{n(H_D+\epsilon)}
+        |A_\epsilon^{(n)}|\leq D^{n(H_D+\epsilon)}
     \end{equation}
 \end{property}
 
@@ -257,7 +265,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
     \eqref{eq:lim-p-1} follows from the LLN. For \eqref{eq:card-A}, observe that:
     \begin{equation*}
         \begin{aligned}
-            x\in A_\epsilon\implies& -\sum_{i=1}^n \log_D p(x_i)\leq n(H_D+\epsilon)\\
+            x\in A_\epsilon^{(n)}\implies& -\sum_{i=1}^n \log_D p(x_i)\leq n(H_D+\epsilon)\\
             \iff&\log_D\left(\prod_{i=1}^n p(X_i)\right)\geq -n(H_D+\epsilon)\\
             \iff&\log_Dp(x)\geq -n(H_D+\epsilon)\\
             \iff&p(x)\geq D^{-n(H_D+\epsilon)}
@@ -266,14 +274,15 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
     and since:
     \begin{equation*}
         \begin{aligned}
-            1\geq \P(X\in A_\epsilon)&=\sum_{x\in A_\epsilon}p(x)\\
-            &\geq |A_\epsilon|D^{-n(H_D+\epsilon)}
+            1\geq \P(X\in A_\epsilon^{(n)})&=\sum_{x\in A_\epsilon}p(x)\\
+            &\geq |A_\epsilon^{(n)}|D^{-n(H_D+\epsilon)}
         \end{aligned}
     \end{equation*}
     which completes the proof.
 \end{proof}
 
-\begin{property}[$A_\epsilon$ is the smallest set concentrating probability]
+\begin{property}[$A_\epsilon^{(n)}$ is the smallest set concentrating probability]
+    \label{prop:a-eps-smallest}
     Under the assumptions of Property \ref{prop:typ-seq-concentrate}, let $B\subseteq \X^n$ and $R>0$ such that
     \begin{equation*}
         \lim_{n\to+\infty}\P(X\in B)=1
@@ -282,25 +291,123 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
     \begin{equation*}
         |B|\leq D^{nR}
     \end{equation*}
-    Then $R\geq H_D$, that is that $A_\epsilon$ is the smallest set concentrating probability.
+    Then $R\geq H_D$, that is that $A_\epsilon^{(n)}$ is the smallest set concentrating probability.
 \end{property}
 
 \begin{proof}
     Let $\epsilon>0$, and assume $D>1$, otherwise the result is trivial. Observe that:
     \begin{equation*}
         \begin{aligned}
-            x\in A_\epsilon\implies&-\sum_{i=1}^n \log_D p(X_i)\geq n(H_D-\epsilon)\\
+            x\in A_\epsilon^{(n)}\implies&-\sum_{i=1}^n \log_D p(X_i)\geq n(H_D-\epsilon)\\
             \iff& p(x)\leq D^{-n(H_D-\epsilon)}
         \end{aligned}
     \end{equation*}
     Therefore,
     \begin{equation*}
         \begin{aligned}
-            \P(X\in A_\epsilon\cap B)&\leq |B|D^{-n(H_D\epsilon)}\\
+            \P(X\in A_\epsilon^{(n)}\cap B)&\leq |B|D^{-n(H_D\epsilon)}\\
             &\leq D^{-n(H_D-R-\epsilon)}
         \end{aligned}
     \end{equation*}
-    Since $D>1$ and $\lim_{n\to+\infty}\P(X\in A_\epsilon\cap B)=1$, we must have $H_D-R-\epsilon\leq 0$, meaning that $H_D-\epsilon\leq R$. We complete the proof by letting $\epsilon\to 0$. 
+    Since $D>1$ and $\lim_{n\to+\infty}\P(X\in A_\epsilon^{(n)}\cap B)=1$, we must have $H_D-R-\epsilon\leq 0$, meaning that $H_D-\epsilon\leq R$. We complete the proof by letting $\epsilon\to 0$. 
 \end{proof}
+
+\subsection{Entropy and source coding rate -- Shannon's first theorem}
+\begin{definition}[Encoding and decoding]
+    Let $X^n=(X_1, \dots, X_n)$ be a vector of i.i.d. random variables, with $X_i\sim p$ on $\X$. We call $X_i$ \emph{source symbols}, and the vector $X^n$ of $n$ source symbols is a \emph{source message} (or \emph{source word}, or \emph{block of source symbols}). 
+
+    Our goal is to \emph{encode} the source message $X^n$ consisting of $n$ symbols using some (hopefully smaller) number of symbols in $\X$. That is, to represent $X^n$ via a function $Y^m=c^{(n)}(X^n)\in \X^m$ for some $m\leq n$, in such a way that one can recover $X^n$ from $Y^m$ via a \emph{decoding function} $d^{(n)}$ at least with high probability.
+\end{definition}
+
+\begin{definition}[Compression rate]
+    The following ratio $R$ is called \emph{(sources) compression rate}:
+    \begin{equation}
+        R:=\frac{m}{n}
+    \end{equation}
+\end{definition}
+
+\begin{definition}[Error probability]
+    We define the \emph{error probability} $P_e^{(n)}$ to be:
+    \begin{equation}
+        P_e^{(n)}:=\P\left(d^{(n)}\left(c^{n}(X^n)\right)\neq X^n\right)
+    \end{equation}
+    which is nothing but the probability that the decoded message is different from the source message.
+\end{definition}
+
+\begin{theorem}[Source coding theorem -- Shannon's first theorem (1948)]
+    \label{th:shannon-first}
+    Let $X^n\in \X^n$ be a vector of i.i.d. random variables, with $X_i\sim p$ on $\X$. Denote $D:=|\X|$ with $1<D<\infty$. Then:
+    \begin{equation}
+        \label{eq:shannon-ft-1}
+        \forall R>H_D(p), \quad \begin{cases}
+            \exists c^{(n)}:\X^n\to \X^{\lceil nR\rceil} \\
+            \exists d^{(n)}:\X^{\lceil nR\rceil}\to \X^n
+        \end{cases}\: \textnormal{such that}\: \lim_{n\to+\infty}P_e(n)=0
+    \end{equation}
+    Furthermore,
+    \begin{equation}
+        \label{eq:shannon-ft-2}
+        \forall R<H_D(p), \quad \begin{cases}
+            \forall c^{(n)}:\X^n\to \X^{\lceil nR\rceil} \\
+            \forall d^{(n)}:\X^{\lceil nR\rceil}\to \X^n
+        \end{cases}\: \textnormal{we have}\: \lim_{n\to+\infty}P_e(n)>0
+    \end{equation}
+\end{theorem}
+
+\begin{proof}
+    Let's start by proving \eqref{eq:shannon-ft-1}. Let $R>H(p)$ and consider $0<\epsilon<R-H_D(p)$. For $n\geq1$, let $A_\epsilon^{(n)}$ be the set of $\epsilon$-typical sequences for the distribution $p$, and let $f^{(n)}$ be an injection of $A_\epsilon^{(n)}$ into $\X^{\lceil nR\rceil}$. Notice that such an injection exists by \eqref{eq:card-A}.
+
+    Let $x_\star\in X^{\lceil nR\rceil}\setminus f^{(n)}(A_\epsilon^{(n)})$ arbitrary. Such an $x_\star$ exists since the inequality is strict in \eqref{eq:card-A} (we have $H_D+\epsilon<R$). We define the following coding function:
+    \begin{equation*}
+        c^{(n)}:=x\to \begin{cases*}
+            f^{(n)}(x) & for $x\in A_\epsilon^{(n)}$\\
+            x_\star & otherwise
+        \end{cases*}
+    \end{equation*}
+    As a decoding function, consider the inverse of $f^{(n)}$ on its image $f^{(n)}(A_\epsilon^{(n)})$, completed arbitrarily on the whole domain $\X^{\lceil nD\rceil}$, that is:
+    \begin{equation*}
+        d^{(n)}:=x\to\begin{cases*}
+            \left[f^{(n)}\right]^{-1}(x) & if $x\in f^{(n)}(A_\epsilon^{(n)})$ \\
+            x_0 & otherwise
+        \end{cases*}
+    \end{equation*}
+    for some arbitrary $x_0\in \X^n$. Finally, note that:
+    \begin{equation*}
+        P_e^{(n)}\leq \P(X\notin A_\epsilon^{(n)})
+    \end{equation*}
+    Therefore, \eqref{eq:shannon-ft-1} follows from \eqref{eq:lim-p-1}.
+
+    The second statement, \eqref{eq:shannon-ft-2}, follows from Property \ref{prop:a-eps-smallest} considering the set:
+    \begin{equation*}
+        B:=\{x \:|\: d^{(n)}\left(c^{n}(x)\right) = x\}
+    \end{equation*}
+\end{proof}
+
+\begin{remark}[Achievable compression rates]
+    The source coding theorem -- Theorem \ref{th:shannon-first} -- says that independent $D$-symbols emitted by a source with distribution $p$ can be encoded asymptotically without errors using $H_D(p)$ encoding symbols per sources symbol. Note that
+    \begin{equation*}
+        H_D(p)\leq H_D(u)=\log_D(D)=1
+    \end{equation*}
+    where $u$ is the uniform distribution. The zero-error probability is approached asymptotically when increasing the length of the encoding blocks of source symbols.
+\end{remark}
+
+\begin{remark}[Source coding rates]
+    In general, one may use different sets of coding symbols $\mathcal{Y}$, having arbitrary number $b:=|\mathcal{Y}|>1$ of elements (set of $b$-digits) together with some coding and decoding functions:
+    \begin{equation*}
+        \begin{cases}
+            c^{(n)}:\X^n\mapsto \mathcal{Y}^{n''}\\
+            d^{(n)}:\mathcal{Y}^{n''}\mapsto \X^n
+        \end{cases}
+    \end{equation*}
+    In this more general scheme, the ratio:
+    \begin{equation}
+        R_s:=\frac{\textnormal{number of $b$-digits used to encode one source message}}{\textnormal{number of source symbols in one source message}} = \frac{n''}{n}
+    \end{equation}
+    is called \emph{(source) coding rate}. It is expressed in $b$-digits/(source) symbol. Considering a bijective mapping $\X^{n'}\mapsto \mathcal{Y}^{n''}$ with $n'$, $n''$ such that $D^{n'}=b^{n''}$ in conjunction with Shannon's first theorem, it is straightforward to see that
+    \begin{equation*}
+        H_D(p)\log_bD = H_b(p) \: \textnormal{[$b$-digit/(source) symbol]}
+    \end{equation*}
+    is the \emph{infimum of coding rates over asymptotically error-free source coding}.
+\end{remark}
 
 \end{document}
