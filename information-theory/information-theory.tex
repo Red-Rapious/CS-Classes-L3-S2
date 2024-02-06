@@ -74,6 +74,7 @@ The entropy $H(p)$ can be interpreted as the \emph{amount of information} carrie
     \begin{equation*}
         \max_{0\leq p\leq 1} H_2(p) = H_2(1/2) = 1 \: [bit/symbol]
     \end{equation*}
+    % TODO: graph of entropy depending on p
 \end{example}
 
 \begin{example}[Uniform distribution]
@@ -259,6 +260,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
         \label{eq:card-A}
         |A_\epsilon^{(n)}|\leq D^{n(H_D+\epsilon)}
     \end{equation}
+    % TODO: graph 
 \end{property}
 
 \begin{proof}
@@ -408,6 +410,20 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
         H_D(p)\log_bD = H_b(p) \: \textnormal{[$b$-digit/(source) symbol]}
     \end{equation*}
     is the \emph{infimum of coding rates over asymptotically error-free source coding}.
+    % TODO: graph
+    \begin{figure}[!ht]
+        \center
+        \begin{tikzpicture}
+            \draw[->, very thick] (0, 0) -- (10, 0) node [below] {$R_s$ [bit/symbol]};
+            \draw[thick] (5, 0.3) -- (5, -0.3) node [below] {$H_2(p)$};
+            \fill (0, 0) circle[radius=0.07] node [below] {$0$};
+
+            \fill [pattern=north east lines, pattern color=red] (0, 0) rectangle (5, 0.5) node [above=5pt, pos=0.5, color=red, text width=4cm, align=center] {no error-free source coding};
+            \fill [pattern=north east lines, pattern color=green] (5, 0) rectangle (9.9, 0.5) node [above=5pt, pos=0.5, color=green, text width=5cm, align=center] {$\exists$ asymptotically error-free source coding};
+
+        \end{tikzpicture}
+        \caption{Source coding "phase transition"}
+    \end{figure}
 \end{remark}
 
 \end{document}
