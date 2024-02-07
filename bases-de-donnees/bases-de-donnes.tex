@@ -49,7 +49,7 @@ De nombreux SGBD sont largement utilisées et ils ne fournissent pas tous toutes
 Les types de SGBD les plus courants sont les suivants:
 \begin{itemize}
     \item Relationnel: les données sont stockées sous forme de table; ce modèle permet des requêtes complexes, utilisant le langage SQL
-    \item XML:les données sont stockées sous forme d'arbre
+    \item XML: les données sont stockées sous forme d'arbre
     \item Graphes/Triplets
     \item Objets, inspiré de la POO
     \item Clé-valeur: très proche du fonctionnement d'une table de hachage
@@ -95,7 +95,7 @@ On se fixe les ensembles infinis dénombrables suivants:
     \end{center}
     et une réservation est de la forme:
     \begin{center}
-        (\texttt{id, INTEGER}, (\texttt{guest, INTEGER}), (\texttt{room, INTEGER}), (\texttt{arrival, DATE}), (\texttt{nights, INTEGER}))
+        ((\texttt{id, INTEGER}), (\texttt{guest, INTEGER}), (\texttt{room, INTEGER}), (\texttt{arrival, DATE}), (\texttt{nights, INT.}))
     \end{center}
 \end{exemple}
 
@@ -134,30 +134,46 @@ On peut également définir des contraintes vérifiées, c'est à dire une condi
 \subsection{Langages de requêtes}
 \subsubsection{Algèbre relationnelle}
 On utilise des \emph{langages algébriques} pour exprimer des requêtes. Un expression d'algèbre relationnelle produit un nouvelle relation à partir des relations de la base de données. Chaque opérateur prend 0, 1 ou 2 sous-expressions. Les opérateurs principaux sont les suivants:
-% TODO: tableau
+\begin{figure}[!ht]
+    \centering
+    \begin{tabular}{c c c c}
+        Opérateur & Arité & Description & Condition \\
+        \hline
+        $R$ & 0 & Nom de relation & $R\in\L$\\
+        $\rho_{A\to B}$ & 1 & Renommage & $A, B\in \L$\\
+        $\Pi_{A_1\dots A_n}$ & 1 & Projection & $A_1\dots A_n\in\L$\\
+        $\sigma_\phi$ & 1 & Sélection & $\phi$ est une formule\\
+        $\times$ & 2 & Produit en croix &\\
+        $\cup$ & 2 & Union&\\
+        $\setminus$&2&Différence&\\
+        $\bowtie_\phi$&2&Jointure&$\phi$ est une formule
+    \end{tabular}
+    \caption{Opérateurs principaux}
+\end{figure}
 
-\paragraph*{Opérateur "Nom de relation"}
-Retourne la relation spécifiée en argument.
-\paragraph*{Opérateur "Renommage"}
+\paragraph*{Nom de relation $R$}
+Retourne la relation (table) spécifiée en argument.
+\paragraph*{Renommage $\rho_{A\to B}$}
 Prend une sous-expression, et renomme une colonne.
-\paragraph*{Opérateur "Projection"}
+\paragraph*{Projection $\Pi_{A_1\dots A_n}$}
 Prend en argument une séquence d'attributs, et conserve en sortie simplement les attributs spécifiés de la relation donnée.
-\paragraph*{Opérateur "Sélection"}
+\paragraph*{Sélection $\sigma_\phi$}
 Prend une formule de sélection pouvant être n'importe quelle combinaison booléenne de comparaisons d'attributs et de constantes, et conserve uniquement les tuples où la condition booléenne est satisfaite.
-\paragraph*{Opérateur "Produit cartésien"}
+\paragraph*{Produit cartésien $\times$}
 Retourne le produits cartésien ensembliste des deux ensembles obtenus par les sous-expressions.
-\paragraph*{Opérateur "Union"}
+\paragraph*{Union $\cup$}
 Retourne l'union des ensembles obtenus par les sous-expressions.
-\paragraph*{Opérateur "Différence"}
+\paragraph*{Différence $\setminus$}
 Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non-monotones.
-\paragraph*{Opérateur "Jointure"}
+\paragraph*{Jointure $\bowtie_\phi$}
 Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une cominaison des opérateurs de renommage, produit cartésien, sélection et projection.
+Si $R$ et $S$ on pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la jointure naturelle de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
 
 Toutes les expressions de l'algèbre relationnel ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, join, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
 
-% Bag semantics
+En sémantique "sac", qui est utilisée en pratique par les SGBD, toutes les opérations retournent des multiensembles, avec répétitions; en particulier, la projection et l'union peuvent introduire des multiensembles quand des relations initiales sont définies.
 
-% Aggregation
+De multiples extensions ont été proposées à l'algèbre relationnelle en ajoutant des fonctionnalités supplémentaires. En particulier, l'extension \emph{aggrégation et groupement} des résultats (Klug, 1982 et Libkin, 2004) est beaucoup utilisée en pratique (voir \texttt{GROUP BY} en SQL).
 
 \subsubsection{SQL}
 Le \emph{Strucutred Query Language} (SQL), est un langage plus ou moins standardisé pour interragir avec un SGBD. Seules quelques différences syntaxiques sont remarquables d'une version à une autre. 
@@ -179,5 +195,7 @@ Les mots-clés et identifiants sont généralement insensibles à la casse. En p
 
 \paragraph*{Requêtes}
 % TODO
+
+\section{Calcul relationnel, théorème de Codd, décidabilité, complexité}
 
 \end{document}
