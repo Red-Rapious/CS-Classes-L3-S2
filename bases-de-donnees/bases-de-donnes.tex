@@ -4,10 +4,159 @@
 \author{Pierre Senellart, Michaël Thomazo, Paul Boniol, Serge Abiteboul\\ Notes par Antoine Groudiev}
 \date{Version du \today}
 
+\renewcommand*{\L}{\mathcal{L}}
+\newcommand*{\V}{\mathcal{V}}
+\newcommand*{\T}{\mathcal{T}}
+
 \begin{document}
 \section*{Introduction}
 Ce document est l'ensemble non officiel des notes du cours \emph{Bases de données} du Département Informatique de l'ENS Ulm. Elles sont librement inspirées des notes de cours sous forme de présentation rédigées par Pierre Senellart.
 
 \section{Gestion de données, modèle relationnel, algèbre et SQL}
+\subsection{Introduction}
+\subsubsection{Gestion de données}
+Les bases de données ont de nombreuses applications (logiciels seuls, sites Web, \dots), et servent à gérer des données. En particulier, elles sont utilisées pour:
+\begin{itemize}
+    \item structurer des données utiles aux applications
+    \item les conserver de manière persistente, même quand l'application ne tourne pas
+    \item lancer des requêtes efficaces sur un large volume de données
+    \item mettre à jour des données sans violer les contraintes structurelles de la base
+    \item autoriser plusieurs utilisateurs à accéder et modifier les données, possiblement simultanément
+\end{itemize}
+Il est par ailleurs souvent désirable d'accéder aux mêmes données depuis des applications distinctes, sur des ordinateurs différents.
+
+On peut considérer comme exemple le système d'information d'un hôtel. Il est accessible depuis un logiciel interne (bureau d'accueil), un site web (hôtes), et une suite de logiciels de comptabilité. Il nécessite des données structurées pour les chambres, clients, réservations, \dots Les données doivent rester stockées de manière péreine, même en cas de coupure de courant. Les requêtes doivent être quasi-instantanées, même avec un long historique de l'hôtel.
+
+L'implémentation naïve nécessite un format de fichier pour stocker les données sur un disque, et un mécanisme de synchronisation, et de récupération en cas d'interruption de la synchronisation. Elle nécessite beaucoup de compétences différentes, de la programmation orientée objet, à des notions de réseau, de maîtrise de structures de données et algorithmes efficaces, de gestion en parallèle, \dots Ré-implémenter une telle structure à chaque fois qu'un tel outil est nécessaire est une perte de temps. 
+
+On utilise donc souvent un \emph{Système de Gestion de Bases de Données} (SGBD), qui est un logiciel simplifiant le design d'une application manipulant des données, en fournissant un accès unifié aux fonctionnalités nécessaire pour la gestion des données, et ce peu importe l'application. Une \emph{base de donnée} désigne une collection de données, gérée par un SGBD.
+
+Un SGBD contient plusieurs fonctionnalités et charactéristiques:
+\begin{itemize}
+    \item Indépendance physique
+    \item Indépendance logique
+    \item Facilité de l'accès aux données
+    \item Optimisation des requêtes
+    \item Intégrité logique
+    \item Intégrité physique
+    \item Partage de données
+    \item Standardisation
+\end{itemize}
+
+\subsubsection{Types de SGBD}
+De nombreux SGBD sont largement utilisées et ils ne fournissent pas tous toutes ces fonctionnalités. Les SGBDS peuvent être distingués selon le modèle de données utilisé, les choix techniques pris, la facilité d'utilisation, la possibilité de mise à l'échelle, ou encore l'architecture interne.
+
+Les types de SGBD les plus courants sont les suivants:
+\begin{itemize}
+    \item Relationnel: les données sont stockées sous forme de table; ce modèle permet des requêtes complexes, utilisant le langage SQL
+    \item XML:les données sont stockées sous forme d'arbre
+    \item Graphes/Triplets
+    \item Objets, inspiré de la POO
+    \item Clé-valeur: très proche du fonctionnement d'une table de hachage
+    \item Orienté colonne: modèle de donnée entre le Clé-valeur et Relationnel; permet de parcourir très rapidement les données à l'intérieur de ce qui correspond à une colonne dans le modèle relationnel
+\end{itemize}
+Les SGBD ne suivant pas le modèle relationnel sont appelés \texttt{NoSQL}.
+
+Dans le modèle relationnel, les données sont décomposées sous forme de \emph{relation} (i.e. de tables), et utilisent un langage plus ou moins standardisé, le SQL. Les données sont stockées sur le disque, dans des tables de relation elles-mêmes stockées ligne par ligne. C'est un système centralisé, avec des propriétés de distributions limitées. Parmi les systèmes les plus répandus, on pourra citer \texttt{Oracle}, \texttt{Microsoft SQL Server}, \texttt{MySQL}, \texttt{SQLite}, et \texttt{PostgreSQL}. En TP, on utilisera la convention \texttt{PostgreSQL}.
+
+Les SGBD relationnels classiques possèdent de nombreuses forces. Ils introduisent une indépendance entre le modèle de données et les structures de stockage, et les requêtes déclaratives et la façon dont elles sont exécutées. Ils sont capables d'exécuter des requêtes optimisées, finement optimisées, permettant de traiter jusqu'à des \texttt{To} de données. C'est une technologie mature, stable, et efficace, riche en fonctionnalités et interfaces. Le modèle relationnel permet de maintenir des contraintes d'intégrité et des transactions qui garantissent le contrôle de la concurrence des processus, l'isolation entre les utilisateurs, et la récupération en cas d'échec.
+
+Les SGBD relationnels satisfont les propriétés suivantes, dites \texttt{ACID}:
+\begin{itemize}
+    \item \emph{Atomisme}: une transaction est soit exécutée en entier, soit pas exécutée du tout
+    \item \emph{Consistence}: les contraintes d'intégrité sont respectées
+    \item \emph{Isolation}: deux transactions concurrentes sont exécutées en série
+    \item \emph{Durabilité}: les données peuvent être récupérées même après un échec système
+\end{itemize}
+Ces propriétés viennent néanmoins également avec des faiblesses, comme leur incapacité à gérer des volumes de données extrêmement larges, de certains types, et impliquent un coût élevé des requêtes.
+
+Les modèles \texttt{NoSQL} forment un écosystème très divers, abandonnant généralement les propriétés \texttt{ACID}, et parfois les requêtes complexes. Des nouveaux systèmes, dits \texttt{NewSQL}, essayent d'établir un compromis entre propriétés \texttt{ACID} et performances.
+
+\subsection{Modèle relationnel}
+On se fixe les ensembles infinis dénombrables suivants:
+\begin{itemize}
+    \item $\L$, les étiquettes
+    \item $\V$, les valeurs
+    \item $\T$, les types, tel que $\forall\tau\in\T, \tau\subseteq\V$
+\end{itemize}
+
+\begin{definition}[Schéma relationnel d'arité $n$]
+    Un schéma relationnel d'arité $n$ est un $n$-uplet $(A_1, \dots, A_n)$ où chaque $A_i$ est un attribut, c'est à dire une paire $(L_i, \tau_i)\in \L\times\T$ où les $L_i$ sont tous distincts.
+\end{definition}
+
+\begin{definition}[Schéma de base de données]
+    Un schéma de base de données est défini par un ensemble fini d'étiquettes $L\subseteq\L$ (les noms des relations), où chaque étiquette $L$ est associée à un schéma de relation.
+\end{definition}
+
+\begin{exemple}
+    On peut par exemple considérer que $\L$ est l'ensemble des chaînes de caractères alphanumériques commençant par une lettre. $\V$ est l'ensemble des suites de bits, et $\T$ est formé des types \texttt{INTEGER}, \texttt{REAL}, \texttt{TEXT}, et \texttt{DATA}, \dots Un schéma de base de données est formé de deux noms de relations \texttt{Client} et \texttt{Reservation}. Un \texttt{Client} est de la forme:
+    \begin{center}
+        ((\texttt{id, INTEGER}), (\texttt{name, TEXT}), (\texttt{email, TEXT}))
+    \end{center}
+    et une réservation est de la forme:
+    \begin{center}
+        (\texttt{id, INTEGER}, (\texttt{guest, INTEGER}), (\texttt{room, INTEGER}), (\texttt{arrival, DATE}), (\texttt{nights, INTEGER}))
+    \end{center}
+\end{exemple}
+
+\begin{definition}[Instance d'un schéma de relation]
+    Une \emph{instance d'un schéma de relation} (aussi appelé une \emph{relation sur ce schéma}) $((L_1, \tau_1), \dots, (L_n, \tau_n))$ est un ensemble fini $\{t_1, \dots, t_k\}$ de tuples de la forme $t_j=(v_{j1}, \dots, v_{jn})$, où $\forall j, \forall i, v_{ij\in\tau_i}$.
+\end{definition}
+
+\begin{definition}[Instance d'un schéma de base de données]
+    Une \emph{instance d'un schéma de base de données} (ou plus simplement \emph{base de donnée sur ce schéma}) est une fonction qui associe à chaque nom de relation une instance du schéma de relation correspondant.
+\end{definition}
+
+\begin{remarque}
+    Le terme \emph{relation} est utilisé de manière ammbiguë pour parler aussi bien d'un schéma de relation ou d'une instance d'un schéma de relation.
+\end{remarque}
+
+Si $A=(L, \tau)$ est le $i$-ème attribut d'une relation $R$, et que $t$ est le $n$-ième tuple d'une instance de $R$, on note $t[A]$ (ou $t[L]$) la valeur de la $i$-ème composante de $t$. De manière similaire, si $\A$ est un $k$-uplet d'attributs parmi les $n$ attributs de $R$, $t[\A]$ est le $k$-uplet formé à partir de $t$ en concaténant les $t[A]$ pour $A\in\A$.
+
+On peut ajouter à un schéma relationnel des \emph{contraintes d'intégrité} de natures différentes, pour définir une notion de \emph{validité} d'une instance.
+\begin{definition}[Clé]
+    Un uplet d'attibuts $\A$ sur un schéma de relation $R$ est une clé s'il ne peut pas exister deux uplets distincts $t_1$ et $t_2$ dans une instance de $R$ tels que $t_1[\A]=t_2[\A]$.
+\end{definition}
+
+\begin{definition}[Clé étrangère]
+    Un $k$-uplet d'attributs $\A$ d'un schéma de relation $R$ est une \emph{clé étrangère} référençant un $k$-uplet d'attributs $\mathcal{B}$ d'un schéma de relation $S$ si pour toutes les instances $I^R$ et $I^S$ de $R$ et $S$, et pour tout uplet $t$ de $I^R$, il existe un \emph{unique} tuple $t'$ de $I^S$ avec $t[\A]=t'[\mathcal{B}]$.
+\end{definition}
+
+On peut également définir des contraintes vérifiées, c'est à dire une condition arbitraire sur les valeurs des attributs d'une relation (en appliquant à chaque tuple de l'instance cette relation).
+
+\begin{exemple}
+    En reprenant l'exemple précédent, on peut donner les contraintes suivantes:
+    %TODO
+\end{exemple}
+
+% TODO: variantes
+
+\subsection{Langages de requêtes}
+\subsubsection{Algèbre relationnelle}
+On utilise des \emph{langages algébriques} pour exprimer des requêtes. Un expression d'algèbre relationnelle produit un nouvelle relation à partir des relations de la base de données. Chaque opérateur prend 0, 1 ou 2 sous-expressions. Les opérateurs principaux sont les suivants:
+% TODO: tableau
+
+\paragraph*{Opérateur "Nom de relation"}
+Retourne la relation spécifiée en argument.
+\paragraph*{Opérateur "Renommage"}
+Prend une sous-expression, et renomme une colonne.
+\paragraph*{Opérateur "Projection"}
+Prend en argument une séquence d'attributs, et conserve en sortie simplement les attributs spécifiés de la relation donnée.
+\paragraph*{Opérateur "Sélection"}
+Prend une formule de sélection pouvant être n'importe quelle combinaison booléenne de comparaisons d'attributs et de constantes, et conserve uniquement les tuples où la condition booléenne est satisfaite.
+\paragraph*{Opérateur "Produit cartésien"}
+Retourne le produits cartésien ensembliste des deux ensembles obtenus par les sous-expressions.
+\paragraph*{Opérateur "Union"}
+Retourne l'union des ensembles obtenus par les sous-expressions.
+\paragraph*{Opérateur "Différence"}
+Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non-monotones.
+\paragraph*{Opérateur "Jointure"}
+Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une cominaison des opérateurs de renommage, produit cartésien, sélection et projection.
+
+Toutes les expressions de l'algèbre relationnel ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, join, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
+
+% Bag semantics
+
+% Aggregation
 
 \end{document}
