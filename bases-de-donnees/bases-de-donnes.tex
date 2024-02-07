@@ -13,7 +13,7 @@
 Ce document est l'ensemble non officiel des notes du cours \emph{Bases de données} du Département Informatique de l'ENS Ulm. Elles sont librement inspirées des notes de cours sous forme de présentation rédigées par Pierre Senellart.
 
 \section{Gestion de données, modèle relationnel, algèbre et SQL}
-\subsection{Introduction}
+\subsection{Introduction} 
 \subsubsection{Gestion de données}
 Les bases de données ont de nombreuses applications (logiciels seuls, sites Web, \dots), et servent à gérer des données. En particulier, elles sont utilisées pour:
 \begin{itemize}
@@ -158,5 +158,26 @@ Toutes les expressions de l'algèbre relationnel ne sont pas valides, et la vali
 % Bag semantics
 
 % Aggregation
+
+\subsubsection{SQL}
+Le \emph{Strucutred Query Language} (SQL), est un langage plus ou moins standardisé pour interragir avec un SGBD. Seules quelques différences syntaxiques sont remarquables d'une version à une autre. 
+
+C'est un langage \emph{déclaratif}, c'est à dire qu'il n'est pas nécessaire de penser à la complexité de l'opération, simplement à ce que l'on veut. C'est le SGBD qui prend en charge l'optimisation de la requête.
+
+Les mots-clés et identifiants sont généralement insensibles à la casse. En pratique, les mots clés sont écrits en majuscule, et les identifiants commencent par une majuscule. Les commentaires sont introduits par \texttt{-}\texttt{-}. Dans certains contexte, on termine les commandes par \texttt{;}, mais le point-virgule ne fait pas partie de la commande, il est simplement demandé par l'environnement (par exemple, pour un client en ligne de commande).
+
+\paragraph*{NULL} La valeur spéciale \texttt{NULL} signifie l'absence de valeur, et introduit une logique tri-valuée étrange: \texttt{True}, \texttt{False}, et \texttt{NULL}. La comparaison normale avec \texttt{NULL} renvoie toujours \texttt{NULL}. On peut vérifier la présence de valeur avec \texttt{IS NULL} ou \texttt{IS NOT NULL}.
+
+\paragraph*{Langage de définition de données}
+% TODO
+
+\paragraph*{Contraintes}
+% TODO
+
+\paragraph*{Mises à jour}
+% TODO
+
+\paragraph*{Requêtes}
+% TODO
 
 \end{document}
