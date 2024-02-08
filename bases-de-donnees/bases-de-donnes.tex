@@ -18,14 +18,14 @@ Ce document est l'ensemble non officiel des notes du cours \emph{Bases de donné
 Les bases de données ont de nombreuses applications (logiciels seuls, sites Web, \dots), et servent à gérer des données. En particulier, elles sont utilisées pour:
 \begin{itemize}
     \item structurer des données utiles aux applications
-    \item les conserver de manière persistente, même quand l'application ne tourne pas
+    \item les conserver de manière persistante, même quand l'application ne tourne pas
     \item lancer des requêtes efficaces sur un large volume de données
     \item mettre à jour des données sans violer les contraintes structurelles de la base
-    \item autoriser plusieurs utilisateurs à accéder et modifier les données, possiblement simultanément
+    \item autoriser plusieurs utilisateurs à accéder et modifier les données, possiblement simultanément.
 \end{itemize}
 Il est par ailleurs souvent désirable d'accéder aux mêmes données depuis des applications distinctes, sur des ordinateurs différents.
 
-On peut considérer comme exemple le système d'information d'un hôtel. Il est accessible depuis un logiciel interne (bureau d'accueil), un site web (hôtes), et une suite de logiciels de comptabilité. Il nécessite des données structurées pour les chambres, clients, réservations, \dots Les données doivent rester stockées de manière péreine, même en cas de coupure de courant. Les requêtes doivent être quasi-instantanées, même avec un long historique de l'hôtel.
+On peut considérer comme exemple le système d'information d'un hôtel. Il est accessible depuis un logiciel interne (bureau d'accueil), un site web (hôtes), et une suite de logiciels de comptabilité. Il nécessite des données structurées pour les chambres, clients, réservations, \dots Les données doivent rester stockées de manière pérenne, même en cas de coupure de courant. Les requêtes doivent être quasi instantanées, même avec un long historique de l'hôtel.
 
 L'implémentation naïve nécessite un format de fichier pour stocker les données sur un disque, et un mécanisme de synchronisation, et de récupération en cas d'interruption de la synchronisation. Elle nécessite beaucoup de compétences différentes, de la programmation orientée objet, à des notions de réseau, de maîtrise de structures de données et algorithmes efficaces, de gestion en parallèle, \dots Ré-implémenter une telle structure à chaque fois qu'un tel outil est nécessaire est une perte de temps. 
 
@@ -64,7 +64,7 @@ Les SGBD relationnels classiques possèdent de nombreuses forces. Ils introduise
 Les SGBD relationnels satisfont les propriétés suivantes, dites \texttt{ACID}:
 \begin{itemize}
     \item \emph{Atomisme}: une transaction est soit exécutée en entier, soit pas exécutée du tout
-    \item \emph{Consistence}: les contraintes d'intégrité sont respectées
+    \item \emph{Consistance}: les contraintes d'intégrité sont respectées
     \item \emph{Isolation}: deux transactions concurrentes sont exécutées en série
     \item \emph{Durabilité}: les données peuvent être récupérées même après un échec système
 \end{itemize}
@@ -167,9 +167,9 @@ Retourne l'union des ensembles obtenus par les sous-expressions.
 Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non-monotones.
 \paragraph*{Jointure $\bowtie_\phi$}
 Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une cominaison des opérateurs de renommage, produit cartésien, sélection et projection.
-Si $R$ et $S$ on pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la jointure naturelle de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
+Si $R$ et $S$ ont pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la jointure naturelle de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
 
-Toutes les expressions de l'algèbre relationnel ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, join, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
+Toutes les expressions de l'algèbre relationnelle ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, join, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
 
 En sémantique "sac", qui est utilisée en pratique par les SGBD, toutes les opérations retournent des multiensembles, avec répétitions; en particulier, la projection et l'union peuvent introduire des multiensembles quand des relations initiales sont définies.
 
@@ -178,7 +178,7 @@ De multiples extensions ont été proposées à l'algèbre relationnelle en ajou
 \subsubsection{SQL}
 Le \emph{Strucutred Query Language} (SQL), est un langage plus ou moins standardisé pour interragir avec un SGBD. Seules quelques différences syntaxiques sont remarquables d'une version à une autre. 
 
-C'est un langage \emph{déclaratif}, c'est à dire qu'il n'est pas nécessaire de penser à la complexité de l'opération, simplement à ce que l'on veut. C'est le SGBD qui prend en charge l'optimisation de la requête.
+C'est un langage \emph{déclaratif}, c'est-à-dire qu'il n'est pas nécessaire de penser à la complexité de l'opération, simplement à ce que l'on veut. C'est le SGBD qui prend en charge l'optimisation de la requête.
 
 Les mots-clés et identifiants sont généralement insensibles à la casse. En pratique, les mots clés sont écrits en majuscule, et les identifiants commencent par une majuscule. Les commentaires sont introduits par \texttt{-}\texttt{-}. Dans certains contexte, on termine les commandes par \texttt{;}, mais le point-virgule ne fait pas partie de la commande, il est simplement demandé par l'environnement (par exemple, pour un client en ligne de commande).
 
