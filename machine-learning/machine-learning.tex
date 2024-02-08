@@ -1,0 +1,84 @@
+\documentclass[toc]{../cs-classes/cs-classes}
+
+\title{Introduction to Machine Learning}
+\author{Alessandro Rudi, Umut Simsekli\\ Notes by Antoine Groudiev}
+
+\begin{document}
+\section*{Introduction}
+
+\section{An overview of Machine Learning}
+\subsection{What is ML?}
+Considering a problem, such as image classification: given an input image of a dog or a cat, the program is asked to determine whether the image is a dog or a cat. Conventional programming would hardcode the solution to this problem. But this process takes time and is not easily generalisable. Instead, an ML model is trained on a dataset to produce a program to solve the problem.
+
+Many successfull applications of Machine Learning are:
+\begin{itemize}
+    \item Face recognition
+    \item Spam filtering
+    \item Speech recognition
+    \item Self-driving systems; pedestrian detection
+\end{itemize}
+
+\subsection{Topics in Machine Learning}
+\subsubsection{Supervised Learning}
+\begin{example}[Classification]
+    Features $x\in\R^d$, labels $y\in\{1, \dots, k\}$
+\end{example}
+
+\begin{definition}[Regression]
+    Features $x\in\R^d$, labels $y\in\R$. To tackle such problem, we look for a parametrized function $f_\theta(x_i)\simeq y_i$ for some $f_\theta$ in a function space
+    \begin{equation*}
+        \mathcal{F} = \{f_\theta : \theta\in\Theta\}
+    \end{equation*}
+    Our goal is therefore to find the best function in $\mathcal{F}$ such that $f$ "fits" the training data. For example, we can say that $f$ "fits" the training data when
+    \begin{equation*}
+        \frac{1}{n}\sum_{i=1}^n (f(x_i)-y_i)^2
+    \end{equation*}
+    is "small". Such a function is not interesting in general, like for classification. 
+\end{definition}
+
+\begin{definition}[Loss function]
+    Assums that the features are in $\mathcal{X}$ and the labels are in $\mathcal{Y}$. We introduce the more general \emph{loss function} notion:
+    \begin{equation*}
+        l:\mathcal{Y}^2\to \R_+
+    \end{equation*}
+    For a regression task, we can use $l(\hat{y}, y)=(\hat{y}-y)^2$. For a classification task, $l(\hat{y}, y)=\mathds{1}_{\hat{y}=y}$.
+\end{definition}
+
+Therefore, for a regression problem, we might choose:
+\begin{equation*}
+    f^\star=\argmin_{f\in\mathcal{F}}\frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i)
+\end{equation*}
+In the parametric case, when $\mathcal{F}=\{f_\theta : \theta\in\Theta\}$, we might minimize with respect to $\theta$:
+\begin{equation*}
+    \theta^\star=\argmin_{\theta\in\Theta}\frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i)
+\end{equation*}
+
+\subsubsection{Probabilistic approach}
+Let $\mathcal{Z}=\mathcal{X}\times\mathcal{Y}$ be the feature space. Let $D$ be a distribution on $\mathcal{Z}$; we make the assumption that the training data is iid from $D$:
+\begin{equation*}
+    (x_i, y_i)\sim D
+\end{equation*}
+and the same thing hold for the test data:
+\begin{equation*}
+    (\tilde{x_i}, \tilde{y_i})\sim D
+\end{equation*}
+According to the Strong Law of Large Numbers, the test loss converges almost surely:
+\begin{equation*}
+    \lim_{n\to\infty}\frac{1}{n}\sum_{i=1}^n l(f_\theta(\tilde{x_i}), \tilde{y_i}) = \E_{(x, y)\sim D}[l(f_\theta(x), y)] =: R(\theta)=R(f_\theta)
+\end{equation*}
+where $R(\theta)$ is the \emph{population risk}.
+
+\begin{definition}[Risk minimization]
+    
+\end{definition}
+
+\subsubsection{Unsupervised Learning}
+\begin{example}[Clustering]
+    
+\end{example}
+
+\begin{example}[Dimensionnality reduction]
+    We are given features $x\in \R^d$ and labels $y\in\{0, 1\}$ which form a "training" dataset $S=\{(x_1, y_1), \dots, (x_n, y_n)\}$. We assume that $d>>1$; our goal is to find $d'<<d$ such that $(x_1, y_1, \dots, )$
+\end{example}
+
+\end{document}
