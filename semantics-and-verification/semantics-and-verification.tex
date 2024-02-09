@@ -3,6 +3,9 @@
 \author{Jérôme Feret and Xavier Rival\\ Notes by Antoine Groudiev}
 \title{Semantics and Applications to Verification}
 
+\DeclareMathOperator{\lfp}{lfp}
+\DeclareMathOperator{\gfp}{gfp}
+
 \begin{document}
 \section*{Introduction}
 This document is Antoine Groudiev's class notes while following the class \emph{Sémantique et applications à la vérification de programmes} (Semantics and Applications to Verification) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Xavier Rival. 
@@ -160,5 +163,147 @@ If it succedds, then we have proven that $\llbracket P\rrbracket\subseteq\S$. It
 \end{figure}
 
 \subsection{Orderings, lattices and fixpoints}
+\subsubsection{Basic definitions on orderings}
+\begin{definition}[Partially ordered set (poset)]
+    Let a set $\S$ and a binary relation $(\sqsubseteq)\subseteq\S\times\S$ over $\S$. Then, $\sqsubseteq$ is an order relation if and only if it is reflexive, transitive, antisymettric. Furthermore, we define $x\sqsubset y::=(x\sqsubseteq y \land x\neq y)$. Most orders in this class won't be total.
+\end{definition}
+
+We often use Hasse diagrams to represent posets.
+
+In the following, we illustrate order relations and their usefulness in semantics using the standard definition of \emph{word automata}. The semantics of an automaton is the set of words recognized by it.
+
+We can already define a few semantic properties:
+\begin{itemize}
+    \item $\mathcal{P}_0$: no recognized word contains two consecutive $b$
+    \begin{equation*}
+        \L[\A]\subseteq L^\star\setminus L^\star bb L^\star
+    \end{equation*}
+    \item $\mathcal{P}_1$: all recognized words contain at least one occurrence of $a$
+    \begin{equation*}
+        \L[\A]\subseteq L^\star aL^\star
+    \end{equation*}
+    \item $\mathcal{P}_2$: recognized words do not contain $b$
+    \begin{equation*}
+        \L[\A]\subseteq (L\setminus \{b\})^\star
+    \end{equation*}
+\end{itemize}
+
+\begin{definition}[$\bot$, $\top$]
+    When they exist, we denote by infimum $\bot$ and supremum $\top$ the smallest and largest elements of the poset.
+\end{definition}
+
+\begin{definition}[$\sqcup$, $\sqcap$]
+    We denote $\sqcap\S$ the glb (greatest lower bound) of $\S$, and $\sqcup$ the lub (lowest upper bound) of $\S$.
+\end{definition}
+
+\subsubsection{Complete lattice}
+\begin{definition}[Complet lattice]
+    A complete lattice is a tuple $(\S,\sqsubseteq,\bot,\top, \sqcup, \sqcap)$ where $(S, \sqsubseteq)$ is a poset, and any subset $\S'$ of $\S$ has a glb $\sqcap\S'$ and a lub $\sqcup\S$.
+\end{definition}
+
+\begin{definition}[Lattice]
+    A lattice is a tuple $(\S,\sqsubseteq,\bot,\top, \sqcup, \sqcap)$ where $(S, \sqsubseteq)$, and any pair $\{x, y\}$ of $\S$ has a glb $x\sqcap y$ and a lub $x\sqcup y$.
+\end{definition}
+\begin{example}
+    $\Q\cap[0, 1]$ is a lattice but not a complete lattice, since 
+    \begin{equation*}
+        \left\{q\in \Q\cap[0, 1]\mid q\leq\frac{\sqrt{2}}{2}\right\}\subseteq\Q\cap[0, 1]
+    \end{equation*} 
+    has no lowest upper bound in $\Q\cap[0, 1]$.
+\end{example}
+\begin{property}
+    A finite lattice is also a complete lattice.
+\end{property}
+
+\begin{definition}[Increasing chain]
+    Let $(\S, \sqsubseteq)$ be a poset and $\mathcal{C}\subseteq \S$. It is an increasing chain if and only if it is not empty, and $(\mathcal{C}, \sqsubseteq)$ is total.
+\end{definition}
+
+\begin{example}
+    In the powerset $(\mathcal{P}(\N), \subseteq)$, 
+    \begin{equation*}
+        \mathcal{C}:=\left\{\{2^0, \dots, 2^i\} \: |\: i\in\N\right\}
+    \end{equation*}
+    is an increasing chain.
+\end{example}
+
+\begin{definition}[Increasing chain condition]
+    The poset $(\S, \sqsubseteq)$ satisfies the increasing chain condition if and only if any increasing chain $\mathcal{C}\subseteq \S$ is finite.
+\end{definition}
+
+\begin{definition}[Complete partial order]
+    A complete partial order (cpo) is a poset $(\S, \sqsubseteq)$ such that any increasing chain $\mathcal{C}$ of $\S$ has at least an upper bound. A pointed cpo is a cpo with a bottom element $\bot$.
+\end{definition}
+
+\subsubsection{How to prove semantic properties}
+
+\subsubsection{Operators over a poset}
+\begin{definition}[Operators and orderings]
+    Let $(\S, \sqsubseteq)$ be a poset and $\phi:\S\to\S$ be an operator over $\S$. Then, $\phi$ is:
+    \begin{itemize}
+        \item \emph{monotone} if and only if $x\sqsubseteq y\Rightarrow \phi(x)\sqsubseteq\phi(y)$
+        \item \emph{continuous} if and only if, for any \textbf{chain} $\S'\subseteq \S$, then:
+        \begin{equation*}
+            \begin{cases*}
+                &if $\sqcup\S'$ exists, so does $\sqcup\phi(\S')$\\
+                &and $\sqcup\phi(\S')=\phi(\sqcup\S')$
+            \end{cases*}
+        \end{equation*}
+        \item $\sqcup$-preserving if and only if:
+        \begin{equation*}
+            \forall\S'\subseteq\S, \begin{cases*}
+                &if $\sqcup\S'$ exists, so does $\sqcup\phi(\S')$\\
+                &and $\sqcup\phi(\S')=\phi(\sqcup\S')$
+            \end{cases*}
+        \end{equation*}
+    \end{itemize}
+\end{definition}
+
+\begin{property}[Continuity $\implies$ monotonicity]
+    If $\phi$ is continuous, then it is monotone.
+\end{property}
+
+\begin{property}[$\sqcup$-preserving $\implies$ monotonicity]
+    If $\phi$ preserves $\sqcup$, then it is monotone.
+\end{property}
+
+\subsubsection{Fixpoints theorems}
+\begin{definition}[Fixpoints]
+    Let $(\S, \sqsubseteq)$ be a poset and $\phi:\S\to\S$ be an operator over $\S$.
+    \begin{itemize}
+        \item A fixpoint of $\phi$ is an element $x$ such that $\phi(x)=x$.
+        \item A pre-fixpoint of $\phi$ is an element $x$ such that $x\sqsubseteq\phi(x)$.
+        \item A post-fixpoint of $\phi$ is an element $x$ such that $\phi(x)\sqsubseteq x$.
+        \item The least fixpoint of $\phi$ is a fixpoint $x$ such that, for any fixpoint $y$, $x\sqsubseteq y$.
+        \item The greatest fixpoint of $\phi$ is a fixpoint $x$ such that, for any fixpoint $y$, $y\sqsubseteq x$.
+    \end{itemize}
+\end{definition}
+
+\begin{theorem}[Tarski's]
+    Let $(\S, \sqsubseteq, \bot, \top, \sqcup, \sqcap)$ be a complete lattice and $\phi:\S\to\S$ be a monotone operator. Then:
+    \begin{itemize}
+        \item $\phi$ has a least fixpoint $\lfp\phi$ and $\lfp\phi = \sqcap\{x\in\S \: | \:\phi(x)\sqsubseteq x\}$
+        \item $\phi$ has a greatest fixpoint $\gfp\phi$ and $\gfp\phi = \sqcup\{x\in\S \: | \:x\sqsubseteq\phi(x)\}$
+        \item the set of fixpoints of $\phi$ is a complete lattice
+    \end{itemize}
+\end{theorem}
+
+\begin{example}
+    We consider a set $\mathcal{E}$, and a subset $\A\subseteq\mathcal{E}$. We let:
+    \begin{equation*}
+        \begin{aligned}
+            f:\mathcal{P}(\mathcal{E}) &\to \mathcal{P}(\mathcal{E})\\
+            X &\mapsto X\cup\A
+        \end{aligned}
+    \end{equation*}
+    According to Tarski's theorem, the smallest fixpoint of $f$ is $\A$, and the greastest is $\mathcal{E}$.
+\end{example}
+
+\begin{theorem}[Kleene's]
+    Let $(\S, \sqsubseteq, \bot)$ be a pointed cpo and $\phi:\S\to\S$ be a continuous operator over $\S$. The $\phi$ has a least fixpoint, and
+    \begin{equation*}
+        \lfp\phi = \bigsqcup_{n\in\N}\phi^n(\bot)
+    \end{equation*}
+\end{theorem}
 
 \end{document}
