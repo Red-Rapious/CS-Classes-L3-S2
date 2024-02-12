@@ -444,7 +444,7 @@ In the following, we let $\X$ be a finite set of \emph{source symbols}, and $\A$
 \begin{definition}[Code]
     A \emph{code} $c$ encoding source symbols $\X$ in alphabet $\A$ is a function
     \begin{equation*}
-            c: \X\to \A^\star\setminus\{\emptyset\}
+            c: \X\to \A^\star\setminus\{\epsilon\}
     \end{equation*}
     $c(x)$ is called \emph{code-word} of the source symbol $x$, and $l(x):=l(c(x))$ is the \emph{code-word length}. The image of $\X$ by $c$, i.e. the set of all possible code-words, is called \emph{codebook}.
 \end{definition}
@@ -518,6 +518,58 @@ In general, efficient codes will have code-words with variable length, with more
 \end{property}
 
 \subsection{Codes on trees}
+\begin{definition}[$k$-ary tree]
+    For $k\in\N^\star$, a \emph{$k$-ary tree} is a rooted tree in which each node (vertex) has no more than $k$ children. A node of a $k$-ary tree having no children is called a \emph{leaf}; otherwise, it is called an \emph{intermediate node}. A tree in which each node has exactly $k$-children is called an \emph{entire $k$-ary tree}, and is hence an infinite tree with no leaf.
+\end{definition}
+
+\begin{remark}
+    There is a natural bijection between the set of words $\A^\star$ expressed in the $D$-elements alphabet $\A$, and the vertices of the entire $D$-ary tree. Bearing in mind this bijection, we shall often identify this set of vertices with $A\star$. In particular, the empty word $\epsilon$ is identified with the root of the tree.
+    % Graph
+
+    Using the above bijection, a code $c:\X\to\A^\star$ can be seen as a mapping from $\X$ to the nodes of the entire $D$-ary tre.
+\end{remark}
+
+\begin{definition}[Coding tree]
+    The minimal subtree of the entire $D$-ary tree containing the root and the code-words of the code $c$ is called the \emph{coding tree of $c$}.
+
+    Note that the coding tree is finite since $|\X|<\infty$, and that the leaves of the coding tree are necessarily the code-words of $c$, but some intermediate nodes might also be code-words.
+\end{definition}
+
+\begin{lemma}[PF coding trees]
+    Code $c$ is PF if and only if it is injective, and it does not have code-words at the intermediate nodes in its coding tree.
+\end{lemma}
+
+% TODO
+
+A useful equivalent characterization of PF codes involve subtrees of the entire regular tree. For any $w\in\A^\star$, denote by $\mathcal{T}(w)$ the subset of elements of $\A^\star$ for which $w$ is a prefix. In graph representation, $\mathcal{T}(w)$ corresponds to the subtree rooted at $w$ and consisting of all its descendants in the entire $|\A|$-regular tree.
+
+\begin{lemma}[PF and subtrees]
+    A code $c$ is PF if and only if the subtrees of the entire regular tree rooted at the code-words corresponding to distinct source symbols are mutually disjoint:
+    \begin{equation*}
+        \forall x\neq y\in \X, \mathcal{T}(c(x))\cap\mathcal{T}(c(y))=\emptyset
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    $\implies$
+    Assume $x\neq y\in\X$ and $a\in \mathcal{T}(c(x))\cap\mathcal{T}(c(y))\neq\emptyset$. Then both $c(x)$ and $c(y)$ are prefixes of $a$, and hence the shorter code-word of the two is a prefix of the longer one.
+
+    $\impliedby$ If $c(x)$ is a prefix of $c(y)$ then $\mathcal{T}(c(y))\subseteq \mathcal{T}(c(x))$, hence the intersection is not empty.    
+\end{proof}
+
+\begin{example}[Uniform coding on the full binary tree]
+    Assume $|\X|=2^m$ for some $1\leq m<\infty$, $\A=\{0, 1\}$. All elements of $\X$ can be encoded by the vertices of the $m$-th generation of the binary tree, or, equivalently, by the binary sequences of length $m$.
+    % Graphe
+    Since the mapping is bijective and all code-words are equal, this is a PF and hence UD code.
+
+    The source coding rate is
+    \begin{equation*}
+        R_s=\frac{\textnormal{number of bits}}{\textnormal{one source symbol}} = \frac{m}{1} = \log_2|\X| = H_2(\textnormal{uniform}(\X))
+    \end{equation*}
+    which corresponds to the infimum achievable coding rate when the source symbols are independently, uniformly sampled in $\X$. By Shannon's source coding theorem we cannot do better even accepting only asymptotically error-less coding.
+\end{example}
+
+A remaining question is that in case of independent source symbols sampled from some general distribution $p$ on $\X$, how to achieve rates $R_S>H_2(p)$ with error-free (UD, PF) codes? The idea is to encode elemnts of $\X$ using binary sequences of \emph{variable length}, with more likely source symbols having shorter code-words.
 
 \subsection{Kraft's inequality}
 
