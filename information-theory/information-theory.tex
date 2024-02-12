@@ -572,6 +572,84 @@ A useful equivalent characterization of PF codes involve subtrees of the entire 
 A remaining question is that in case of independent source symbols sampled from some general distribution $p$ on $\X$, how to achieve rates $R_S>H_2(p)$ with error-free (UD, PF) codes? The idea is to encode elemnts of $\X$ using binary sequences of \emph{variable length}, with more likely source symbols having shorter code-words.
 
 \subsection{Kraft's inequality}
+Kraft's inequality will be our main tool in studying the performance of UD and PF codes.
+
+\begin{definition}[Aggregated block codes]
+    For a code $c$ and $n\in \N^\star$, the corresponding \emph{aggregated block code} $c^{(n)} : \X^n\to \A^\star$ of block-length $n$ is defined as follows:
+    \begin{equation*}
+        \forall x\in \X^n, c^{(n)}(x) := c(x_1) * \dots * c(x_n)
+    \end{equation*}
+\end{definition}
+
+\begin{lemma}
+    If $c$ is UD then the aggregated block code $c^{(n)}$ is UD.
+\end{lemma}
+
+% TODO: proof
+
+\begin{theorem}[Kraft's inequality]
+    Let $c$ be a code encoding source symbols $\X$ with alphabet $\A$. Assume $D:=|\A|<\infty$. 
+    \begin{enumerate}
+        \item If $c$ is UD then
+        \begin{equation}
+            \sum_{x\in\X} D^{-l(c(x))}\leq 1
+        \end{equation}
+
+        \item Let $\{l(x)\: |\:x\in\X\}$ be a collection of non-negative integers. If
+        \begin{equation*}
+            \sum_{x\in\X} D^{-l(c(x))}\leq 1
+        \end{equation*}
+        then there exists a PF (hence UD) code $c$ with code-word lengths $l(x)=l(c(x))$.
+    \end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof of Case 1.]
+    Assuming $|X|<\infty$ consider UD code $c$ and denote by $l_{\max}$ its maximal code-word length:
+    \begin{equation*}
+        l_{\max}=\max_{x\in\X} l(c(x)) <\infty
+    \end{equation*}
+    Let $n\in\N^\star$. Consider the aggregated block code $c^{(n)}$ corresponding to $c$. Recall from the preceding lemma that $c^{(n)}$ is UD. Denote by $\alpha(k)$ the number of code-words of $c^{(n)}$ of length $k$:
+    \begin{equation*}
+        \alpha(k) := |\{x\in\X \: | \: l(c^{(n)}(x)) = k\}|
+    \end{equation*}
+    Note that $\alpha(k)=0$ for $k=0$ and for $k>nl_{\max}$. In general $\alpha(k)\leq D^k$, since $c^{(n)}$ is UD and there are at most $D^k$ differen code-words of length $k$.
+
+    We have
+    \begin{equation*}
+        \begin{aligned}
+            \left(\sum_{x\in\X} D^{-l(c(x))}\right)^n &= \sum_{x\in\X} D^{-l(c(x_1)+\dots+c(x_n))}\\
+            &= \sum_{x\in\X} D^{-l(c^{(n)}(x))}\\
+            &= \sum_{k} \alpha(k)D^{-k}\\
+            &\leq \sum_{k=1}^{nl_{\max}} D^kD^{-k}\\
+            &= nl_{\max}
+        \end{aligned}
+    \end{equation*}
+
+    Consequently,
+    \begin{equation*}
+        \sum_{x\in\X} D^{-l(c(x))} \leq (nl_{\max})^{1/n} \to_{n\to\infty} 1
+    \end{equation*}
+    which completes the proof of the first statement for $|\X|<\infty$.
+
+    If $|\X|=\infty$, consider an increasing sequence of subsets $\X_m$ such that $\bigcup_m \X_m = \X$ and codes truncated to $\X_m$.
+\end{proof}
+
+\begin{proof}[Proof of Case 2.]
+    We assume that $|\X|<\infty$. WLOG, let $\X=\{1, \dots, |\X|\}$, chosen such that $l(1)\leq\dots\leq l(|\X|)$. Define $m:=l(|\X|)=\max_{x\in\X} l(x)$. We construct a code $c$ with code-word lengths $l(c(i))=l(i)$ by encoding messages with some vertices of the entire $D$-ary tree as follows (recall $D:=|\A|$):
+    \begin{itemize}
+        \item The code-word of $1\in\X$ is corresponds to the most recent common ancestor of the lexicographically first group of $D^{m-l(1)}$ on the $m$-th generation.
+        \item By the induction, the code-word of $i\in\X$ corresponds to the most recent common ancestor of the lexicographically $i$-th group of $D^{m-l(i)}$ nodes of the $m$-th generation.
+    \end{itemize}
+    % Graph
+
+    Note that by the assumption of the second statement,
+    \begin{equation*}
+        \sum_{i=1}^{|\X|}D^{m-l(i)} \leq D^m
+    \end{equation*}
+    and thus the above construction can be completed. By the construction, subtrees rooted at the selected code-words are disjoint, $\mathcal{T}(c(i)\cap\mathcal{T}(c(j)))=\emptyset$ for $1\leq i\neq j\leq |\X|$, hence by lemma, the constructed code is PF.
+    
+    We can similarly extend this to the case where $|\X|=\infty$.
+\end{proof}
 
 \subsection{Kraft's code}
 
