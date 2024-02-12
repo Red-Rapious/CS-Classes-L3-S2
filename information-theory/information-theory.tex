@@ -3,8 +3,6 @@
 \title{Information theory and coding}
 \author{Bartek Blaszczyszyn\\ Notes by Antoine Groudiev}
 
-\renewcommand*{\P}{\mathbb{P}}
-\newcommand*{\E}{\mathbb{E}}
 \newcommand*{\X}{\mathcal{X}}
 
 \begin{document}
@@ -434,5 +432,95 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
         \caption{Source coding "phase transition"}
     \end{figure}
 \end{remark}
+
+\section{Uniquely decipherable codes}
+We shall introduce some error-free source coding schemes and prove
+that in this class the entropy still indicates the infimum of achievable coding rates. The price to pay for error-free coding is \emph{variable code-word length}. The main tool is Kraft's code proposed in 1949.
+
+\subsection{Uniquely decipherable and prefix-free codes}
+In the following, we let $\X$ be a finite set of \emph{source symbols}, and $\A$ a set of coding symbols, called \emph{alphabet}. We define $D:=|\A|\in\N^\star$. Note that in general, $D\neq|\X|$. We denote $\A^\star$ the set of \emph{words}, i.e. the finite (including null) sequences of character over alphabet $\A$. We denote $x*y$ or simply $xy$ the concatenation between words $x$ and $y$.
+% Concatenation definition
+
+\begin{definition}[Code]
+    A \emph{code} $c$ encoding source symbols $\X$ in alphabet $\A$ is a function
+    \begin{equation*}
+            c: \X\to \A^\star\setminus\{\emptyset\}
+    \end{equation*}
+    $c(x)$ is called \emph{code-word} of the source symbol $x$, and $l(x):=l(c(x))$ is the \emph{code-word length}. The image of $\X$ by $c$, i.e. the set of all possible code-words, is called \emph{codebook}.
+\end{definition}
+In general, efficient codes will have code-words with variable length, with more probable source symbols having short code-words. In order to be able to uniquely decode a sequence of source symbols, we require more than just the injectivity of $c$.
+
+\begin{definition}[Codes uniquely decipherable (UD)]
+    A code $c: \X\to\A^\star$ is \emph{uniquely decipherable} (UD) if $\forall k, l \geq 1, \forall x_1\dots x_k\in \X, \forall y_1, \dots, y_k\in \X$,
+    \begin{equation*}
+        c(x_1)*\dots*c(x_k)=c(y_1)*\dots*c(y_k) \implies k=l \land \forall i, x_i=y_i
+    \end{equation*}
+\end{definition}
+
+\begin{remark}
+    Note that $c$ is UD if the following mapping is injective:
+    \begin{equation*}
+        \begin{aligned}
+            X^\star&\to\A^\star\\
+            (x_1, \dots, x_n)&\mapsto c(x_1) * \dots * c(x_n)
+        \end{aligned}
+    \end{equation*}
+\end{remark}
+
+\begin{definition}[Prefix-free (PF) codes]
+    A code $c: \X\to\A^\star$ is \emph{prefix-free (PF)} if
+    \begin{equation*}
+        \nexists x\neq y\in \X, \exists a\in\A^\star,\: c(x)*a=c(y)
+    \end{equation*} 
+    When such an $a\in\A^\star$ exists, $c(x)$ is said to be a \emph{prefix} of $c(y)$.
+\end{definition}
+
+\begin{lemma}[PF$\implies$ UD]
+    A prefix-free code is uniquely decipherable.
+\end{lemma}
+
+\begin{proof}
+    Let $c$ be a PF code. Suppose by contradiction that $x_1, \dots, x_k, y_1, \dots, y_l$ violate the UD condition. Let $i$ be the smallest index such that $x_i\neq y_i$. Then, $c(x_i)$ is a prefix of $c(y_i)$ or the other way around, depending on the code length.
+\end{proof}
+
+\begin{remark}[Decoding v. sequential decoding of block messages]
+    There is a difference between the decoding of UD and PF codes:
+    \begin{itemize}
+        \item A UD code allows one to uniquely decode, that is to find, given a concatenation $(a_1, \dots, a_n)$ of some code-words, the sequence of symbols $x_i$ for $1\leq i\leq n$ such that
+        \begin{equation*}
+            c(x_1)*\dots *c(x_n)=(a_1, \dots, a_n)
+        \end{equation*} 
+        \item A PF code allows one to decode the symbols $x_i$ sequentially, by decoding with $c$ the successive shortest prefixes of the encoded sequence found in the codebook. Sequential decogin simplifies decoding of blocks of symbols. As we shall see, it does not restrict the achievable performance of source coding.
+    \end{itemize}
+\end{remark}
+
+\begin{example}
+    Let's consider codes $c: \X=\{1, 2, 3, 4\} \to \{0, 1\}^\star$. We define:
+    \begin{itemize}
+        \item A PF hence UD code of constant length, such that
+        \begin{equation*}
+            c(1) = (0, 0), c(2) = (0, 1), c(3) = (1, 0), c(4) = (1, 1)
+        \end{equation*}
+        \item A PF hence UD code of variable length
+        \begin{equation*}
+            c(1) = (0), c(2) = (1, 0), c(3) = (1, 1 0), c(4) = (1, 1, 1)
+        \end{equation*}
+        \item A not UD hence not PF code:
+        \begin{equation*}
+            c(1) = (0), c(2) = (1), c(3) = (1, 0), c(4) = (1, 1)
+        \end{equation*}
+        We have for instance that $c(2)*c(1)=c(3)$ and $c(2)*c(2)=c(4)$.
+    \end{itemize}
+\end{example}
+
+\begin{property}
+    There exists codes that are UD but not PF.
+\end{property}
+
+\subsection{Codes on trees}
+
+\subsection{Kraft's inequality}
+
+\subsection{Kraft's code}
 
 \end{document}
