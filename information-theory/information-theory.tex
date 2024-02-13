@@ -332,6 +332,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 \begin{definition}[Compression rate]
     The following ratio $R$ is called \emph{(sources) compression rate}:
     \begin{equation}
+        \label{eq:compression-rate}
         R:=\frac{m}{n}
     \end{equation}
 \end{definition}
@@ -592,6 +593,7 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
     \begin{enumerate}
         \item If $c$ is UD then
         \begin{equation}
+            \label{eq:kraft-ineq}
             \sum_{x\in\X} D^{-l(c(x))}\leq 1
         \end{equation}
 
@@ -652,5 +654,109 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
 \end{proof}
 
 \subsection{Kraft's code}
+We have suggested that an efficient UD code has in general variable length of the code-words. Its coding rate can be defined asymptotically on a sequence of source symbols $X_1, X_2, \dots$
+\begin{equation}
+    \label{eq:compression-infinite}
+    R_s := \lim_{n\to\infty} \frac{l(c(X_1))+\dots+l(c(X_n))}{n} \quad \left[\frac{D-\textnormal{digit}}{\textnormal{source symbol}}\right]
+\end{equation}
+assuming that the limit exists, thus extending the previous definition of $R$ \eqref{eq:compression-rate} for fixed length codes.
+
+For $X_1, X_2, \dots$ i.i.d. with $X\sim p$, by the LLN, the limit in \eqref{eq:compression-infinite} exists a.s. and
+\begin{equation*}
+    R_s = \E[l(c(X))]
+\end{equation*}
+Therefore, looking for a rate-optimal UD code consists in minimizing the mean code-word $\E[l(c(X))]$. In particular, we want to know whether there exist UD codes for all compression rates $R>H_D(p)$, as it is the case for asymptotically error-free codes, according to Shannon's source coding theorem \eqref{eq:shannon-ft-1}.
+
+\begin{definition}[Kraft's code]
+    For a probability distribution $p$ on $\X$, Kraft's code with alphabet $\A$ of cardinality $D:=|\A|$ is any PF code $c_K$ having code-words of length
+    \begin{equation*}
+        \forall x\in \X, \quad l(c_K(x))=\lceil -\log_D(p(x))\rceil
+    \end{equation*}
+\end{definition}
+
+\begin{remark}
+    Note that
+    \begin{equation*}
+        \sum_{x\in\X}D^{-\lceil-\log_Dp(x)\rceil}\leq \sum_{x\in\X}D^{\log_Dp(x)}=\sum_{x\in\X}p(x)=1
+    \end{equation*}
+\end{remark}
+
+\begin{property}[Mean length of Kraft's code]
+    The mean code-word length of any Kraft's code satisfies
+    \begin{equation}
+        \label{eq:mean-length-kraft}
+        H_D(p)\leq \E[l(c_K(X))]\leq H_D(p)+1
+    \end{equation}
+    Furthermore, there is no UD code $c$ with mean code-word length
+    \begin{equation*}
+        \E[l(c(X))]\leq H_D(p)
+    \end{equation*}
+\end{property}
+
+\begin{proof}
+    For the upper bound, note that
+    \begin{equation*}
+        \begin{aligned}
+            \E[l(c_K(X))]&=\sum_{x\in\X}p(x)l(c(x))\\
+            &\leq \sum_{x\in\X}p(x)(-\log_Dp(x)+1)\\
+            &= H_D(p)+1
+        \end{aligned}
+    \end{equation*}
+    The second statement follows from the second statement of Kraft's inequality combined with Gibbs' inequality. Indeed, for UD code $c$, by Kraft's inequality \eqref{eq:kraft-ineq}, $\bar{q}(x):=D^{-l(c(x))}$ can be seen as a sub-probability measure on $\X$. Consider a probability measure $q$ on $\X$ such that $\bar{q}(x)\leq q(x)$. We have
+    \begin{equation*}
+        \begin{aligned}
+            \E[l(c(X))] &= \sum_{x\in\X}p(x)l(c(x))\\
+            &= -\sum_{x\in\X}p(x)\log_D(D^{-l(c(x))})\\
+            &\geq -\sum_{x\in\X}p(x)\log_Dq(x)\\
+            &\geq -\sum_{x\in\X}p(x)\log_Dp(x) & \textnormal{(Gibbs' inequality)}\\
+            &= H_D(p)
+        \end{aligned}
+    \end{equation*}
+\end{proof}
+
+\begin{remark}
+    The second statement of the previous property can also be deduced from Shannon's first theorem \eqref{eq:shannon-ft-2}. Indeed, UD codes have zero-error probability and thus necessarily compression rate no smaller than $H_D(p)$. Some work is required to make this argument rigorous.
+\end{remark}
+
+\begin{property}
+    The not necessarily integer-valued function
+    \begin{equation*}
+        l^\star(x):=-\log_Dp(x)
+    \end{equation*}
+    minimizes $\sum_{x\in\X}p(x)l(x)$ within the class of functions satisfying Kraft's inequality constraint
+    \begin{equation*}
+        \sum_{x\in\X}D^{-l(x)}\leq 1
+    \end{equation*}
+\end{property}
+
+\begin{proof}
+    % TODO: full
+    We use Gibbs' inequality, noticing that $\sum_{x\in\X}p(x)l^\star(x)=H_D(p)$.
+\end{proof}
+
+\begin{corollary}[Kraft's code par block achieve all coding rates above the entropy]
+    Let $X_1, X_2, \dots$ be i.i.d. source symbols on $\X$ with $X_i\sim p$. For given $n, k\in\N^\star$, denote by
+    \begin{equation*}
+        X_k^{(n)} := (X_{(k-1)n+1}, \dots, X_{kn})
+    \end{equation*}
+    the source messages consisting of blocks of $n$ source symbols. Let $c_K^{(n)}:\X^n \to \A^\star$ be a Kraft's code related to the $n$-th product probability measure $p^n$, where 
+    \begin{equation*}
+        p^n(x):=p(x_1)\dots p(x_n)
+    \end{equation*}
+    (Note that in general, it is not the aggregated block-code related to a "one-dimensional" Kraft's code $c_k:\X\to\A^\star$, the former being used in the proof of Kraft's inequality.) The coding rate of this block-code $c^{(n)}$ is
+    \begin{equation*}
+        \begin{aligned}
+            R_s &= \lim_{k\to\infty} \frac{l(c_K^{(n)}(X_1^{(n)}))+\dots+l(c_K^{(n)}(X_k^{(n)}))}{kn} \quad \left[\frac{D-\textnormal{digit}}{\textnormal{source symbol}}\right]\\
+            &= \frac{\E[l(c_K^{(n)}(X_1^{(n)}))]}{n} \qquad\qquad \textnormal{(a.s. by the LLN)}\\
+            &\leq \frac{H_D(p^n)+1}{n} \qquad\qquad \textnormal{(by \eqref{eq:mean-length-kraft})}\\
+            &= \frac{nH_D(p)+1}{n} \qquad\qquad \textnormal{(the variables are independent)}\\
+            &=H_D(p)+\frac{1}{n} \to_{n\to\infty} H_D(p)
+        \end{aligned}
+    \end{equation*}
+\end{corollary}
+
+\begin{remark}[Entropy is the infimum of coding rates achievable over UD codes]
+    The previous corollary shows that for any $\epsilon>0$ there exists a PF code (for example, Kraft's block-code) offering coding rate $R_s\leq H_D(p)+\epsilon \left[\frac{D-\textnormal{digit}}{\textnormal{source symbol}}\right]$. Combining this with the second statement of \eqref{eq:mean-length-kraft} we conclude that $H_D(p)$ is the infimum of coding rates achievable over UD codes.
+\end{remark}
 
 \end{document}
