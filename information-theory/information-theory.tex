@@ -540,7 +540,29 @@ In general, efficient codes will have code-words with variable length, with more
     Code $c$ is PF if and only if it is injective, and it does not have code-words at the intermediate nodes in its coding tree.
 \end{lemma}
 
-% TODO
+\begin{figure}[!ht]
+    \center
+    \begin{tikzpicture}[->]
+        \node (tree) {$\epsilon$}
+            child { node {(1)} 
+                child { node {(1, 1)} }
+                child { node {(1, 2)} }
+                child { node {\dots} }
+                child { node {(1, D)} }
+            }
+            child { node {\dots} }
+            child { node {\dots} }
+            child { node {\dots} }
+            child {node {(D)} 
+                child { node {(D, 1)} }
+                child { node {(D, 2)} }
+                child { node {\dots} }
+                child { node {(D, D)} }
+            };
+        \node [below=4cm] {\dots};
+    \end{tikzpicture}
+    \caption{The entire $D$-ary tree}
+\end{figure}
 
 A useful equivalent characterization of PF codes involve subtrees of the entire regular tree. For any $w\in\A^\star$, denote by $\mathcal{T}(w)$ the subset of elements of $\A^\star$ for which $w$ is a prefix. In graph representation, $\mathcal{T}(w)$ corresponds to the subtree rooted at $w$ and consisting of all its descendants in the entire $|\A|$-regular tree.
 
@@ -560,7 +582,42 @@ A useful equivalent characterization of PF codes involve subtrees of the entire 
 
 \begin{example}[Uniform coding on the full binary tree]
     Assume $|\X|=2^m$ for some $1\leq m<\infty$, $\A=\{0, 1\}$. All elements of $\X$ can be encoded by the vertices of the $m$-th generation of the binary tree, or, equivalently, by the binary sequences of length $m$.
-    % Graphe
+
+    \begin{figure}[!ht]
+        \center
+        \begin{tikzpicture}[->]
+            \node (tree) {$\epsilon$}
+                child { node {(0)} 
+                    child { node {\dots} 
+                        child { node {(0, \dots, 0)} }
+                        child { node {\dots} }
+                    }
+                    child [missing]
+                    child { node {\dots} 
+                        child { node {\dots} }
+                        child { node {(0, \dots, 1)} }
+                    }
+                }
+                child [missing]
+                child [missing]
+                child [missing]
+                child {node {(1)} 
+                    child { node {\dots} 
+                        child { node {\dots} }
+                        child { node {\dots} }
+                    }
+                    child [missing]
+                    child { node {\dots} 
+                        child { node {\dots} }
+                        child { node {(1, \dots, 1)} }
+                    }
+                };
+            \draw[thick, -, decoration={brace,mirror},decorate]
+                (-6.1, -4.8) -- node[below=5pt] {$2^m = |\X|$} (6.1, -4.8);
+        \end{tikzpicture}
+        \caption{Binary sequences}
+    \end{figure}
+
     Since the mapping is bijective and all code-words are equal, this is a PF and hence UD code.
 
     The source coding rate is
