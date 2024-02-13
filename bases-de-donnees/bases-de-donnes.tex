@@ -27,11 +27,11 @@ Il est par ailleurs souvent désirable d'accéder aux mêmes données depuis des
 
 On peut considérer comme exemple le système d'information d'un hôtel. Il est accessible depuis un logiciel interne (bureau d'accueil), un site web (hôtes), et une suite de logiciels de comptabilité. Il nécessite des données structurées pour les chambres, clients, réservations, \dots Les données doivent rester stockées de manière pérenne, même en cas de coupure de courant. Les requêtes doivent être quasi instantanées, même avec un long historique de l'hôtel.
 
-L'implémentation naïve nécessite un format de fichier pour stocker les données sur un disque, et un mécanisme de synchronisation, et de récupération en cas d'interruption de la synchronisation. Elle nécessite beaucoup de compétences différentes, de la programmation orientée objet, à des notions de réseau, de maîtrise de structures de données et algorithmes efficaces, de gestion en parallèle, \dots Ré-implémenter une telle structure à chaque fois qu'un tel outil est nécessaire est une perte de temps. 
+L'implémentation naïve nécessite un format de fichier pour stocker les données sur un disque, et un mécanisme de synchronisation, et de récupération en cas d'interruption de la synchronisation. Elle nécessite beaucoup de compétences différentes, de la programmation orientée objet, à des notions de réseau, de maîtrise de structures de données et algorithmes efficaces, de gestion en parallèle, \dots Réimplémenter une telle structure à chaque fois qu'un tel outil est nécessaire est une perte de temps. 
 
 On utilise donc souvent un \emph{Système de Gestion de Bases de Données} (SGBD), qui est un logiciel simplifiant le design d'une application manipulant des données, en fournissant un accès unifié aux fonctionnalités nécessaire pour la gestion des données, et ce peu importe l'application. Une \emph{base de donnée} désigne une collection de données, gérée par un SGBD.
 
-Un SGBD contient plusieurs fonctionnalités et charactéristiques:
+Un SGBD contient plusieurs fonctionnalités et caractéristiques:
 \begin{itemize}
     \item Indépendance physique
     \item Indépendance logique
@@ -81,7 +81,7 @@ On se fixe les ensembles infinis dénombrables suivants:
 \end{itemize}
 
 \begin{definition}[Schéma relationnel d'arité $n$]
-    Un schéma relationnel d'arité $n$ est un $n$-uplet $(A_1, \dots, A_n)$ où chaque $A_i$ est un attribut, c'est à dire une paire $(L_i, \tau_i)\in \L\times\T$ où les $L_i$ sont tous distincts.
+    Un schéma relationnel d'arité $n$ est un $n$-uplet $(A_1, \dots, A_n)$ où chaque $A_i$ est un attribut, c'est-à-dire une paire $(L_i, \tau_i)\in \L\times\T$ où les $L_i$ sont tous distincts.
 \end{definition}
 
 \begin{definition}[Schéma de base de données]
@@ -108,21 +108,21 @@ On se fixe les ensembles infinis dénombrables suivants:
 \end{definition}
 
 \begin{remarque}
-    Le terme \emph{relation} est utilisé de manière ammbiguë pour parler aussi bien d'un schéma de relation ou d'une instance d'un schéma de relation.
+    Le terme \emph{relation} est utilisé de manière ambiguë pour parler aussi bien d'un schéma de relation ou d'une instance d'un schéma de relation.
 \end{remarque}
 
 Si $A=(L, \tau)$ est le $i$-ème attribut d'une relation $R$, et que $t$ est le $n$-ième tuple d'une instance de $R$, on note $t[A]$ (ou $t[L]$) la valeur de la $i$-ème composante de $t$. De manière similaire, si $\A$ est un $k$-uplet d'attributs parmi les $n$ attributs de $R$, $t[\A]$ est le $k$-uplet formé à partir de $t$ en concaténant les $t[A]$ pour $A\in\A$.
 
 On peut ajouter à un schéma relationnel des \emph{contraintes d'intégrité} de natures différentes, pour définir une notion de \emph{validité} d'une instance.
 \begin{definition}[Clé]
-    Un uplet d'attibuts $\A$ sur un schéma de relation $R$ est une clé s'il ne peut pas exister deux uplets distincts $t_1$ et $t_2$ dans une instance de $R$ tels que $t_1[\A]=t_2[\A]$.
+    Un uplet d'attributs $\A$ sur un schéma de relation $R$ est une clé s'il ne peut pas exister deux uplets distincts $t_1$ et $t_2$ dans une instance de $R$ tels que $t_1[\A]=t_2[\A]$.
 \end{definition}
 
 \begin{definition}[Clé étrangère]
     Un $k$-uplet d'attributs $\A$ d'un schéma de relation $R$ est une \emph{clé étrangère} référençant un $k$-uplet d'attributs $\mathcal{B}$ d'un schéma de relation $S$ si pour toutes les instances $I^R$ et $I^S$ de $R$ et $S$, et pour tout uplet $t$ de $I^R$, il existe un \emph{unique} tuple $t'$ de $I^S$ avec $t[\A]=t'[\mathcal{B}]$.
 \end{definition}
 
-On peut également définir des contraintes vérifiées, c'est à dire une condition arbitraire sur les valeurs des attributs d'une relation (en appliquant à chaque tuple de l'instance cette relation).
+On peut également définir des contraintes vérifiées, c'est-à-dire une condition arbitraire sur les valeurs des attributs d'une relation (en appliquant à chaque tuple de l'instance cette relation).
 
 \begin{exemple}
     En reprenant l'exemple précédent, on peut donner les contraintes suivantes:
@@ -160,27 +160,27 @@ Prend en argument une séquence d'attributs, et conserve en sortie simplement le
 \paragraph*{Sélection $\sigma_\phi$}
 Prend une formule de sélection pouvant être n'importe quelle combinaison booléenne de comparaisons d'attributs et de constantes, et conserve uniquement les tuples où la condition booléenne est satisfaite.
 \paragraph*{Produit cartésien $\times$}
-Retourne le produits cartésien ensembliste des deux ensembles obtenus par les sous-expressions.
+Retourne le produit cartésien ensembliste des deux ensembles obtenus par les sous-expressions.
 \paragraph*{Union $\cup$}
 Retourne l'union des ensembles obtenus par les sous-expressions.
 \paragraph*{Différence $\setminus$}
 Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non-monotones.
 \paragraph*{Jointure $\bowtie_\phi$}
-Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une cominaison des opérateurs de renommage, produit cartésien, sélection et projection.
+Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une combinaison des opérateurs de renommage, produit cartésien, sélection et projection.
 Si $R$ et $S$ ont pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la jointure naturelle de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
 
-Toutes les expressions de l'algèbre relationnelle ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, join, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
+Toutes les expressions de l'algèbre relationnelle ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, jointure, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
 
 En sémantique "sac", qui est utilisée en pratique par les SGBD, toutes les opérations retournent des multiensembles, avec répétitions; en particulier, la projection et l'union peuvent introduire des multiensembles quand des relations initiales sont définies.
 
-De multiples extensions ont été proposées à l'algèbre relationnelle en ajoutant des fonctionnalités supplémentaires. En particulier, l'extension \emph{aggrégation et groupement} des résultats (Klug, 1982 et Libkin, 2004) est beaucoup utilisée en pratique (voir \texttt{GROUP BY} en SQL).
+De multiples extensions ont été proposées à l'algèbre relationnelle en ajoutant des fonctionnalités supplémentaires. En particulier, l'extension \emph{agrégation et groupement} des résultats (Klug, 1982 et Libkin, 2004) est beaucoup utilisée en pratique (voir \texttt{GROUP BY} en SQL).
 
 \subsubsection{SQL}
-Le \emph{Strucutred Query Language} (SQL), est un langage plus ou moins standardisé pour interragir avec un SGBD. Seules quelques différences syntaxiques sont remarquables d'une version à une autre. 
+Le \emph{Structured Query Language} (SQL), est un langage plus ou moins standardisé pour interagir avec un SGBD. Seules quelques différences syntaxiques sont remarquables d'une version à une autre. 
 
 C'est un langage \emph{déclaratif}, c'est-à-dire qu'il n'est pas nécessaire de penser à la complexité de l'opération, simplement à ce que l'on veut. C'est le SGBD qui prend en charge l'optimisation de la requête.
 
-Les mots-clés et identifiants sont généralement insensibles à la casse. En pratique, les mots clés sont écrits en majuscule, et les identifiants commencent par une majuscule. Les commentaires sont introduits par \texttt{-}\texttt{-}. Dans certains contexte, on termine les commandes par \texttt{;}, mais le point-virgule ne fait pas partie de la commande, il est simplement demandé par l'environnement (par exemple, pour un client en ligne de commande).
+Les mots-clés et identifiants sont généralement insensibles à la casse. En pratique, les mots clés sont écrits en majuscule, et les identifiants commencent par une majuscule. Les commentaires sont introduits par \texttt{-}\texttt{-}. Dans certains contextes, on termine les commandes par \texttt{;}, mais le point-virgule ne fait pas partie de la commande, il est simplement demandé par l'environnement (par exemple, pour un client en ligne de commande).
 
 \paragraph*{NULL} La valeur spéciale \texttt{NULL} signifie l'absence de valeur, et introduit une logique tri-valuée étrange: \texttt{True}, \texttt{False}, et \texttt{NULL}. La comparaison normale avec \texttt{NULL} renvoie toujours \texttt{NULL}. On peut vérifier la présence de valeur avec \texttt{IS NULL} ou \texttt{IS NOT NULL}.
 
