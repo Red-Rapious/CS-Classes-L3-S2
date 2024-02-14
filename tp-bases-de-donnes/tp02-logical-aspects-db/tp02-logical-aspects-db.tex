@@ -13,6 +13,8 @@
 \newcommand*{\actor}{\textnormal{Actor}}
 \newcommand*{\director}{\textnormal{Director}}
 \newcommand*{\producer}{\textnormal{Producer}}
+\newcommand*{\viewer}{\textnormal{Viewer}}
+
 \newcommand{\constant}[1]{\textnormal{\say{#1}}}
 \usepackage{relsize}
 \usepackage{CJKutf8}
@@ -87,7 +89,7 @@
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            \exists x_{\titl} (\exists x \; \movie(x_{\titl}, x, x_{\actor}) \land \producer(x_{\actor}, x_{\titl}))
+            \exists x_{\titl} \; (\exists d \; \movie(x_{\titl}, d, x_{\actor}) \land \producer(x_{\actor}, x_{\titl}))
         \end{equation*}
 
         % Which actors play in a movie Orson Welles plays in?
@@ -97,7 +99,7 @@
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            \exists x_{\titl}\; \left(\exists x\; \movie(x_{\titl}, x, \constant{Orson Welles}) \land (\exists x \; \movie(x_{\titl}, x, x_{\actor}))\right)
+            \exists x_{\titl}\; \big((\exists d \; \movie(x_{\titl}, d, \constant{Orson Welles})) \land (\exists d \; \movie(x_{\titl}, d, x_{\actor}))\big)
         \end{equation*}
 
         % Which producers produce all the movies directed by Akira Kurosawa ?
@@ -123,54 +125,47 @@
     Consider the following queries:
   \begin{enumerate}
     % Which viewers watch all the movies?
-    \item PSJR algebra:
-    \begin{equation}
+    \item PSJRU algebra:
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     Conjunctive calculus:
-    \begin{equation}
-        t
-    \end{equation}
+    \begin{equation*}
+        \forall m \; \viewer(x, m)
+    \end{equation*}
     
-    %Which viewers like all the movies they watch?
-    \item PSJR algebra:
-    \begin{equation}
-        t
-    \end{equation}
+    % Which viewers like all the movies they watch?
+    \item PSJRU algebra:
+    \begin{equation*}
+        \Pi_{\viewer}(\seen)\setminus\Pi_{\viewer}(\seen\setminus\likes)
+    \end{equation*}
     Conjunctive calculus:
-    \begin{equation}
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     
-    %Who produces a movie that does not play in any cinema?
-    \item PSJR algebra:
-    \begin{equation}
+    % Who produces a movie that does not play in any cinema?
+    \item PSJRU algebra:
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     Conjunctive calculus:
-    \begin{equation}
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     
-    %Which producers see all the movies they produce?
-    \item PSJR algebra:
-    \begin{equation}
+    % Which producers see all the movies they produce?
+    \item PSJRU algebra:
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     Conjunctive calculus:
-    \begin{equation}
+    \begin{equation*}
         t
-    \end{equation}
+    \end{equation*}
     
-    %Which actors have a Bacon number?
-    \item PSJR algebra:
-    \begin{equation}
-        t
-    \end{equation}
-    Conjunctive calculus:
-    \begin{equation}
-        t
-    \end{equation}
+    % Which actors have a Bacon number?
+    \item Undecidable.
 
   \end{enumerate}  
 \end{exercise}
