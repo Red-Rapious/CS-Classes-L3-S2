@@ -3,8 +3,176 @@
 \title{TD 02 - Logical aspect of databases}
 \author{Antoine Groudiev}
 
+\newcommand*{\cinema}{\textnormal{Cinema}}
+\newcommand*{\titl}{\textnormal{Title}}
+\newcommand*{\movie}{\textnormal{Movie}}
+\newcommand*{\seen}{\textnormal{Seen}}
+\newcommand*{\likes}{\textnormal{Likes}}
+\newcommand*{\name}{\textnormal{Name}}
+\newcommand*{\tim}{\textnormal{Time}}
+\newcommand*{\actor}{\textnormal{Actor}}
+\newcommand*{\director}{\textnormal{Director}}
+\newcommand*{\producer}{\textnormal{Producer}}
+\newcommand{\constant}[1]{\textnormal{\say{#1}}}
+\usepackage{relsize}
+\usepackage{CJKutf8}
+
 \begin{document}
 \begin{exercise}
-
+    We suggest the following changes:
+    \begin{itemize}
+        \item Add a unique identifier to \texttt{Movie}
+        \item Replace the \texttt{Title} field in \texttt{Cinema}, \texttt{Produced}, \texttt{Seen} and \texttt{Likes} by a \texttt{Movie} identifier
+    \end{itemize}
 \end{exercise}
+
+% PSJR = Project, Select, Join & Rename
+\begin{exercise}
+    Consider the following queries:
+    \begin{enumerate}
+        % Where and when can one see the movie “Mad Max”?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\name, \tim}\left(\sigma_{\titl=\constant{Mad Max}}(\cinema)\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \cinema(x_{\titl}, x_{\name}, \constant{Mad Max})
+        \end{equation*}
+
+        % What are the titles of the movies directed by Orson Welles?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\titl}\left(\sigma_{\director =\constant{Orson Welles}}(\movie)\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \exists x, \movie(x_{\titl}, \constant{Orson Welles}, x)
+        \end{equation*}
+
+        % Who are the actors playing in “Ran”?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\actor}\left(\sigma_{\titl=\constant{Ran}}\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \exists x, \movie(\constant{Ran}, x, x_{\actor})
+        \end{equation*}
+
+        % Where can one see a movie in which Signoret plays?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\name}\left(\Pi_{\titl}(\sigma_{\actor=\constant{Signoret}}(\movie)\underset{\titl=\cinema, \titl}{\bowtie}\cinema)\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \exists x_{\titl} \;(\exists x \;\movie(x_{\titl}, x, \constant{Signoret})) \land (\exists x \; \cinema(x_{\name}, x, x_{\titl}))
+        \end{equation*}
+
+        % Who are the actors that produced a movie?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\actor}\left(\movie\underset{\movie.\actor=\producer.\producer}{\mathlarger\bowtie}\producer\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            (\exists x, \exists y, \movie(x, y, x_{\actor})) \land (\exists x, \producer(x_{\actor}, x))
+        \end{equation*}
+
+        % Who are the actors that produced a movie in which they play?
+        \item PSJR algebra:
+        \begin{equation*}
+            \Pi_{\actor}\left(\movie\underset{\substack{\movie.\actor=\producer.\producer\\\movie.\titl=\producer.\titl}}{\mathlarger\bowtie}\producer\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \exists x_{\titl} (\exists x \; \movie(x_{\titl}, x, x_{\actor}) \land \producer(x_{\actor}, x_{\titl}))
+        \end{equation*}
+
+        % Which actors play in a movie Orson Welles plays in?
+        \item PSJR algebra:
+        \begin{equation*}
+           \Pi_{\actor}\left(\Pi_{\titl}(\sigma_{\actor=\constant{Orson Welles}}(\movie))\underset{\titl=\movie.\titl}{\bowtie}\movie\right)
+        \end{equation*}
+        Conjunctive calculus:
+        \begin{equation*}
+            \exists x_{\titl}\; \left(\exists x\; \movie(x_{\titl}, x, \constant{Orson Welles}) \land (\exists x \; \movie(x_{\titl}, x, x_{\actor}))\right)
+        \end{equation*}
+
+        % Which producers produce all the movies directed by Akira Kurosawa ?
+        \item This query is undecidable since it is not monotone. Indeed, consider $D_0$ a database on the given schema, containing a movie 
+        \begin{equation*}
+            \movie(\constant{Citizen Kane}, \constant{Orson Welles}, \constant{Orson Welles})
+        \end{equation*}
+        and a producer
+        \begin{equation*}
+            \producer(\constant{Orson Welles}, \constant{Citizen Kane})
+        \end{equation*}
+        In this database, the query \say{Which producers produce all the movies directed by Akira Kurosawa?} returns the set $\{\constant{Orson Welles}\}$. Now, consider $D_1$ the database $D_0$ to which we added the following movie:
+        \begin{CJK}{UTF8}{min}
+        \begin{equation*}
+            \movie(\constant{七人の侍}, \constant{Akira Kurosawa}, \constant{Toshiro Mifune})
+        \end{equation*}
+        \end{CJK}
+        In this database, the query \say{Which producers produce all the movies directed by Akira Kurosawa?} returns the empty set. Therefore, this query is not monotone, and cannot be expressed in PSJR algebra and conjunctive calculus.
+    \end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+    Consider the following queries:
+  \begin{enumerate}
+    % Which viewers watch all the movies?
+    \item PSJR algebra:
+    \begin{equation}
+        t
+    \end{equation}
+    Conjunctive calculus:
+    \begin{equation}
+        t
+    \end{equation}
+    
+    %Which viewers like all the movies they watch?
+    \item PSJR algebra:
+    \begin{equation}
+        t
+    \end{equation}
+    Conjunctive calculus:
+    \begin{equation}
+        t
+    \end{equation}
+    
+    %Who produces a movie that does not play in any cinema?
+    \item PSJR algebra:
+    \begin{equation}
+        t
+    \end{equation}
+    Conjunctive calculus:
+    \begin{equation}
+        t
+    \end{equation}
+    
+    %Which producers see all the movies they produce?
+    \item PSJR algebra:
+    \begin{equation}
+        t
+    \end{equation}
+    Conjunctive calculus:
+    \begin{equation}
+        t
+    \end{equation}
+    
+    %Which actors have a Bacon number?
+    \item PSJR algebra:
+    \begin{equation}
+        t
+    \end{equation}
+    Conjunctive calculus:
+    \begin{equation}
+        t
+    \end{equation}
+
+  \end{enumerate}  
+\end{exercise}
+
 \end{document}
