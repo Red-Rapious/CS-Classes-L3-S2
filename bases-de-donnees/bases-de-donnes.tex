@@ -198,6 +198,51 @@ Les mots-clés et identifiants sont généralement insensibles à la casse. En p
 
 \section{Calcul relationnel, théorème de Codd, décidabilité, complexité}
 \subsection{Calcul relationnel}
+Le calcul relationnel est un langage logique utilisé pour exprimer des requêtes. Il est constitué de formules logiques du premier ordre, sans symboles de fonctions, mais avec des symboles de relation sur le schéma de base de donnée (plus des prédicats de comparaison). Il approche les requêtes avec une perspective non-nommée et non typée.
+
+\subsubsection{Syntaxe}
+Soient $\X$ un ensemble de variables, un ensemble $\V$ de valeurs et un schéma de base de données $S$. 
+\begin{itemize}
+    \item Pour chaque relation $R\in S$ d'arité $n$, et pour tout $(\alpha_1, \dots, \alpha_n)\in(\X\cup\V)^n$, alors $R(\alpha_1, \dots, \alpha_n)\in\textnormal{FO}$.
+    \item Prédicat d'égalité: $\alpha=\alpha'\in\textnormal{FO}$, pour $(\alpha, \alpha')\in(\X\cup\V)^2$
+    \item Pour toutes $(\phi_1, \phi_2)\in\textnormal{FO}$:
+    \item \begin{itemize}
+        \item $\phi_1\land\phi_2\in\textnormal{FO}$
+        \item $\phi_1\lor\phi_2\in\textnormal{FO}$
+        \item $\not\phi_1\in\textnormal{FO}$
+        \item $\forall x \phi_1 \in\textnormal{FO}$
+        \item $\exists x \phi_1 \in\textnormal{FO}$
+    \end{itemize}
+\end{itemize}
+Les variables libres de $\phi\in\textnormal{FO}$ sont les variables $x$ apparaissant dans $\phi$ et qui ne sont pas quantifiées par $\forall x$ ou $\exists x$.
+
+\subsubsection{Sémantique}
+% TODO
+
+\subsubsection{Sous-classes de requêtes}
+\begin{itemize}
+    \item Requête conjonctive (CQ, \emph{Conjunctive query}): requête de calcul relationnel sans $\lor, \not, \forall$.
+    \item Requête positive (PQ, \emph{Positive query}): requête sans $\not, \forall$. Elle ne conserve que les requêtes monotones, c'est-à-dire que lorsque la base de donnée augmente en taille, la requête ne peut retourner que plus d'éléments.
+    \item Union de requêtes conjonctives (UCQ, \emph{Union of conjunctive queries}): cas spécifique des requêtes positives lorsque les $\lor$ et $\land$ forment une DNF (Forme Normale Disjonctive).
+    \item Requête booléenne: requête sans variable libre.
+\end{itemize}
+
+\subsubsection{Théorème de Codd}
+\begin{theoreme}[Codd, 1972]
+    L'algèbre relationnelle et le calcul relationnel sont équivalents:
+    \begin{itemize}
+        \item Pour toute requête d'algèbre relationnelle $q$ sur un schéma $S$, il existe une requête de calcul relationnel $Q$ sur $S$ telle que pour toute base de donnée $D$ sur $S$, $q(D)=Q(D)$.
+        \item Pour toute requête de calcul relationnel $Q$ sur un schéma $S$, il existe une requête d'algèbre relationnelle $q$ sur $S$ telle que pour toute base de donnée $D$ sur $S$, $q(D)=Q(D)$.
+    \end{itemize}
+    De plus, la conversion d'un formalisme à un autre peut être fait en temps polynomial.
+\end{theoreme}
+
+Ce théorème est très important, car il permet d'utiliser un formalisme déclaratif pour spécifier des requêtes logiques ou en SQL. Ces requêtes sont ensuite compilées grâce à la transformation de Codd vers un formalisme algébrique. Ces requêtes algébriques sont ensuite optimisées, en utilisant les propriétés de l'algèbre relationnelle. Les requêtes optimisées peuvent ensuite être évaluées en exploitant le fait que chaque opérateur de l'algèbre relationnelle peut facilement être implémenté.
+
+\subsubsection{Sous-classes de FO}
+Les requêtes conjonctives (CQ) sont équivalents aux requêtes d'algèbre relationnelle sans $\cup$ et $\setminus$, et dans lesquelles $\sigma$ n'a pas de disjonction.
+
+Les unions de requêtes conjonctives (UCQ) sont équivalentes aux requêtes positives (PQ), avec une sur-croissance exponentielle, et sont équivalentes aux requêtes algébriques sans $\setminus$.
 
 \subsection{Complexité de l'évaluation d'une requête}
 
