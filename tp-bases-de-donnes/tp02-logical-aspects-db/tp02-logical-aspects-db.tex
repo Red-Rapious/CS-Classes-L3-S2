@@ -131,7 +131,7 @@
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        \forall m \; \viewer(x, m)
+        \forall m \; \seen(x_{\viewer}, m)
     \end{equation*}
     
     % Which viewers like all the movies they watch?
@@ -141,7 +141,7 @@
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        t
+        \forall m \; (\seen(x_{\viewer}, m)\land \likes(x_{\viewer}, m)) \lor (\lnot \seen(x_{\viewer}, m) \land \lnot \likes(x_{\viewer}, m))
     \end{equation*}
     
     % Who produces a movie that does not play in any cinema?
@@ -151,7 +151,7 @@
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        t
+        \exists m \; \underbrace{\producer(x_{\producer}, m)}_{x_{\producer} \textnormal{ produces a movie } m} \land \underbrace{\lnot(\exists n, \; \exists t, \; \cinema(n, t, m))}_{\textnormal{and this movie does not play in theater}}
     \end{equation*}
     
     % Which producers see all the movies they produce?
@@ -161,13 +161,45 @@
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        t
+        \forall m, \; \lnot(\producer(x_{\producer}, m)) \lor \seen(x_{\producer}, m)
     \end{equation*}
     
     % Which actors have a Bacon number?
     \item Undecidable.
 
   \end{enumerate}  
+\end{exercise}
+
+\begin{exercise}
+    Division can be expressed using the other operators of PSJRUC algebra:
+    \begin{equation*}
+        \Pi_1(I)\setminus \underbrace{\Pi_1(\overbrace{\Pi_1(I)\times J}^{\mathclap{\text{every possible $(i, j)$ couple}}} \setminus I)}_{\mathclap{\text{every $x$ such that $\exists y$ with $(x, y)\notin I$}}}
+    \end{equation*}
+\end{exercise}
+
+\setcounter{exercise}{6}
+\begin{exercise}
+    \begin{enumerate}
+        \item An equivalent relational calculus expression is:
+        \begin{equation*}
+            \Pi_{R.A}(R)\setminus\Pi_{R.A}(\sigma_{S.C\lor R.B\leq 1}(R\times S))
+        \end{equation*}
+
+        An equivalent relational algebra expression is:
+        \begin{equation*}
+            \exists x_B, \; R(r_A, r_b) \land r_b > 1 \land \lnot (\exists s_c, \; \exists s_B, S(s_C, s_B)\land s_C=r_A)
+        \end{equation*}
+
+        \item An equivalent relational calculus expression is:
+        \begin{equation*}
+            \Pi_A(R)\setminus \Pi_{A_1}(\sigma_{A_1<A_2}(\rho_{A\to A_1}(R)\times \rho_{A\to A_2}(R)))
+        \end{equation*}
+
+        An equivalent relational algebra expression is:
+        \begin{equation*}
+            \underbrace{\big(\exists b, \; R(x_{\max}, b)\big)}_{x_{\max} \text{ is in } A} \land \underbrace{\big(\forall a, \; (\exists b, \; R(a, b)) \land x_{\max} \geq a\big)}_{\text{and } x_{\max} \text{ is the maximum of } A}
+        \end{equation*}
+    \end{enumerate}
 \end{exercise}
 
 \end{document}
