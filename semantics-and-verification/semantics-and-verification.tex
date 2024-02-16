@@ -1,6 +1,6 @@
 \documentclass[toc]{../cs-classes/cs-classes}
 
-\author{Jérôme Feret and Xavier Rival\\ Notes by Antoine Groudiev}
+\author{Xavier Rival and Jérôme Feret\\ Notes by Antoine Groudiev}
 \title{Semantics and Applications to Verification}
 
 \DeclareMathOperator{\lfp}{lfp}
@@ -305,5 +305,103 @@ We can already define a few semantic properties:
         \lfp\phi = \bigsqcup_{n\in\N}\phi^n(\bot)
     \end{equation*}
 \end{theorem}
+
+\renewcommand{\S}{\mathbb{S}}
+\newcommand{\B}{\mathbb{B}}
+
+\section{Operational Semantics}
+Operational semantics are mathematical descriptions of the executions of a program. It is based on a model of programs, called transition systems.
+
+\subsection{Definition and properties}
+\begin{definition}[Transition systems (TS)]
+    A transition system is a tuple $(\S, \to)$ where $\S$ is the \emph{set of states of the system}, and $\to\subseteq\S\times\S$ is the transition relation of the system.
+\end{definition}
+Note that the set of states may be infinite. The majority of interesting examples come from the cases where $\S$ is infinite.
+
+\begin{definition}[Deterministic system]
+    A deterministic system is such that a state fully determines the next state.
+    \begin{equation*}
+        \forall s_0, s_1, s_1'\in\S, (s_0\to s_1 \land s_0\to s_1') \implies s_1 = s_1'
+    \end{equation*}
+    Otherwise, a transition system is non-deterministic.
+\end{definition}
+
+The transition relation $\to$ defines atomic execution steps. It is often called \emph{small-step semantics} or \emph{structured operational semantics}. Steps are \emph{discrete}, and we do not consider non-deterministic systems with probability on transitions (probabilistic transition systems).
+
+\begin{definition}[Initial and final states]
+    We often consider transition systems with a set of initial and final states:
+    \begin{enumerate}
+        \item a set of initial states $\S_I\subseteq\S$ denots states where the execution should start
+        \item a set of final states $\S_F\subseteq\S$ denotes states where the execution should reach the end of the program
+    \end{enumerate}
+    When needed, we add these to the definition of the transition systems $(S, \to, \S_I, \S_F)$.
+\end{definition}
+
+\begin{definition}[Blocking state $\neq$ final state]
+    A state $s_0\in\S$ is blocking when it is the origin of no transition:
+    \begin{equation*}
+        \forall s_1\in\S, \lnot(s_0\to s_1)
+    \end{equation*}
+    As an example, we often introduce an error state (usually noted $\Omega$)
+\end{definition}
+
+\subsection{Examples}
+\subsubsection{Word recognition}
+We can formalize the \emph{word recognition} by a finite automaton using a transition system. We consider an automaton $\A=(Q, q_i, q_f, \to)$. A state is defined by the remaining of the word to recognize, and the automaton state that has been reached so far. Thus,
+\begin{equation*}
+    \S = Q\times \Sigma^\star
+\end{equation*}
+We define the transition relation $\to$ to be:
+\begin{equation*}
+    (q_O, aw)\to(q_1, w) \iff q_0 \to^a q_1
+\end{equation*}
+The initial and final states are defined by:
+\begin{equation*}
+    \begin{cases*}
+        \S_I = \{(q_i, w) \: | \: w\in\Sigma^\star\} \\
+        \S_F = \{(q_f, \epsilon)\}
+    \end{cases*}
+\end{equation*}
+
+\subsubsection{Pure \texorpdfstring{$\lambda$}{ Ⲗ}-calculus}
+A bare-bones model of functional programming:
+\begin{definition}[$\lambda$-terms]
+    The set of $\lambda$-terms is defined by:
+        \begin{align*}
+            t, u, \dots ::&= x & variable\\
+            &| \lambda x\cdot t & abstraction\\
+            &| tu & application
+        \end{align*}
+\end{definition}
+
+\begin{definition}[$\beta$-reduction]
+    % TODO
+\end{definition}
+
+The $\lambda$-calculus defines a transition system. $\S$ is the set of $\lambda$-terms and $\to_\beta$ the transition relation. $\to_\beta$ is non-deterministic, since multiple $\beta$-reduction are sometimes possible. Given a lambda term $t_0$, we may consider $(\S, \to_\beta, \S_I)$ where $\S_I = \{t_0\}$. Blocking states are terms with no redex $(\lambda x \cdot u)v$.
+
+\subsection{A MIPS like assembly language}
+We now consider a very simplified assembly language, containing machine integers $\B^{32}$. Instruction are encoded over 32 bits and stored in the same space as data, $\B^{32}$. We assume a fixed set of addresses $A$.
+
+The memory configuration contains the program counter \texttt{pc}, the general purpose register $r_0, \dots, r_{31}$, and the main memory (RAM):
+\begin{equation*}
+    \mathbf{mem}:A\subseteq\B^{32}\to\B^{32}
+\end{equation*}
+
+\begin{definition}[State]
+    A state is a tuple $(\pi, \rho, \mu)$ which comprises a program counter value $\pi\in\B^{32}$, a function mapping each general purpose register to its value $\rho : \{0, \dots, 32\} \to \B^{32}$, and a function mapping each memory cell to its value, $\mu:A\to\B^{32}$.
+\end{definition}
+We can define transition relations.
+
+We now look at a more classical imperative language (a bare-bone subset of C), containing variables $X$, labels $L$, and values $V$. A syntax can be defined.
+
+\subsection{Traces semantics}
+\begin{definition}[Traces]
+    A \emph{finite trace} is a finite sequence of states $s_0, \dots, s_n$ noted $\langle s_0, \dots, s_n\rangle$. An infinite trace is an infinite sequence of states $\langle s_0, \dots\rangle$. Besides, we write $\S^\star$ for the set of finite traces, $\S^\omega$ for the set of infinite traces, and $S^\alpha=\S^\star\cup\S^\omega$.
+\end{definition}
+
+\begin{definition}[Concatenation operator $\cdot$]
+    
+\end{definition}
 
 \end{document}
