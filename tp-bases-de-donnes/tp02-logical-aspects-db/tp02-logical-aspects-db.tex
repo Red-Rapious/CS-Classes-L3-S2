@@ -12,6 +12,7 @@
 \newcommand*{\tim}{\textnormal{Time}}
 \newcommand*{\actor}{\textnormal{Actor}}
 \newcommand*{\director}{\textnormal{Director}}
+\newcommand*{\produced}{\textnormal{Produced}}
 \newcommand*{\producer}{\textnormal{Producer}}
 \newcommand*{\viewer}{\textnormal{Viewer}}
 
@@ -75,21 +76,21 @@
         % Who are the actors that produced a movie?
         \item PSJR algebra:
         \begin{equation*}
-            \Pi_{\actor}\left(\movie\underset{\movie.\actor=\producer.\producer}{\mathlarger\bowtie}\producer\right)
+            \Pi_{\actor}\left(\movie\underset{\movie.\actor=\produced.\produced}{\mathlarger\bowtie}\produced\right)
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            (\exists x, \exists y, \movie(x, y, x_{\actor})) \land (\exists x, \producer(x_{\actor}, x))
+            (\exists x, \exists y, \movie(x, y, x_{\actor})) \land (\exists x, \produced(x_{\actor}, x))
         \end{equation*}
 
         % Who are the actors that produced a movie in which they play?
         \item PSJR algebra:
         \begin{equation*}
-            \Pi_{\actor}\left(\movie\underset{\substack{\movie.\actor=\producer.\producer\\\movie.\titl=\producer.\titl}}{\mathlarger\bowtie}\producer\right)
+            \Pi_{\actor}\left(\movie\underset{\substack{\movie.\actor=\produced.\producer\\\movie.\titl=\produced.\titl}}{\mathlarger\bowtie}\produced\right)
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            \exists x_{\titl} \; (\exists d \; \movie(x_{\titl}, d, x_{\actor}) \land \producer(x_{\actor}, x_{\titl}))
+            \exists x_{\titl} \; (\exists d \; \movie(x_{\titl}, d, x_{\actor}) \land \produced(x_{\actor}, x_{\titl}))
         \end{equation*}
 
         % Which actors play in a movie Orson Welles plays in?
@@ -109,7 +110,7 @@
         \end{equation*}
         and a producer
         \begin{equation*}
-            \producer(\constant{Orson Welles}, \constant{Citizen Kane})
+            \produced(\constant{Orson Welles}, \constant{Citizen Kane})
         \end{equation*}
         In this database, the query \say{Which producers produce all the movies directed by Akira Kurosawa?} returns the set $\{\constant{Orson Welles}\}$. Now, consider $D_1$ the database $D_0$ to which we added the following movie:
         \begin{CJK}{UTF8}{min}
@@ -127,11 +128,11 @@
     % Which viewers watch all the movies?
     \item PSJRU algebra:
     \begin{equation*}
-        t
+        \Pi_{\viewer}(\seen)\setminus\Pi_{\viewer}(\movie\setminus(\movie\bowtie\seen))
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        \forall m \; \seen(x_{\viewer}, m)
+        \forall m, \; \seen(x_{\viewer}, m)
     \end{equation*}
     
     % Which viewers like all the movies they watch?
@@ -147,21 +148,21 @@
     % Who produces a movie that does not play in any cinema?
     \item PSJRU algebra:
     \begin{equation*}
-        t
+        \Pi_{\producer}(\produced)\setminus\Pi_{\producer}(\movie\bowtie\produced\bowtie\cinema)
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        \exists m \; \underbrace{\producer(x_{\producer}, m)}_{x_{\producer} \textnormal{ produces a movie } m} \land \underbrace{\lnot(\exists n, \; \exists t, \; \cinema(n, t, m))}_{\textnormal{and this movie does not play in theater}}
+        \exists m \; \underbrace{\produced(x_{\producer}, m)}_{x_{\producer} \textnormal{ produces a movie } m} \land \underbrace{\lnot(\exists n, \; \exists t, \; \cinema(n, t, m))}_{\textnormal{and this movie does not play in theater}}
     \end{equation*}
     
     % Which producers see all the movies they produce?
     \item PSJRU algebra:
     \begin{equation*}
-        t
+        \Pi_{\producer}(\seen)\setminus\Pi_{\produced}(\seen\setminus\produced)
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        \forall m, \; \lnot(\producer(x_{\producer}, m)) \lor \seen(x_{\producer}, m)
+        \forall m, \; \lnot(\produced(x_{\producer}, m)) \lor \seen(x_{\producer}, m)
     \end{equation*}
     
     % Which actors have a Bacon number?

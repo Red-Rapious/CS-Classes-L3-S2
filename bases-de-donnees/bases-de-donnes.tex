@@ -164,10 +164,10 @@ Retourne le produit cartésien ensembliste des deux ensembles obtenus par les so
 \paragraph*{Union $\cup$}
 Retourne l'union des ensembles obtenus par les sous-expressions.
 \paragraph*{Différence $\setminus$}
-Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non-monotones.
+Retourne l'ensemble obtenu par la première sous-expression, privé de l'ensemble obtenu par la seconde sous-expression. Cet opérateur ajoute de l'expressivité aux requêtes, par exemple avec des requêtes non monotones.
 \paragraph*{Jointure $\bowtie_\phi$}
 Prends deux tables et une condition de jointure, et retourne les tuples où la condition de jointure est vérifiée. C'est un opérateur crucial dans la perception et l'usage du modèle relationnel, mais est en fait redondant. Il peut être vu comme une combinaison des opérateurs de renommage, produit cartésien, sélection et projection.
-Si $R$ et $S$ ont pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la jointure naturelle de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
+Si $R$ et $S$ ont pour attributs $\A$ et $\mathcal{B}$, on note $R\bowtie S$ la \emph{jointure naturelle} de $R$ et $S$, où la formule de jointure est $\bigwedge_{A\in\A\cap \mathcal{B}}A=A$.
 
 Toutes les expressions de l'algèbre relationnelle ne sont pas valides, et la validité d'une requête dépend en général du schéma de la base de données. Par exemple, si un nom de relation n'existe pas, si l'on essaye d'unifier deux relations avec des attributs différents, ou encore si l'on essaye de produire une table par produit, jointure, ou renommage qui contient deux attributs avec le même nom. L'implémentation de la gestion de ces erreurs par les SGBD est très variable.
 
