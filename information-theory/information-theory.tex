@@ -837,6 +837,7 @@ Let $\X$ be a finite set of source symbols, $p$ a probability distribution on $\
 \end{remark}
 
 \begin{property}
+    \label{prop:optimal-code-exists}
     There exists an optimal code, which moreover can be taken PF.
 \end{property}
 \begin{proof}
@@ -898,5 +899,87 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
         \sum_{i=1}^9 p(i)p(i)\simeq 2.593
     \end{equation*}
 \end{example}
+
+\subsection{Optimality of Huffman's code}
+\begin{lemma}[Optimal binary code -- Base condition]
+    \label{lem:obc-base}
+    Let $\X=\{1, \dots, n\}$, with $3\leq n<\infty$ and $p$ be a probability distribution on $\X$ such that $p(i)>0$. There exists binary PF codes
+    \begin{equation*}
+        c:\{1, \dots, n\} \to \{0, 1\}^\star
+    \end{equation*}
+    optimal for $p$, satisfying
+    \begin{equation}
+        \label{eq:base-condition}
+        \begin{cases*}
+            c(n) = \omega * 0 \\
+            c(n-1) = \omega * 1 \textnormal{ for } \displaystyle\max_{i=1, \dots, n-2}p(i) \geq p(n-1)\geq p(n) > 0
+        \end{cases*}
+    \end{equation}
+    for some $\omega\in\{0, 1\}^\star$.
+\end{lemma}
+
+\begin{proof}
+    Let $c:\X\to\{0, 1\}^\star$ be an optimal binary code for $p$, which is PF. It exists by Property \ref{prop:optimal-code-exists}. Enumerate $p(1)\geq\dots p(n)>0$. Then the code-word lengths of this optimal code necessarily satisfy $l(1)\leq\dots\leq l(n)$ (\emph{The proof is left as an exercise}.)
+
+    Note that we have $l(n-1)=l(n)$. Indeed, if $l(n-1)<l(n)$, then replacing $c(n)$ by its prefix $c'(n)$ of length $l(n-1)$, we obtain a PF code that has a strictly smaller mean code-word length, thus contradicting the optimality of $c$.
+    % TODO: graph
+
+    One can also assume that $c(n) = \omega * (1)$ and $c(n-1)=\omega * (0)$. This might require exchanging some code words of length $l(n)$, preserving the PF property and the mean code-word length.
+\end{proof}
+
+\begin{lemma}[Optimal binary code -- Recursive step]
+    Under the assumptions of Lemma \ref{lem:obc-base} let a code $c$ be optimal for $p$ satisfying the base condition \eqref{eq:base-condition}. Then, any optimal code $c'$ for the distribution $p'$ defined by:
+    \begin{equation*}
+        \begin{cases*}
+            p'(i) = p(i), \quad \forall 1\leq i\leq n-1\\
+            p'(n-1) = p(n-1) + p(n)
+        \end{cases*}
+    \end{equation*}
+    makes the following code $\hat{c}'$ optimal for $p$:
+    \begin{equation*}
+        \hat{c}'(i) := 
+        \begin{cases*}
+            c'(i) & for $1\leq i\leq n-2$\\
+            c'(n-1) * (0) & for $i=n-1$\\
+            c'(n) * (1) & for $i=n$
+        \end{cases*}
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    Denote by $L'$ and $\hat{L}'$ the mean code-word length of $c'$ and $\hat{c}'$ respectively. We have
+    \begin{equation*}
+        L'+p(n-1)+p(n)=\hat{L}'
+    \end{equation*}
+    Indeed,
+    \begin{equation*}
+        \begin{aligned}
+            L'&=\sum_{i=1}^{n-2}p(i)l(c'(i))+(p(n-1)+p(n))l(c'(n-1))\\
+            \hat{L}'&=\sum_{i=1}^{n-2} p(i)l(c'(i))+(p(n-1)+p(n))(l(c'(n-1))+1)
+        \end{aligned}
+    \end{equation*}
+
+    Consider also a code $c''$ shortening to $\{1, \dots, n-1\}$ the original optimal code $c$ for $p$ satisfying the initialization property \eqref{eq:base-condition}:
+    \begin{equation*}
+        c''(i):=\begin{cases*}
+            c(i) & for $i=1, \dots, n-2$\\
+            \omega & for $i=n-1$
+        \end{cases*}
+    \end{equation*}
+    Denote by $L''$ the mean code of $c''$. We have a similar relation:
+    \begin{equation*}
+        L''+p(n-1)+p(n)=L
+    \end{equation*}
+    Therefore,
+    \begin{equation*}
+        \begin{aligned}
+            L&=L''+p(n-1)+p(n)\\
+            &\geq L' + p(n-1) + p(n)\\
+            &=\hat{L}'\\
+            &\geq L
+        \end{aligned}
+    \end{equation*}
+    thus proving that $L=\hat{L}'$ and hence that $\hat{c}'$ is optimal for $p$, which completes the proof.
+\end{proof}
 
 \end{document}
