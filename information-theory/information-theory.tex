@@ -866,5 +866,37 @@ Let $\X$ be a finite set of source symbols, $p$ a probability distribution on $\
 \end{remark}
 
 \subsection{Huffman's code}
+Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider the binary alphabet $\A=\{0, 1\}$.
+
+\begin{definition}[Huffman's coding tree]
+    We construct a binary tree $\mathcal{T}_H = T_H(p)$ with vertices marked by some probabilities (real values in $[0, 1]$) executing the following algorithm:
+    \begin{enumerate}
+        \item Assign distinct vertices (of a binary tree to be constructed) to all elements $x\in\X$, \emph{activate} and mark them by the corresponding probability $p(x)$. At this stage, all the vertices are isolated, there are no edges in the graph.
+        \item Take two different active vertices minimizing the sum of their probabilities. Deactivate these vertices and create a new one, being the direct common ancestor of them. Activate and mark this new vertex by the sum of the probaibilities of the two vertices deactivated in this step.
+        \item Repeat step 2 until there is only one active vertex. Declare this vertex to be the root $\emptyset$ of the constructed graph, which is a tree. The root is marked with probability 1.
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}[Huffman's code]
+    Huffman's code is a function $c_H:\X\to\{0, 1\}^\star$ which assignes to $x\in\X$ the binary representation of the vertex corresponding to $x$ in Huffman's binary tree $\mathcal{T}_H$.
+\end{definition}
+
+\begin{example}[Huffman's tree and code construction]
+    Let $\X=\{1, \dots, 9\}$ and 
+    \begin{equation*}
+        p=(0.01, 0.02, 0.03, 0.1, 0.12, 0.2, 0.2, 0.3)
+    \end{equation*}
+    We obtain the following Huffman's coding tree:
+    % TODO: graph
+
+    Note that for the Huffman's code $c=c_H$, the mean code length is
+    \begin{equation*}
+        \sum_{i=1}^9 p(i)l(c(i))=2.64
+    \end{equation*}
+    and the entropy is
+    \begin{equation*}
+        \sum_{i=1}^9 p(i)p(i)\simeq 2.593
+    \end{equation*}
+\end{example}
 
 \end{document}
