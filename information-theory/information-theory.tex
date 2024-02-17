@@ -814,4 +814,57 @@ Therefore, looking for a rate-optimal UD code consists in minimizing the mean co
     The previous corollary shows that for any $\epsilon>0$ there exists a PF code (for example, Kraft's block-code) offering coding rate $R_s\leq H_D(p)+\epsilon \left[\frac{D-\textnormal{digit}}{\textnormal{source symbol}}\right]$. Combining this with the second statement of \eqref{eq:mean-length-kraft} we conclude that $H_D(p)$ is the infimum of coding rates achievable over UD codes.
 \end{remark}
 
+\section{Optimal codes}
+We shall present \emph{Huffman's code}, introduced in 1952, which is optimal in the sens of minimizing the mean code-word length for a given source distribution.
+
+\subsection{Optimality}
+Let $\X$ be a finite set of source symbols, $p$ a probability distribution on $\X$ and $\A$ a finite alphabet with $D:=|\A|<\infty$ characters.
+
+\begin{definition}[Optimal codes]
+    A code $c:\X\to\A^\star$ is called an \emph{optimal $D$-ary code} for $p$ if it is a UD code which minimizes the mean code-word length $\E[l(c(X))]$ with $X\sim p$, in the class of UD codes:
+    \begin{equation*}
+        \E[l(c(X))] = \min_{\hat{c} \textnormal{ UD code}} \E[l(\hat{c}(X))]
+    \end{equation*}
+\end{definition}
+
+\begin{remark}
+    For any optimal $D$-ary code $c$ for $p$, by \ref{eq:mean-length-kraft}, we have:
+    \begin{equation*}
+        \label{eq:optimal-code-bound}
+        H_D(p)\leq\E[l(c(X))]\leq\E[l(c_k(X))]\leq H_D(p) + 1
+    \end{equation*}
+    where $c_k$ is a Kraft code (a PF code having code-words of lengths $l(x)=\lceil1/\log p(x)\rceil$).
+\end{remark}
+
+\begin{property}
+    There exists an optimal code, which moreover can be taken PF.
+\end{property}
+\begin{proof}
+    Assume that $p_{\min}:=\min_{x\in\X}p(x)>0$. The elements of $\X$ with zero probability can have arbitrary code-words as they do not impact the mean code length. Observe first than an optimal code exists as a solution of an optimization problem in the finite domain of the non-negative integer-valued functions $l(\cdot)$ on $\X$ bounded by $(H_D(p)+1)/p_{\min}<\infty$. Indeed, $\E[l(c(X))]\geq \max_{x\in\X} l(c(x))p_{\min}$, and by \eqref{eq:optimal-code-bound}, no code with the mean code-word length larger than $H_D(p)+1$ is optimal.
+
+    By Kraft's inequality \eqref{eq:kraft-ineq}, the code-word lengths of a given optimal code (which is UD) satisfy
+    \begin{equation*}
+        \sum_{x\in\X}D^{-l(c(x))}\leq 1
+    \end{equation*}
+    By the second statement of Kraft's inequality, there exists a PF code having the same code-word lengths. It is hence optimal.
+\end{proof}
+
+\begin{remark}
+    Combining the two statements of Kraft's inequality, a UD code $c$ is an optimal $D$-ary code for $p$ if and only if its code-word lengths $l(x):=l(c(x))$ solve the following optimization problem:
+    \begin{equation}
+        \label{eq:optimization-pb}
+        \begin{cases*}
+            \textnormal{minimize } \sum_{x\in\X}p(x)l(x)\\
+            \textnormal{subject to } \sum_{x\in\X}D^{-l(x)}\leq 1
+        \end{cases*}
+    \end{equation}
+    in the set of non-negative integer valued functions $l$. Recall that:
+    \begin{itemize}
+        \item The function $l^\star(x):=-\log p(x)$ solves \eqref{eq:optimization-pb} in the set of non-negative, real-valued functions yielding $\sum_{x\in\X}p(x)l^\star(x)=H_D(p)$.
+        \item Kraft's codes assume $l(x)=\lceil -\log p(x)\rceil$, which is not necessarily a solution to \eqref{eq:optimization-pb} in integer-valued functions.
+    \end{itemize}
+\end{remark}
+
+\subsection{Huffman's code}
+
 \end{document}
