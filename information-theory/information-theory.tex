@@ -928,6 +928,7 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
 \end{proof}
 
 \begin{lemma}[Optimal binary code -- Recursive step]
+    \label{lem:recursive-step}
     Under the assumptions of Lemma \ref{lem:obc-base} let a code $c$ be optimal for $p$ satisfying the base condition \eqref{eq:base-condition}. Then, any optimal code $c'$ for the distribution $p'$ defined by:
     \begin{equation*}
         \begin{cases*}
@@ -980,6 +981,36 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
         \end{aligned}
     \end{equation*}
     thus proving that $L=\hat{L}'$ and hence that $\hat{c}'$ is optimal for $p$, which completes the proof.
+\end{proof}
+
+\begin{corollary}
+    Huffman's code is optimal.
+\end{corollary}
+
+\begin{proof}
+    Indeed, Huffman's code is constructed by recursion:
+    \begin{itemize}
+        \item It ensures the base condition \eqref{eq:base-condition} (when the second step of the algorithm of Huffman's binary tree is performed).
+        \item Making the recursive step of Lemma \ref{lem:recursive-step} reduced the cardinality of the set of messages iteratively down to $|\X|=2$. At the final step any of the two existing bijections of $\X$ to $\{0, 1\}$ is an optimal PF code.
+    \end{itemize}
+    Lemma \ref{lem:recursive-step} guarantees the optimality by the induction.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:optimal-binary-code}
+    Huffman's code minimizes the mean code-word length amongst \emph{binary} UD codes.
+\end{lemma}
+
+\begin{remark}
+    Huffman's code minimizes the mean code-word length amongst \emph{binary} UD codes. Comparing it to Kraft's code $c_K$ introduced previously, using \eqref{eq:mean-length-kraft} with binary alphabet $D=2$ we have, for $X\sim p$:
+    \begin{equation}
+        H_2(p)\leq\E[l(c_H(X))]\leq\E[l(c_K(X))]\leq H_2(p)+1
+    \end{equation}
+    Consequently, when applied per block, Huffman's code achieves asymptotically optimal coding rate converging to the entropy.
+\end{remark}
+
+\begin{proof}[Proof of Lemma \ref{lem:optimal-binary-code}]
+    Let $c:\X=\{1, \dots, n\}\to\{0, 1\}^\star$ be an optimal binary code for $p$, which is PF. It exists by Property \ref{prop:optimal-code-exists}. The code-word lengths of this optimal code necessarily satisfy $l(1)\leq\dots\leq l(n)$.
 \end{proof}
 
 \end{document}
