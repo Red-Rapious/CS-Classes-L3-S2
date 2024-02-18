@@ -66,7 +66,7 @@
         % Where can one see a movie in which Signoret plays?
         \item PSJR algebra:
         \begin{equation*}
-            \Pi_{\name}\left(\Pi_{\titl}(\sigma_{\actor=\constant{Signoret}}(\movie)\underset{\titl=\cinema, \titl}{\bowtie}\cinema)\right)
+            \Pi_{\name}\left(\Pi_{\titl}(\sigma_{\actor=\constant{Signoret}}(\movie))\underset{\titl=\cinema.\titl}{\bowtie}\cinema\right)
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
@@ -90,7 +90,7 @@
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            \exists x_{\titl} \; (\exists d \; \movie(x_{\titl}, d, x_{\actor}) \land \produced(x_{\actor}, x_{\titl}))
+            \exists x_{\titl}, \; (\exists d, \; \movie(x_{\titl}, d, x_{\actor}) \land \produced(x_{\actor}, x_{\titl}))
         \end{equation*}
 
         % Which actors play in a movie Orson Welles plays in?
@@ -100,7 +100,7 @@
         \end{equation*}
         Conjunctive calculus:
         \begin{equation*}
-            \exists x_{\titl}\; \big((\exists d \; \movie(x_{\titl}, d, \constant{Orson Welles})) \land (\exists d \; \movie(x_{\titl}, d, x_{\actor}))\big)
+            \exists x_{\titl},\; \big((\exists d \; \movie(x_{\titl}, d, \constant{Orson Welles})) \land (\exists d \; \movie(x_{\titl}, d, x_{\actor}))\big)
         \end{equation*}
 
         % Which producers produce all the movies directed by Akira Kurosawa ?
@@ -143,7 +143,7 @@
     Conjunctive calculus:
     \begin{equation*}
         %\forall m \; (\seen(x_{\viewer}, m)\land \likes(x_{\viewer}, m)) \lor (\lnot \seen(x_{\viewer}, m) \land \lnot \likes(x_{\viewer}, m))
-        \underbrace{(\exists m, \; \seen(x_{\viewer}, m))}_{x_{\viewer} \textnormal{ is a viewer}} \land \underbrace{(\forall m, \;\lnot \seen(x_{\viewer}, m)\lor\likes(x_{\viewer}, m))}_{\textnormal{for each film that they saw, they liked it}}
+        \underbrace{(\exists m, \; \seen(x_{\viewer}, m))}_{x_{\viewer} \textnormal{ is a viewer}} \land \underbrace{(\forall m, \;\lnot \seen(x_{\viewer}, m)\lor\likes(x_{\viewer}, m))}_{\textnormal{for each film that they saw, they liked it } (\seen\implies\likes)}
     \end{equation*}
     
     % Who produces a movie that does not play in any cinema?
@@ -154,7 +154,7 @@
     \end{equation*}
     Conjunctive calculus:
     \begin{equation*}
-        \exists m \; \underbrace{\produced(x_{\producer}, m)}_{x_{\producer} \textnormal{ produces a movie } m} \land \underbrace{\lnot(\exists n, \; \exists t, \; \cinema(n, t, m))}_{\textnormal{and this movie does not play in theater}}
+        \exists m, \; \underbrace{\produced(x_{\producer}, m)}_{x_{\producer} \textnormal{ produces a movie } m} \land \underbrace{\lnot(\exists n, \; \exists t, \; \cinema(n, t, m))}_{\textnormal{and this movie does not play in theater}}
     \end{equation*}
     
     % Which producers see all the movies they produce?
@@ -166,7 +166,7 @@
     Conjunctive calculus:
     \begin{equation*}
         %\forall m, \; \lnot(\produced(x_{\producer}, m)) \lor \seen(x_{\producer}, m)
-        (\exists m, \; \produced(x, m))\land(\forall m, \; \lnot\produced(x, m)\lor\seen(x, m))
+        (\exists m, \; \produced(x, m))\land(\forall m, \; \underbrace{\lnot\produced(x, m)\lor\seen(x, m)}_{\produced\implies\seen})
     \end{equation*}
     
     % Which actors have a Bacon number?
