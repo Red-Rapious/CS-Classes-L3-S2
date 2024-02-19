@@ -173,6 +173,17 @@ The firmware contains routines that can be called from real mode by setting cert
 specifies the teletype function (0x0e) with argument '!', and triggers the "video service" interrupt to display the character. It is time-consuming to experiment with such low-level programs on real hardware, but it is realtively easy to do in an emulator such as \texttt{qemu} or \texttt{Bochs}.
 
 \subsection{x86 protected mode and memory segmentation}
+\subsubsection{Protected mode}
+The Intel 80286, introduced in 1982, is a 16-bit microprocessor with a 24-bit address bus ($2^{24}$=16M). It introduced a \emph{protected mode} and was used in the IBM PC/AT. 8°286 added address bits A20 to A23, but some 8086 software relied on the wraparound "feature". IBM added a logic gate to the motherboard that allows manually forcing the A20 line on the bus to 0. By default, it is enabled (=0) for backward compatibility; the boot software must manually disable this override (=1). It is still a "feature" of modern x86 and x86-64 processors.
+
+The 32-bit 80386 was released in 1985 as an extension of the 80286. In addition to the real mode, it provides a better protected mode, which protects memory via memory segments, virtual memory and protection via \emph{rings}. This is the main mode of the x86 (IA-32) architecture.
+
+In x86 protected mode, address translation is done in two stages: \emph{segmentation} and \emph{paging}. It translates logical addresses in linear addresses, which are then translated to physical addresses. A \emph{logical addres} is an address used in machine instruction; a \emph{linear address} is simply a virtual address, while a \emph{physical address} is written onto the memory bus to access devices and memory.
+
+\emph{Segmentation} divides addressable memory into smaller address spaces called \emph{segments}. Compared to the real mode, segments are protected by bounds checking and access rights. Furthermore, a segment is defined by a \emph{descriptor} stored in a \emph{descriptor table}. The DS can be changed with \texttt{mov} of the descriptor index, and the CS can be changed with \texttt{jmp} or \texttt{call}.
+
+\subsubsection{Descriptor tables}
+Descriptor tables can be global (GDT) or local (LDT). An OS can use local descriptor tables for per-process segmentation. For instance, it can use a read-only and executable segment for code, a readable, writable and non-executable segment for data, and another segment for the stack. Or it can just use a single \emph{flat} model together with virtual memory; it is essentially what Linux does, which is simpler portable and produces less overhead.
 
 \subsection{x86-64 long mode}
 
