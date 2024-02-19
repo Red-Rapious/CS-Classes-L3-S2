@@ -118,4 +118,64 @@ A solution to this is to use multi-level page tables. For example, we could use 
 \end{figure}
 This may seem expensive and impractical, but the TLB helps by catching PTEs from the page tables at different levels, and in practice the lookup is not much slower than with a single level.
 
+\subsection{x86 real mode and segment:offset addressing}
+\subsubsection{Introduction}
+The first Intel 16-bit processor, the 8086, was released in 1978. It uses 16-bit words and 20-bit addresses, allowing up to $2^{20}$=1 MiB of addressable memory. It uses memory segmentation, with no MMU: physical addressing is always used. The following 8088 and 80186 introduces some slight modifications and new instructions. They are the ancestors of the x86 architecture.
+
+\subsubsection{The segment:offset addressing}
+How can we access a 20-bit physical address space with 16-bit registers? It uses special segment registers to provide the extra 4 bits. For example, put 0x12F3 in the data segment register \texttt{\%ds}. This is the base address of the 64K segment starting at 0X12F30. Notice that the physical base address is the segment address shifted 4 bits to the left. Addresses in moste data instructions are implicitly relative to \texttt{\%ds}. For example, the instruction \texttt{movl 7, \%ax} loads the word from 0x12F37 into \texttt{\%ax}. Putting 0X4B27 in the \texttt{\%bx} register then executing \texttt{movl (\%bx), \%ax} loads the word from 0x12F30+0x4B27 into \texttt{\%ax}. Therefore, we have the equation:
+\begin{equation*}
+    \textnormal{physical address} = (\textnormal{segment address} << 4) + \textnormal{offset}
+\end{equation*}
+
+Different segment:offset addresses refer to the same physical address (e.g. both 0020:0010 and 0000:0210 refers to physical address 0x210). Furthermore, some addresses are too big for 20-bits (e.g. FFF:0010 wraps around to the beginning: 0X00000).
+
+\subsubsection{Real mode}
+All x86 and x86-64 start in real mode. They can only access 1 MiB, with no memory protection or virtual memory. They need segment registers to access more than 64K. Nevertheless, they can access BIOS functions to query and control hardware, and can still use 32-bit registers. The code that "boots" a kernel executes in real mode and later switches to protected mode by updating CPU registers. There exist techniques for running real-mode processes or switching back to real mode to access the BIOS.
+
+The segment registers are the following:
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{|c|c|p{8cm}|}
+        \hline
+        \texttt{\%cs} & Code segment register & Used implicitly with the instruction pointer \texttt{\%ip}, and updated on calls, jumps, interrupts, and exceptions\\
+        \hline
+        \texttt{\%ds} & Data segment register & Used implicitly by most data access instructions\\
+        \hline
+        \texttt{\%es} & Extra segment register & Used implicitly in some string instructions\\
+        \hline
+        \texttt{\%fs} & Far segment register & Free for programmer use\\
+        \hline
+        \texttt{\%gs} & Far segment register & Free for programmer use\\
+        \hline
+        \texttt{\%ss} & Stack segment register & Used implicitly with the stack pointer \texttt{sp} and base pointer \texttt{bp}\\
+        \hline
+    \end{tabular}
+    \caption{Segment registers}
+\end{figure}
+Apart from the implicit effects of the segment registers, programmers can also use them explicitly. For example, \texttt{movl \$4, \%fs=200} moves a 32-bit value representing the number 4 to the address given by the segment register \texttt{\%fs}, plus 200. Similaryl, \texttt(movl \$4, \%es:100(\%eax, \%ebx, 2)) moves a 32-bit value representing the number 4 to the address given by
+\begin{equation*}
+    \texttt{\%eax} + \texttt{\%ebx} \times 2 + 100
+\end{equation*}
+relative to the segment register \texttt{\%es}.
+
+\subsubsection{Low-level real-mode programming}
+The PC contains a set of firmware routines called the BIOS -- Basic Input/Output System. While many modern systems are based on the UEFI -- Unified Extensible Firmware Interface, most also support BIOS services.
+
+The BIOS software executes when a computer is powered on. It checks the installed hardware and configures it. It provides features for configuring machine settings, and goes through the attached disks in order, loading their first sector into memory and checking for a special value. If the value is found, then the sector contents loaded into memory are execture in real mode. This small (512 bytes) program is normally responsible for loading and executing the next boot stage and ultimately the kernel software.
+
+The firmware contains routines that can be called from real mode by setting certain registers and triggering an interrupt, e.g.
+\begin{minted}{asm}
+    mov $0x0e, %ah
+    mov '!', %al
+    int $0x10
+\end{minted}
+specifies the teletype function (0x0e) with argument '!', and triggers the "video service" interrupt to display the character. It is time-consuming to experiment with such low-level programs on real hardware, but it is realtively easy to do in an emulator such as \texttt{qemu} or \texttt{Bochs}.
+
+\subsection{x86 protected mode and memory segmentation}
+
+\subsection{x86-64 long mode}
+
+\subsection{x86 and x86-64 paging}
+
 \end{document}
