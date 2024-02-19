@@ -45,4 +45,47 @@ We can represent this simple model of the function \vmap by a data structure acc
 
 We could think of individually mapping each byte or word, but it is too complicated in terms of software, and too expensive in terms of hardware and data structure. Thus, the address spaces are divided into numbered \emph{pages}, which are blocks of a specific size, e.g. 4 KiB. They are always aligned on \emph{page size}, i.e. they cannot overlap. The mapping is therefore represented by a \emph{page table}. In first approximation, it is a list of entries, one for each virtual page, specifing either \none (when there is no mapping), or $\some p$ where $p$ is a physical page number.
 
+\subsection{VM as a tool for memory management}
+The key idea is that each process has its own virtual address space. It can view memory as a simple linear array of bytes. Mapping function scatters addresses through physical memory. Well-chosen mappings simplify memory allocation and management. Each virtual page can be mapped to any physical page. A virtual page can be stored in different physical pages at different times. This allows to share code and data among processes, by mapping virtual pages to the same physical page.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[scale=0.6]{images/address-translation.png}
+    \caption{Address translation}
+\end{figure}
+
+\subsection{Address translation}
+The following diagram shows the translation of addresses with a page table:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/virtual-addressing.png}
+    \caption{Use of a page table}
+\end{figure}
+
+The processor stars by sending a virtual address to the MMU, which requests a page table entry address from memory. The page table entry is fetched from page table in memory, and the MMU sends the phydical address to cache or memory. Finally, the cache or memory sends the data word back to the processor. This is summarized in the following diagram:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{images/MMU.png}
+    \caption{Page hit}
+\end{figure}
+
+Translation can be sped up using a \emph{Translation Lookaside Buffer} (TLB). Page table entries (PTEs) are cached in L1 like any other memory word. PTE hit still requires a small L1 delay, and PTEs may be evicted by other data references. The solution to this is a \emph{Translation Lookaside Buffer} (TLB). It is a small hardware cache in the MMU, which maps virtual page numbers to physical page numbers. It contains complete page table entries for a small number of pages.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{images/TLB.png}
+    \caption{Use of a Translation Lookaside Buffer (TLB)}
+\end{figure}
+The modified hit procedure using TLB is therefore of the form:
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{images/TLB-hit.png}
+    \caption{TLB hit}
+\end{figure}
+Notice that a TLB hit eliminates a memory access. A TLB miss incus an additional memory acces (the PTE). Fortunately, TLB misses are rare.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{images/TLB-miss.png}
+    \caption{TLB miss}
+\end{figure}
+
 \end{document}
