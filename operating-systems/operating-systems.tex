@@ -153,7 +153,7 @@ The segment registers are the following:
     \end{tabular}
     \caption{Segment registers}
 \end{figure}
-Apart from the implicit effects of the segment registers, programmers can also use them explicitly. For example, \texttt{movl \$4, \%fs=200} moves a 32-bit value representing the number 4 to the address given by the segment register \texttt{\%fs}, plus 200. Similaryl, \texttt(movl \$4, \%es:100(\%eax, \%ebx, 2)) moves a 32-bit value representing the number 4 to the address given by
+Apart from the implicit effects of the segment registers, programmers can also use them explicitly. For example, \texttt{movl \$4, \%fs=200} moves a 32-bit value representing the number 4 to the address given by the segment register \texttt{\%fs}, plus 200. Similarly, \texttt(movl \$4, \%es:100(\%eax, \%ebx, 2)) moves a 32-bit value representing the number 4 to the address given by
 \begin{equation*}
     \texttt{\%eax} + \texttt{\%ebx} \times 2 + 100
 \end{equation*}
@@ -183,10 +183,55 @@ In x86 protected mode, address translation is done in two stages: \emph{segmenta
 \emph{Segmentation} divides addressable memory into smaller address spaces called \emph{segments}. Compared to the real mode, segments are protected by bounds checking and access rights. Furthermore, a segment is defined by a \emph{descriptor} stored in a \emph{descriptor table}. The DS can be changed with \texttt{mov} of the descriptor index, and the CS can be changed with \texttt{jmp} or \texttt{call}.
 
 \subsubsection{Descriptor tables}
-Descriptor tables can be global (GDT) or local (LDT). An OS can use local descriptor tables for per-process segmentation. For instance, it can use a read-only and executable segment for code, a readable, writable and non-executable segment for data, and another segment for the stack. Or it can just use a single \emph{flat} model together with virtual memory; it is essentially what Linux does, which is simpler portable and produces less overhead.
+Descriptor tables can be global (GDT) or local (LDT). An OS can use local descriptor tables for per-process segmentation. For instance, it can use a read-only and executable segment for code, a readable, writable and non-executable segment for data, and another segment for the stack. Or it can just use a single \emph{flat} model together with virtual memory; it is essentially what Linux does, which is simpler, portable and produces less overhead.
+
+Descriptor tables define segmentation. In practice, it is represented by an array of 8-byte \emph{descriptors}, which can be of different types (segment, local descriptor table, task state segment, \dots). Before entering protected mode, a global descriptor table must be installed into the GDTR register using the \texttt{lgdt} instruction. A descriptor is specified in 48-bits by a base (virtual address) and a size.
+
+Segment registers index descriptor tables: in protected mode, \texttt{\%cs}, \texttt{\%ds}, \texttt{\%es}, \texttt{\%fs}, \texttt{\%gs} and \texttt{\%ss} hold 16-bit segment selectors. A 12-bit index specifies a descriptor in either the current GDT or LDT, as determined by bit 2. The first two bits specify the privilege level. Instructions implicitly use and set the segment registers similarly to real mode, but linear addresses are calculated indirectly via a descriptor table.
+
+\paragraph*{Recap: logical to linear address} A segment register is either specified implicitly (\texttt{movl \$4, 200}) or explicitly (\texttt{movl \$4, \%fs:100(\%eax, \%ebx, 2)}). It specifies a descriptor in the GDT or LDT. The (cached) base address of the segment descriptor is added to the offset to determine a linear address in a 4G virtual address space.
+
+\subsubsection{Flat segmentation model}
+The flat model gives access to a contiguous, unsegmented address space. It defines two segment descriptors: one for code (\texttt{\%cs}), and one for data (via \texttt{\%ss}, \texttt{\%ds}, \texttt{\%es}, \texttt{\%fs}, and \texttt{\%gs}). The base address is 0x00000000, and the limit is 4G. X86 Linux uses a variation of this scheme with 4 segments (kernel code and data, and user code and data).
+
+\subsubsection{Flat with protection model}
+Is uses the base addresses and limits to isolate code from data, and also limits access to ranges where physical memory exists. The processor raises a \emph{general protection fault} on illegal accesses. A bit is redundant when using virtual memory.
+
+\subsubsection{Multi-segment segmentation model}
+The model uses all features of x86, with one descriptor table per task. It separates data segments from one another. It is not used in most operating systems, because it is redundant with VM, complicated, and not portable.
+
+\subsubsection{The Task State Segment}
+The Task State Segment (TSS) is yet another data structure for controlling or using the HW. It is specified by the \emph{task register} (TR, instruction \texttt{ltr}). It is intended for harware multitasking, but is slow and not portable, and is therefore not used. In protected mode (x86), it stores copies of the segment and data registers. Furthermore, it specifies stack pointers to use on context switches.
 
 \subsection{x86-64 long mode}
+% long mode
 
-\subsection{x86 and x86-64 paging}
+\subsection{Summary of x86 processor modes}
+\begin{itemize}
+    \item Real mode: walks and talks like an 8086
+    \begin{itemize}
+        \item How your computer boots up
+        \item 20-bit address space
+        \item Direct physical memory access
+        \item Segmentation available
+        \item No paging
+    \end{itemize}
+    \item Protected mode -- 32-bit execution mode
+    \begin{itemize}
+        \item Segmentation and paging
+        \item Privilege levels (user vs. kernel)
+    \end{itemize}
+    \item Long mode -- 64-bit execution mode
+    \begin{itemize}
+        \item Very similar to protected mode
+        \item Restrict segmentation use
+        \item Remove deprecated 8086 instructions
+    \end{itemize}
+\end{itemize}
+
+\subsection{Paging on x86 and x86-64}
+The basic ideas on address translation and multi-level page tables apply. There is 3 different paging modes: 32-bits paging (x86), PAE paging (Physical address extension), with addresses up to 64G on a 32-bit architecture, and 4-level paging with 64 bit virtual addresses.
+
+Segmentation gives a virtual address in a linear address space. Now, paging translates the virtual address into a physical one.
 
 \end{document}
