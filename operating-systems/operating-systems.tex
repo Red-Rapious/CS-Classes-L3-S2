@@ -88,4 +88,34 @@ Notice that a TLB hit eliminates a memory access. A TLB miss incus an additional
     \caption{TLB miss}
 \end{figure}
 
+\subsection{Kernel and User Mode}
+Each user process will have its own virtual address space define by a distinct page table. But should user code be allowed to update page tables and virtual memory mappings directly? No! That would not provide any real protection. Therefore, a process has at least 2 operating modes: a \emph{Kernel/Supervisor mode}, in which all instructions and registers are available, and a \emph{User mode}, in which some instructions and registers are restricted. Special instructions or events (interrupts) alloww to switch from one operating mode to the other. Virutal memory mappings can depend on the mode.
+
+In practice, PTEs are extended with permission bits. Page permissions are checked for every move instruction to or from memory. If violated, the OS sends the process the error SIGSEGV (segmentation fault).
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{images/PTEs-permissions.png}
+    \caption{PTEs extended with permission bits}
+\end{figure}
+
+\subsection{Multi-level page tables}
+Suppose that we maintain a 48-bit virtual address space, with a page size of 4 KiB ($2^{12}$), with an 8-byte PTE. We would need a 512 GiB page table:
+\begin{equation*}
+    2^{48} \times 2^{-12} \times 2^3 = 2^{39} \textnormal{ bytes}
+\end{equation*}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{images/2-level-PT.png}
+    \caption{A two-level page table hierarchy}
+\end{figure}
+A solution to this is to use multi-level page tables. For example, we could use a 2-levels page table, where in the first level, each PTE points to a page table, and in the second level, each PTE points to a page. This reduces memory requirements. Usually, most of the virtual address space is unallocated. If a level 1 PTE is null, there is no corresponding level 2 page table. The level 2 page tables can be created as needed, reducing pressure on physical memory.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{images/translation-k-level.png}
+    \caption{Address translation with a $k$-level page table}
+\end{figure}
+This may seem expensive and impractical, but the TLB helps by catching PTEs from the page tables at different levels, and in practice the lookup is not much slower than with a single level.
+
 \end{document}
