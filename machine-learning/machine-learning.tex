@@ -84,4 +84,75 @@ where $R(\theta)$ is the \emph{population risk}.
 \section{Linear Least Squares Regression}
 Consider an input space $X$ and an output space $Y$. We consider a function $f:X\to Y$ unknown to us, that we want to recover. We are given samples $D_N = [(x_1, y_1), \dots, (x_N, y_N)]$. Our goal is to produce $\hat{f}_D$ such that $\hat{f}_D$ "converges" to $f$ when $|D|\to+\infty$.
 
+\section{Logic regression and convex analysis}
+\subsection*{Recap of important notions and notations}
+We are given an input space $X$ and an output space $Y$. We want to learn the relationship between input and output, modelised by a probability distribution $\rho\in \P(X\times Y)$. Thus, we try to find the best function $f_\star:X\to Y$, given a loss function $l:Y\times Y\to\R$. Therefore, $f_\star$ is often defined by:
+\begin{equation*}
+    f_\star = \argmin_{f:X\to Y} \E_{X, Y}[l(f(X), Y)]
+\end{equation*}
+where
+\begin{equation*}
+    \E_{X, Y}[g(X, Y)] = \int_{\R^2} g(x, y) \cdot \mathrm{d}\rho(x, y)
+\end{equation*}
+
+In practice, you only know some samples $D_N=[(x_1, y_1), \dots, (x_N, y_N)]$ with $(x_i, y_i) \sim \rho$, making it impossible to choose such an $f_\star$. Therefore, we try to find a good model $\hat{f}_{D_N}$, such that
+\begin{equation*}
+    \lim_{N\to+\infty}\mathcal{E}(\hat{f}_{D_N}) - \mathcal{E}(f) = 0
+\end{equation*}
+Such a result will often be given by a \emph{learning rate function} $c(N)$, with
+\begin{equation*}
+    \E_{D_N}[\mathcal{E}(\hat{f}_{D_N}) - \mathcal{E}(f)] \leq c(N) = o(1)
+\end{equation*}
+The function $\hat{f}_{D_N}$ can be chosen such that it minimizes the empirical error:
+\begin{equation*}
+    \hat{f}_{D_N} = \argmin_{f\in\mathcal{H}}\hat{\mathcal{E}}(f) = \argmin_{f\in\mathcal{H}} \frac{1}{N} \sum_{i=1}^N l(f(x_i), y_i)
+\end{equation*}
+
+\subsection{}
+We consider the case where $X=\R^d$ and $Y=\R$. We define the loss $l$ to be the least squares, $l(y, y') = (y-y')^2$, and we choose our functions to be of the form of $f_\star = \theta_\star^T X$. In this case, ERM is OLS:
+\begin{equation*}
+    \hat{\theta}_N = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2
+\end{equation*}
+
+We can also define $\hat{\theta}_{N, \lambda}$ to be:
+\begin{equation*}
+    \hat{\theta}_{N, \lambda} = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2 + \lambda||\theta||^2
+\end{equation*}
+This allows to regulate the "complexity" of the function to avoid overfitting. This is called Tikhonov regularization. In this case, we have
+\begin{equation*}
+    \E_{\hat{Y}}[\mathcal{\hat{\theta}_N} - \mathcal{E}(\theta_\star)] = \frac{\sigma^2 d}{N}
+\end{equation*}
+and therefore the optimal function is 
+\begin{equation*}
+    \hat{f}_{N, \lambda} = \argmin_{f\in\mathcal{H}} \hat{\mathcal{E}}(f) + \lambda R(f)
+\end{equation*}
+
+We define $X\in\R^{N\times d} := (x_1^T, \dots, x_N^T)$, and $\hat{Y}=(\hat{y}_1, \dots, \hat{y}_n)$. We this notation, we have
+\begin{equation*}
+    \hat{\theta}_{N, \lambda} = \frac{1}{N}||X\theta-\hat{Y}||^2 + \lambda||\theta||^2
+\end{equation*}
+Thus, we have
+\begin{equation*}
+    \begin{aligned}
+        \nabla\mathcal{L}(\theta) := \frac{2}{N}X^TX\theta - 2\frac{X^T\hat{Y}}{N}+2\lambda\theta &= 0\\
+        (\frac{X^TX}{N}+\lambda)\theta &= X^T\hat{Y}
+    \end{aligned}
+\end{equation*}
+therefore,
+\begin{equation*}
+    \hat{\theta}_{N, \lambda} = \left(\frac{X^TX}{N}+\lambda I\right)^{-1}\frac{X^T\hat{Y}}{N} = \left(X^TX+\lambda N I\right)^{-1}X^T\hat{Y}
+\end{equation*}
+We introduce the singular value decomposition of $X$:
+\begin{equation*}
+    X = U\Sigma V^T
+\end{equation*}
+where $U^TU = UU^T = I_N$, $V^TV = VV^T=I_d$, and $\Sigma$ is diagonal with $\forall i, \,\Sigma_{i, i} \geq 0$.
+In this case,
+\begin{equation*}
+\begin{aligned}
+    X^TX + \lambda NI_d &= V\Sigma U^T U \Sigma V^T + \lambda N I_d\\
+    &= V(\underbrace{\Sigma^2 + \lambda N I}_{\textnormal{invertible}}) V^T
+\end{aligned}
+\end{equation*}
+
 \end{document}
