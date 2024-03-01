@@ -5,6 +5,10 @@
 
 \DeclareMathOperator{\lfp}{lfp}
 \DeclareMathOperator{\gfp}{gfp}
+\DeclareMathOperator{\pcl}{PCl}
+\DeclareMathOperator{\Lim}{Lim}
+\DeclareMathOperator{\safe}{Safe}
+\DeclareMathOperator{\live}{Live}
 
 \begin{document}
 \section*{Introduction}
@@ -403,5 +407,111 @@ We now look at a more classical imperative language (a bare-bone subset of C), c
 \begin{definition}[Concatenation operator $\cdot$]
     
 \end{definition}
+
+\newcommand*{\Sc}{\mathcal{S}}
+\section{Traces Properties}
+\subsection{A high level overview}
+The goal of verification is to prove that $\llbracket P \rrbracket\subseteq \Sc$ (i.e. that all behaviors of $P$ satisfy specifications $\Sc$) where $\llbracket P\rrbracket$ is the program semantics and $\Sc$ the desired specification. Today, we will mostly focus on program's properties, $\Sc$. We will see different families of properties, proof techniques, and specification of properties (are there languages to describe properties?).
+
+A property is a set of traces, defining the admissible executions. There are \emph{safety properties}: something will never happen, which is often proven by invariance; \emph{liveness properties}: something will eventually happen, proven by variance; and beyond safety and liveness, there are \emph{hyperproperties}.
+
+As usual, we consider $\Sc = (\S, \to, \S_{\mathcal{I}})$.
+\begin{definition}[Properties as sets of states]
+    A property $\mathcal{P}\subseteq\S$. $\mathcal{P}$ if all reacheable states belong to $\mathcal{P}$.
+\end{definition}
+This is the case of the absence of runtime errors, and non-termination.
+
+\begin{definition}[Properties as sets of traces]
+    A property $\mathcal{T}$ is a set of traces $\mathcal{T} \subseteq \S^\alpha$. $\mathcal{T}$ if and only if all traces belong to $\mathcal{T}$, i.e. $\llbracket\S\rrbracket^\alpha \subseteq \mathcal{T}$
+\end{definition}
+State properties are trace properties. Functional properties and termination are trace properties.
+
+\begin{property}[Montonicity]
+\end{property}
+
+\subsection{Safety properties}
+\subsubsection{Informal and formal definitions}
+\begin{definition}[Informal definition of safety properties]
+    A safety property is a property which specifies that some (bad) behavior defined by a finite, irrecoverable observation will never occur, at any time.
+\end{definition}
+\begin{example}
+    The following properties are safety properties:
+    \begin{itemize}
+        \item Absence of runtime errors
+        \item State properties
+        \item Non-termination 
+        \item "Not reaching state $b$ after visiting state $a$"
+    \end{itemize}
+    Termination is \textbf{not} a safety property, since no finite execution is a counter-example of its termination.
+\end{example}
+
+We now intend to provide a formal definition of safety. How to refute a safety property? We assume $\Sc$ does not satisfy safety property $\mathcal{P}$. Thus, there exists a counter-example trace $\sigma=<s_0, \dots, s_n, \dots>\in \llbracket S \rrbracket \setminus \mathcal{P}$. At this point of our study, the trace may be finite or infinite. ... A safety property that does not hold can always be refuted with a finite, irrecoverable counter-example.
+
+\paragraph*{A few operators on traces}
+\begin{definition}[Prefix]
+    We write $\sigma_{\lceil i}$ for the prefix of length $i$ of trace $\sigma$.
+\end{definition}
+
+\begin{definition}[Suffix or tail]
+    We write $\sigma_{i \rceil}$ for the suffix of length $i$ of trace $\sigma$.
+\end{definition}
+
+\begin{definition}[Upper closure operators]
+    In a preorder $(\Sc, \sqsubseteq)$, a function $\phi : \Sc \to \Sc$ is an upper closure operatof if and only if it is monotone, extensive ($\forall x\in \Sc, x\sqsubseteq \phi(x)$) and idempotent.
+\end{definition}
+
+\begin{definition}[Prefix closure]
+    The prefix closure operatof is defined by:
+    \begin{equation*}
+        \begin{aligned}
+            \pcl : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\star)\\
+            X &\mapsto \{\sigma_{\lceil i} \: | \: \sigma\in X, i\in \N\}
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+$\pcl$ is monotone, idempotent, but not extensive on $\mathcal{P}(\S^\alpha)$ (infinite traces do not appear anymore). Its restriction to $\mathcal{P}(\S^\star)$ is extensive.
+
+\begin{definition}[The $\Lim$ operator]
+    The limit operator is defined by:
+    \begin{equation*}
+    \begin{aligned}
+        \Lim : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\alpha)\\
+        X &\mapsto X\cup \{\sigma\in\S^\alpha \: | \: \forall i\in\N, \sigma_{\lceil i}\in X\}
+    \end{aligned}
+    \end{equation*}
+    Operator $\Lim$ is an upper-closure operator.
+\end{definition}
+
+\begin{definition}{The $\safe$ operator}
+    Operator $\safe$ is defined by $\safe = \Lim\circ\pcl$.\\
+    Operator $\safe$ is an upper closure operator over $\mathcal{P}(\S^\alpha)$.
+\end{definition}
+
+\begin{definition}[Safety property]
+    A trace property $\mathcal{T}$ is a safety property if and only if $\safe(\mathcal{T}) = \mathcal{T}$. If $\mathcal{T}$ is a trace property, then $\safe(\mathcal{T})$ is a safety property.
+\end{definition}
+
+\begin{theorem}
+    Any state property is also a safety property.
+\end{theorem}
+
+\subsubsection{Proof method}
+
+\subsection{Liveness properties}
+\subsubsection{Informal and formal definitions}
+
+\subsubsection{Proof method}
+
+\subsection{Decomposition of trace properties}
+\begin{theorem}
+    Let $\mathcal{T}\subseteq \S^\alpha$; it can be decomposed into the conjunction of safety property $\safe(\mathcal{T})$ and liveness property $\live(\mathcal{T})$:
+    \begin{equation*}
+        \mathcal{T} = \safe(\mathcal{T}) \cap \live(\mathcal{T})
+    \end{equation*}
+\end{theorem}
+
+\subsection{A specification language: temporal logic}
+
+\subsection{Beyond safety and liveness}
 
 \end{document}
