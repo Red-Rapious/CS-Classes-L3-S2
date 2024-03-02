@@ -961,12 +961,13 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
     \end{equation*}
 
     Consider also a code $c''$ shortening to $\{1, \dots, n-1\}$ the original optimal code $c$ for $p$ satisfying the initialization property \eqref{eq:base-condition}:
-    \begin{equation*}
+    \begin{equation}
+        \label{eq:c-second}
         c''(i):=\begin{cases*}
             c(i) & for $i=1, \dots, n-2$\\
             \omega & for $i=n-1$
         \end{cases*}
-    \end{equation*}
+    \end{equation}
     Denote by $L''$ the mean code of $c''$. We have a similar relation:
     \begin{equation*}
         L''+p(n-1)+p(n)=L
@@ -1011,6 +1012,45 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
 
 \begin{proof}[Proof of Lemma \ref{lem:optimal-binary-code}]
     Let $c:\X=\{1, \dots, n\}\to\{0, 1\}^\star$ be an optimal binary code for $p$, which is PF. It exists by Property \ref{prop:optimal-code-exists}. The code-word lengths of this optimal code necessarily satisfy $l(1)\leq\dots\leq l(n)$.
+
+    Notice that we have $l(n-1) = l(n)$: indeed, if $l(n-1)<l(n)$, then replacing $c(n)$ by its prefix $c'(n)$ of length $l(n-1)$, we obtain a PF code that has a strictly small mean code-word length, thus contradicting the optimality of $c$.
+
+    Even if it requires exchanging some code words of length $l(n)$, preserving the PF property and the mean code-word length, one can assume that
+    \begin{equation*}
+        \begin{cases*}
+            c(n) = \omega * (1)\\
+            c(n-1) = \omega * (0)
+        \end{cases*}
+    \end{equation*}
+    Consider $c'$ given by \eqref{eq:c-second}. In what follows we shall prove that $c'$ is optimal of $p'$. Denote by $L$ and $L'$ the mean code-word length of $c$ and $c'$ respectively. We have
+    \begin{equation*}
+        L' + p(n-1) + p(n) = L
+    \end{equation*}
+    since
+    \begin{equation*}
+        \begin{aligned}
+            L &= \sum_{i=1}^{n-2} p(i)l(i) + [p(n-1)+p(n)][l(\omega)+1]\\
+            L' &= \sum_{i=1}^{n-2} p(i)l(i) + [p(n-1)+p(n)] l(\omega)
+        \end{aligned}
+    \end{equation*}
+    Denote by $c_0'$ an optimal PF code for $p'$ and by $L_0'$ its mean code-word length. Consider the following code $\hat{c}$ for $p$:
+    \begin{equation*}
+        \hat{c}(i) = \begin{cases*}
+            c_0(i) & for $i\in\llbracket 1; n-2 \rrbracket$\\
+            c_0(n-1) * (0) & for $i=n-1$\\
+            c_0(n-1) * (1) & for $i=n$\\
+        \end{cases*}
+    \end{equation*}
+    and denote by $\hat{L}$ the mean code-word length of $\hat{c}$. That being said, we have:
+    \begin{equation*}
+        \begin{aligned}
+            L &= L' + p(n-1) + p(n)\\
+            &\geq L_0' + p(n-1) + p(n)\\
+            &= \hat{L}\\
+            &\geq L
+        \end{aligned}
+    \end{equation*}
+    thus proving that $L'=L_0'$, and hence that $c'$ is optimal for $p'$,which completes the proof.
 \end{proof}
 
 \end{document}
