@@ -1,4 +1,4 @@
-\documentclass{../cs-classes/cs-classes}
+\documentclass[toc]{../cs-classes/cs-classes}
 
 \title{Information theory and coding}
 \author{Bartek Blaszczyszyn\\ Notes by Antoine Groudiev}
@@ -217,7 +217,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
             &\geq -\E[\log p'(X, X_{n+1})] = H(X_1, \dots, X_n, X_{n+1})
         \end{aligned}
     \end{equation*}
-    by Gibbs' inequality, the property is hereditary. Furthermore, there is equality in Gibbs' when $p'=q$, hence when $X_{n+1}$ is independent from $X$, i.e. when $X_1, \dots, X_n, X_{n+1}$ are independent.
+    by Gibbs' inequality, the property is hereditary. Furthermore, there is equality in Gibbs' when $p'=q$, hence when $X_{n+1}$ is independent of $X$, i.e. when $X_1, \dots, X_n, X_{n+1}$ are independent.
 \end{proof}
 
 \subsection{Typical sequences of random variables}
@@ -450,9 +450,9 @@ In the following, we let $\X$ be a finite set of \emph{source symbols}, and $\A$
 In general, efficient codes will have code-words with variable length, with more probable source symbols having short code-words. In order to be able to uniquely decode a sequence of source symbols, we require more than just the injectivity of $c$.
 
 \begin{definition}[Codes uniquely decipherable (UD)]
-    A code $c: \X\to\A^\star$ is \emph{uniquely decipherable} (UD) if $\forall k, l \geq 1, \forall x_1\dots x_k\in \X, \forall y_1, \dots, y_k\in \X$,
+    A code $c: \X\to\A^\star$ is \emph{uniquely decipherable} (UD) if $\forall k, l \geq 1, \forall x_1\dots x_k\in \X, \forall y_1, \dots, y_l\in \X$,
     \begin{equation*}
-        c(x_1)*\dots*c(x_k)=c(y_1)*\dots*c(y_k) \implies k=l \land \forall i, x_i=y_i
+        c(x_1)*\dots*c(x_k)=c(y_1)*\dots*c(y_l) \implies k=l \land \forall i\in\llbracket 1, k\rrbracket, x_i=y_i
     \end{equation*}
 \end{definition}
 
@@ -652,7 +652,7 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
             \sum_{x\in\X} D^{-l(c(x))}\leq 1
         \end{equation}
 
-        \item Let $\{l(x)\: |\:x\in\X\}$ be a collection of non-negative integers. If
+        \item Let $\{l(x)\:|\:x\in\X\}$ be a collection of non-negative integers. If
         \begin{equation*}
             \sum_{x\in\X} D^{-l(c(x))}\leq 1
         \end{equation*}
