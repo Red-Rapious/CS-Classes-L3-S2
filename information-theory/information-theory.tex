@@ -1146,4 +1146,101 @@ The first condition allows one to parse any infinite sequence of letters from $\
     \end{equation*}
 \end{proof}
 
+\subsection{Mean formulas of valid parsing}
+We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., with $X_i \sim p$, and $D:=|\A|$. We denote by $W_i$ the $i$-th word identified during the sequential parsing of $X1, X_2, \dots$ with the dictionary $\mathcal{C}$, and by $L_i := l(W_i)$ the length of this message.
+
+\begin{definition}[Probability function]
+    We define a probability function $P$ on finite sequences such that for any $\omega = (x_1, \dots, x_l)\in\A^\star$,
+    \begin{equation*}
+        \begin{cases}
+            P(\omega) = \prod_{j=1}^l p(x_i)\\
+            P(\epsilon) = 1
+        \end{cases}
+    \end{equation*}
+\end{definition}
+
+\begin{remark}
+    Recall that we may interpret $\omega$ as a node of the entire $D$-ary tree corresponding to $\A^\star$, and therefore
+    \begin{equation*}
+        \sum_{\omega\in\A^\star} = +\infty
+    \end{equation*}
+    Particularly, $P$ is \emph{not} a probability distribution on $\A^\star$.
+\end{remark}
+
+\begin{lemma}[Distribution of the parsed messages]
+    \label{lem:distribution-parsed-messages}
+    The sequence of messages $W_i$ obtained from i.i.d. sequences of souce symbols having distribution $p$ by a valid parsing code $C$ is an i.i.d sequence, with the distribution of any $W_i\sim W$ given by
+    \begin{equation}
+        \label{eq:def-P}
+        \P(W=\omega) = \begin{cases*}
+            P(\omega) & for $\omega\in\mathcal{C}$\\
+            0 & otherwise
+        \end{cases*}
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    Left as an exercise for the reader. It is relatively easy to show that $\sum_{\omega\in\mathcal{C}}P(\omega)=1$, and remains to show that $W_i$ are i.i.d.
+\end{proof}
+
+\begin{lemma}[Mean length of parsed messages]
+    Under the assumptions of the previous Lemma, denote by $\mathcal{T}$ a complete tree of the parsing code related to $\mathcal{C}$. Then:
+    \begin{equation}
+        \E[L] := \E[l(W)] = \sum_{\substack{\omega\in\mathcal{T}\\\textnormal{intermediate}}}P(\omega)
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    We shall start by proving that for $l\geq0$,
+    \begin{equation*}
+        \label{eq:mass-conservation}
+        \P(L>l) = \sum_{\substack{\omega\in\mathcal{T}, \,l(\omega)=l\\\textnormal{intermediate}}}P(\omega)
+    \end{equation*}
+    Indeed, note by the definition of $P$ \eqref{eq:def-P} that the probability of each node is equal to the sum of the probabilities of its children:
+    \begin{equation*}
+        P(\omega) = \sum_{x\in\A}P(\omega*x)
+    \end{equation*}
+    We can interpret the above formula as a low of \emph{conservation of the mass} (probability) sent in the tree from the root (of mass 1) to subsequent generations in the tree $\mathcal{T}$. In this interpetation, $P(L>l)$ is the total mass received at the code words of length strictly biggen than $l$. Therefore, the right-hand-side of \eqref{eq:mass-conservation} is the total mass sent by all intermediate nodes of length $l$, which proves \eqref{eq:mass-conservation} by the mass conservation law.
+
+    Furthermore,
+    \begin{equation*}
+        \begin{aligned}
+            \E[L] &= \sum_{l=0}^\infty l\P(L=l)\\
+            &= \sum_{l=0}^\infty \P(L>l)\\
+            &= \sum_{l=0}^\infty \sum_{\substack{\omega\in\mathcal{T}, \,l(\omega)=l\\\textnormal{intermediate}}}P(\omega)\\
+            &= \sum_{\substack{\omega\in\mathcal{T}\\\textnormal{intermediate}}}P(\omega)
+        \end{aligned}
+    \end{equation*}
+\end{proof}
+
+\begin{property}[Parsed message entropy]
+    Under the assumptions of the previous Lemma, with $X\sim p$, we have
+    \begin{equation}
+        \label{eq:parsed-message-entropy}
+        H(W) = H(X) \E[L]
+    \end{equation}
+\end{property}
+\begin{proof}
+    Since $\mathds{1}_{L_1<i}$ is a function of the vector $(X_1, \dots, X_{i-1})$, it is independent of $X_i$. Consequently, $\mathds{1}_{L_1\geq i}$ and $X_i$ are also independent random variables. By Lemma \ref{lem:distribution-parsed-messages} and \eqref{eq:def-P}, we have
+    \begin{equation*}
+        \P(W_1 = \underbrace{(x_1, \dots, x_l)}_{:=\omega}) = P(w) = \prod_{i=1}^l p(x_i)
+    \end{equation*}
+    Therefore,
+    \begin{equation*}
+        \begin{aligned}
+            H(W) = H(W_1) &= - \E[\log P(W_1)]\\
+            &= -\E\left[\log\left(\prod_{i=1}^{L_1}p(X_i)\right)\right]\\
+            &= -\E\left[\sum_{i=1}^{L_1}\log p(X_i)\right]
+        \end{aligned}
+    \end{equation*}
+    Furthermore,
+    \begin{equation*}
+        \begin{aligned}
+            H(W) = -\E\left[\sum_{i=1}^{L_1}\log p(X_i)\right] &= -\E\left[\sum_{i=1}^\infty \mathds{1}_{i\leq L_1}\log p(X_i)\right]\\
+            &= - \sum_{i=1}^\infty \E[\mathds{1}_{i\leq L_1} \log p(X_i)]\\
+            &= - \sum_{i=1}^\infty \P(i\leq L_1) \E[\log p(X_i)]\\
+            &= -\E[\log p(X) \sum_{i=1}^\infty \P(i\leq L_1)]\\
+            &= H(X) \E[L_1] = H(X)\E[L]
+        \end{aligned}
+    \end{equation*}
+\end{proof}
+
 \end{document}
