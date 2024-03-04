@@ -523,7 +523,30 @@ In general, efficient codes will have code-words with variable length, with more
 
 \begin{remark}
     There is a natural bijection between the set of words $\A^\star$ expressed in the $D$-elements alphabet $\A$, and the vertices of the entire $D$-ary tree. Bearing in mind this bijection, we shall often identify this set of vertices with $A\star$. In particular, the empty word $\epsilon$ is identified with the root of the tree.
-    % Graph
+    
+    \begin{figure}[!ht]
+        \center
+        \begin{tikzpicture}[->]
+            \node (tree) {$\epsilon$}
+                child { node {(1)} 
+                    child { node {(1, 1)} }
+                    child { node {(1, 2)} }
+                    child { node {\dots} }
+                    child { node {(1, D)} }
+                }
+                child { node {\dots} }
+                child { node {\dots} }
+                child { node {\dots} }
+                child {node {(D)} 
+                    child { node {(D, 1)} }
+                    child { node {(D, 2)} }
+                    child { node {\dots} }
+                    child { node {(D, D)} }
+                };
+            \node [below=4cm] {\dots};
+        \end{tikzpicture}
+        \caption{The entire $D$-ary tree}
+    \end{figure}
 
     Using the above bijection, a code $c:\X\to\A^\star$ can be seen as a mapping from $\X$ to the nodes of the entire $D$-ary tre.
 \end{remark}
@@ -535,32 +558,9 @@ In general, efficient codes will have code-words with variable length, with more
 \end{definition}
 
 \begin{lemma}[PF coding trees]
+    \label{lem:pf-coding-trees}
     Code $c$ is PF if and only if it is injective, and it does not have code-words at the intermediate nodes in its coding tree.
 \end{lemma}
-
-\begin{figure}[!ht]
-    \center
-    \begin{tikzpicture}[->]
-        \node (tree) {$\epsilon$}
-            child { node {(1)} 
-                child { node {(1, 1)} }
-                child { node {(1, 2)} }
-                child { node {\dots} }
-                child { node {(1, D)} }
-            }
-            child { node {\dots} }
-            child { node {\dots} }
-            child { node {\dots} }
-            child {node {(D)} 
-                child { node {(D, 1)} }
-                child { node {(D, 2)} }
-                child { node {\dots} }
-                child { node {(D, D)} }
-            };
-        \node [below=4cm] {\dots};
-    \end{tikzpicture}
-    \caption{The entire $D$-ary tree}
-\end{figure}
 
 A useful equivalent characterization of PF codes involve subtrees of the entire regular tree. For any $w\in\A^\star$, denote by $\mathcal{T}(w)$ the subset of elements of $\A^\star$ for which $w$ is a prefix. In graph representation, $\mathcal{T}(w)$ corresponds to the subtree rooted at $w$ and consisting of all its descendants in the entire $|\A|$-regular tree.
 
@@ -1058,6 +1058,92 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
         \end{aligned}
     \end{equation*}
     thus proving that $L'=L_0'$, and hence that $c'$ is optimal for $p'$,which completes the proof.
+\end{proof}
+
+\subsection{Shannon-Fano-Elias code (supplement)}
+We shall present the Shannon-Fano-Elias code introduced in 1954. It is not optimal, but does not require ordering of the probabilities necessary to compte Huffman's code. As Kraft's and Huffman's codes, when applied per block, it achieves asymptotically optimal coding rates converging to the entropy.
+
+\section{Parsing codes}
+In previous lessons we have shown that coding rates close to the entropy of the source can be achieved by grouping source symbols in fixed-length blocks (messages) and coding these messages using some codes (e.g. Kraft's, Huffman's, or SFE) optimized for the block distribution. In this lesson, we shall see that equally small coding rates can be achieved by some optimal (for the given source distribution) grouping of the source symbols in \emph{variable-length blocks}, called \emph{parsing}, and encoding these blocks with some simple, non-optimized codes. This is the idea of Tunstall's code proposed in 1967.
+
+\subsection{Source parsing}
+Given a finite alphabet $\A$ of cardinality $D:=|\A|<\infty$, we denote by $\A^\star$ the set of all finite words in alphabet $\A$. In what follows, we think of $\A$ as source symbols (previously denoted $\X$) and the elements of $\A^\star$ are possible variables-length blocks (messages) of symbols to be former by \emph{parsing}, i.e. grouping of source symbols.
+
+\begin{example}[Sequential source parsing using a dictionary]
+    Parsing of the source sequence
+    \begin{equation*}
+        abbabbbaaababba\dots
+    \end{equation*}
+    with \emph{dictionary} $\mathcal{C} = \{a, ba, bba, bbb\}$ consists in cutting the sequence successively into segments found in the dictionary:
+    \begin{equation*}
+        a|bba|bbb|a|a|a|ba|bba|\dots
+    \end{equation*}
+    The identified segments of the source sequence will be considered as variable-length blocks (messages), to be encoded by some source code.
+\end{example}
+
+It is customary to interpret the process of parsing as some decoding procedure, in which initially unknow messages are recognized in the given source sequence (becoming in this \say{reversed} context encoded sequences). This is formalized in what follows.
+
+\begin{definition}[Parsing code related to dictionay $\mathcal{C}$]
+    Let $\mathcal{C} := \{C(1), \dots, C(M)\} \subset \A^\star\setminus\{\epsilon\}$ be a finite subset of words, called \emph{dictionary}, indexed by $\llbracket 1, M\rrbracket$. The function
+    \begin{equation*}
+        \begin{aligned}
+            C : \llbracket 1, M\rrbracket &\to \mathcal{C}
+            i &\mapsto C(i)
+        \end{aligned}
+    \end{equation*}
+    is called the \emph{parsing code} related to $\mathcal{C}$. We shall often identify the dictionary $\mathcal{C}$ with the corresponding parsing code.
+\end{definition}
+
+\begin{definition}[Valid dictionary]
+    One says that dictionary $\mathcal{C} \subset \A^\star$ is \emph{valid} if the following two conditions hold:
+    \begin{enumerate}
+        \item Each infinite sequence of characters in $\A$ has a prefix in $\mathcal{C}$
+        \item The parsing code related to $\mathcal{C}$ is PF
+    \end{enumerate}
+\end{definition}
+The first condition allows one to parse any infinite sequence of letters from $\A$, looking for the shortest prefixes of the remaining (not yet parsed) part in the dictionary. Second condition guarantees that this sequential parsing is the only one possible.
+
+\begin{example}[Valid fixed-length parsing]
+    For $n\geq1$, let $\mathcal{C} := \{(x_1, \dots, x_n) \: | \: x_i \in \A\}$. Parsing with $\mathcal{C}$ produces fixed-length blocks (messages) considered in previous lessons.
+\end{example}
+
+\subsection{Parsing codes and trees}
+\begin{lemma}[Valid paring codes and complete coding trees]
+    Let $\mathcal{C}$ be a finite dictionary over the alphabet $\A$ with $D:=|\A|$. The parsing code related to $\mathcal{C}$ is valid if and only if its coding tree is a complete $D$-ary tree, whose leaves correspond exactly to dstinct elements of $\mathcal{C}$.
+\end{lemma}
+
+\begin{proof}[$\implies$]
+    Let $\mathcal{C}$ correspond to a valid code. By Lemma \ref{lem:pf-coding-trees}, $C$ being PF, it has all its coding words on distinct leaves. 
+    
+    Let $\omega$ be an intermediate node of the coding tree, hence not a code word. Suppose by contradiction $\omega$ is missing some child, say $\omega*x$, in the coding tree. Then, any sequence starting with $\omega*x*\dots$ does not have any prefix in $\mathcal{C}$, which contradicts the first condition of a valid parsing code.
+\end{proof}
+
+\begin{proof}[$\impliedby$]
+    Assume that the coding tree corresponding to $\mathcal{C}$ is complete, with $\mathcal{C}$ being exactly the leaves. The again, by Lemma \ref{lem:pf-coding-trees}, $\mathcal{C}$ is PF, which statisfies the second condition.
+
+    Assume that $\omega$ is the prefix of length 1 of some infinite sequence. Note that $\omega$ is in the coding tree of $\mathcal{C}$ since the root $\epsilon\notin\mathcal{C}$ is an intermediate node. If $\omega\notin\mathcal{C}$, then $\omega$ is also an intermediate node of the coding tree of $\mathcal{C}$, and thus it has all $D$ possible children $\omega*z$ for $z\in\A$, one of which is necessarily a prefix of the given sequence of length 2. The result follows by induction since the coding tree of $\mathcal{C}$ is finite.
+\end{proof}
+
+\begin{lemma}[Node conservation law for complete trees]
+    Let $\mathcal{C}$ be a finite dictionary of a valid parsing code. Denote by $M$ and $\alpha$, respectively, the number of leaves and intermediate nodes in the coding tree related to $\mathcal{C}$. Then:
+    \begin{equation*}
+        M = 1 + \alpha(D-1)
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    Let's call a \emph{terminating node} an intermediate node whose children are leaves. By induction, we shall keep selecting one terminating node and removing all its children, until no more intermediate nodes are present in the tree. This modifies the number of intermediate nodes and leaves the following way:
+    \begin{equation*}
+        \begin{aligned}
+            (\alpha, M) &\longrightarrow (\alpha-1, M-D+1)\\
+            &\longrightarrow (\alpha-2, M-2D+2)\\
+            &\dots\\
+            &\longrightarrow (0, M-\alpha(D-1))
+        \end{aligned}
+    \end{equation*}
+    At this last step our tree consists of just one node, the root, which is also a leaf. Hence,
+    \begin{equation*}
+        M-\alpha(D-1) = 1
+    \end{equation*}
 \end{proof}
 
 \end{document}
