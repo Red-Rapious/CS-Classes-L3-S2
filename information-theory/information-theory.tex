@@ -688,14 +688,21 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
     \end{equation*}
     which completes the proof of the first statement for $|\X|<\infty$.
 
-    If $|\X|=\infty$, consider an increasing sequence of subsets $\X_m$ such that $\bigcup_m \X_m = \X$ and codes truncated to $\X_m$.
+    If $|\X|=\infty$, consider an increasing sequence of subsets $(\X_m)$ such that $\bigcup_m \X_m = \X$. For any $m$, the restriction of $c$ to $\X_m$ is also UD; the finite case therefore proves that
+    \begin{equation*}
+        \sum_{x\in\X_m}D^{-l(c(x))}\leq 1
+    \end{equation*}
+    This being true for any $m$, it follows that 
+    \begin{equation*}
+        \lim_{m\to\infty}\sum_{x\in\X_m}D^{-l(c(x))} = \sum_{x\in\X}D^{-l(c(x))} \leq 1
+    \end{equation*}
 \end{proof}
 
 \begin{proof}[Proof of Case 2.]
     We assume that $|\X|<\infty$. WLOG, let $\X=\{1, \dots, |\X|\}$, chosen such that $l(1)\leq\dots\leq l(|\X|)$. Define $m:=l(|\X|)=\max_{x\in\X} l(x)$. We construct a code $c$ with code-word lengths $l(c(i))=l(i)$ by encoding messages with some vertices of the entire $D$-ary tree as follows (recall $D:=|\A|$):
     \begin{itemize}
-        \item The code-word of $1\in\X$ is corresponds to the most recent common ancestor of the lexicographically first group of $D^{m-l(1)}$ on the $m$-th generation.
-        \item By the induction, the code-word of $i\in\X$ corresponds to the most recent common ancestor of the lexicographically $i$-th group of $D^{m-l(i)}$ nodes of the $m$-th generation.
+        \item The code-word of $1\in\X$ corresponds to the most recent common ancestor of the lexicographically first group of $D^{m-l(1)}$ on the $m$-th generation.
+        \item By induction hypothesis, the code-word of $i\in\X$ corresponds to the most recent common ancestor of the lexicographically $i$-th group of $D^{m-l(i)}$ nodes of the $m$-th generation.
     \end{itemize}
     % Graph
 
@@ -703,7 +710,7 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
     \begin{equation*}
         \sum_{i=1}^{|\X|}D^{m-l(i)} \leq D^m
     \end{equation*}
-    and thus the above construction can be completed. By the construction, subtrees rooted at the selected code-words are disjoint, $\mathcal{T}(c(i)\cap\mathcal{T}(c(j)))=\emptyset$ for $1\leq i\neq j\leq |\X|$, hence by lemma, the constructed code is PF.
+    and thus the above construction can be completed. By construction, subtrees rooted at the selected code-words are disjoint, $\mathcal{T}(c(i)\cap\mathcal{T}(c(j)))=\emptyset$ for $1\leq i\neq j\leq |\X|$, hence by lemma, the constructed code is PF.
     
     We can similarly extend this to the case where $|\X|=\infty$.
 \end{proof}
