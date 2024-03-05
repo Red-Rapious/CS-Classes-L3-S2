@@ -1243,4 +1243,47 @@ We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., 
     \end{equation*}
 \end{proof}
 
+\subsection{Parsing and translation}
+\paragraph*{Parsing} Recall that parsing a source sequence $x_1*x_2 * \dots$ with a valid dictionary $\mathcal{C} = \{C(1), \dots, C(M)\}$ brakes a given source sequence into blocks of symbols (messages) $W_i = C(j_i)\in\mathcal{C}$:
+\begin{equation*}
+    x_1*x_2*\dots = W_1 * W_2 * \dots = C(j_1) * C(j_2) * \dots
+\end{equation*}
+
+\paragraph*{Translation} Indices $j_i\in\llbracket 1, M\rrbracket$ of messages $W_i = C(j_i)$ are then encoded with a \emph{translation code} $c:\llbracket 1, M\rrbracket\to \mathcal{Y}^b$ having code-words of \emph{fixed} length $b\geq1$, and using (possibly different) alphabet $\mathcal{Y}$. Note that the number of new encoding characters $|\mathcal{Y}|$ and the code-word length $b$ should satisfy $M\leq|\mathcal{Y}|^b$ so that we are guaranteed existence of a decipherable translation (injection) $c:\llbracket 1, M\rrbracket\to\mathcal{Y}^b$.
+
+The superposition of a valid parsing code $\mathcal{C}$ with an injective translation code of fixed length
+\begin{equation*}
+    x_1*x_2*\dots \longrightarrow C(j_1)*C(j_2)*\dots \longrightarrow c(j_1)*c(j_2)*\dots
+\end{equation*}
+is an injective mapping from $\A^\star$ into $\mathcal{Y}^\star$ and one can sequentially decode $x_1*x_2*\dots$ from $c(j_1)*c(j_2)*\dots$.
+
+\begin{example}[Parsing and translating with binary alphabet]
+    We will parse the source sequence
+    \begin{equation*}
+        abbabbbaaababba\dots
+    \end{equation*}
+    with the dictionary
+    \begin{equation*}
+        \mathcal{C} = \{C(1) = 1, C(2)=ba, C(2)=bba, C(4)=bbb\}
+    \end{equation*}
+    into variable length messages, whose indices in $\llbracket 1, 4\rrbracket$ are encoded with binary translation code of length 2, $c:\llbracket 1, 4\rrbracket \to \{0, 1\}^2$.
+
+    \begin{figure}[!ht]
+        \centering
+        \renewcommand{\arraystretch}{1.3}
+        \begin{tabular}{r c c c c c c c c c}
+            source sequence&$a$&$bba$&$bbb$&$a$&$a$&$a$&$ba$&$bba$&\dots\\
+            parsing&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$\\
+            message index in $\mathcal{C}$&1&3&4&1&1&1&2&3&\dots\\
+            translating&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$&$\downarrow$\\
+            binary encoded sequence&00&10&11&00&00&00&01&10&\dots
+        \end{tabular}
+    \end{figure}
+
+    The whole parsing and translation process maps:
+    \begin{equation*}
+        abbabbbaaababba\dots \longrightarrow 0010110000000110\dots
+    \end{equation*}
+\end{example}
+
 \end{document}
