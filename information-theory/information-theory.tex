@@ -1286,4 +1286,40 @@ is an injective mapping from $\A^\star$ into $\mathcal{Y}^\star$ and one can seq
     \end{equation*}
 \end{example}
 
+\begin{property}[Coding rate for parsing and translation]
+    The coding rate for an i.i.d. sequence $X_1, X_2, \dots$ when using a superposition of parsing and translation into code-words of length $b$ of alphabet $\mathcal{Y}$, by Lemma \ref{lem:distribution-parsed-messages} and by the LLN, is almost surely equal to
+    \begin{equation*}
+        R_s := \lim_{n\to\infty} \frac{nb}{l(W_1)+\dots+l(W_n)} = \frac{b}{\E[L]} \; \left[\frac{|\mathcal{Y}|\textnormal{-digit}}{\textnormal{(source) symbol}}\right]
+    \end{equation*}
+    where $L=l(W)$ is the random variable having the distribution of the parsed message length.
+
+    Using \eqref{eq:parsed-message-entropy},
+    \begin{equation*}
+        R_s = \frac{b}{\E[L]} = \frac{bH(X)}{H(W)}
+    \end{equation*}
+    where $X\sim X_i$ and $W\sim W_i$.
+\end{property}
+
+\begin{remark}
+    Note that the uniform entropy bound $H(W)\leq\log M$ and condition $M\leq|\mathcal{Y}|^b$ gives in general
+    \begin{equation*}
+        H_{\mathcal{Y}}(W)\leq\log_{|\mathcal{Y}|} M\leq b
+    \end{equation*}
+    impliying the lower bound on the coding rate $R_s\geq H_{|\mathcal{Y}|}(X)$, which is the entropy of the source, here expressed in $|\mathcal{Y}$-digits per source symbol.
+\end{remark}
+
+The superposition of parsing and translation achieves a coding rate close to this lower bound provided
+\begin{equation*}
+    H_{|\mathcal{Y}|}(W) \simeq b
+\end{equation*}
+which can be achieved when $|\mathcal{C}| = M \simeq |\mathcal{Y}|^b$ and the distribution of the messages $W$ on $\mathcal{C}$ is close to the uniform one:
+\begin{equation*}
+    H_{\mathcal{Y}} \simeq \log_{|\mathcal{Y}|}M \simeq b
+\end{equation*}
+where the first $\simeq$ holds if and only if $W$ follows a uniform distribution of cardinality $\mathcal{C}$, and the second holds if and only if $|\mathcal{C}|=M\simeq|\mathcal{Y}|^b$.
+
+In what follows, we shall present Tunstall's code, allowing one to achieve the previous semi-equality asymptotically when $b\to\infty$. In general, Tunstall's code transforms sequences of symbols having given distribution $p$ into an i.i.d sequence of messages approximately uniformly distributer.
+
+\subsection{Tunstall's code}
+
 \end{document}
