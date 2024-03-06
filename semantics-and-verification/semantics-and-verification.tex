@@ -211,7 +211,7 @@ We can already define a few semantic properties:
 \begin{example}
     $\Q\cap[0, 1]$ is a lattice but not a complete lattice, since 
     \begin{equation*}
-        \left\{q\in \Q\cap[0, 1]\mid q\leq\frac{\sqrt{2}}{2}\right\}\subseteq\Q\cap[0, 1]
+        \set{q\in \Q\cap[0, 1]}{q\leq\frac{\sqrt{2}}{2}}\subseteq\Q\cap[0, 1]
     \end{equation*} 
     has no lowest upper bound in $\Q\cap[0, 1]$.
 \end{example}
@@ -226,7 +226,7 @@ We can already define a few semantic properties:
 \begin{example}
     In the powerset $(\mathcal{P}(\N), \subseteq)$, 
     \begin{equation*}
-        \mathcal{C}:=\left\{\{2^0, \dots, 2^i\} \: |\: i\in\N\right\}
+        \mathcal{C}:=\set{\{2^0, \dots, 2^i\}}{i\in\N}
     \end{equation*}
     is an increasing chain.
 \end{example}
@@ -286,8 +286,8 @@ We can already define a few semantic properties:
 \begin{theorem}[Tarski's]
     Let $(\S, \sqsubseteq, \bot, \top, \sqcup, \sqcap)$ be a complete lattice and $\phi:\S\to\S$ be a monotone operator. Then:
     \begin{itemize}
-        \item $\phi$ has a least fixpoint $\lfp\phi$ and $\lfp\phi = \sqcap\{x\in\S \: | \:\phi(x)\sqsubseteq x\}$
-        \item $\phi$ has a greatest fixpoint $\gfp\phi$ and $\gfp\phi = \sqcup\{x\in\S \: | \:x\sqsubseteq\phi(x)\}$
+        \item $\phi$ has a least fixpoint $\lfp\phi$ and $\lfp\phi = \sqcap\set{x\in\S}{\phi(x)\sqsubseteq x}$
+        \item $\phi$ has a greatest fixpoint $\gfp\phi$ and $\gfp\phi = \sqcup\set{x\in\S}{x\sqsubseteq\phi(x)}$
         \item the set of fixpoints of $\phi$ is a complete lattice
     \end{itemize}
 \end{theorem}
@@ -362,7 +362,7 @@ We define the transition relation $\to$ to be:
 The initial and final states are defined by:
 \begin{equation*}
     \begin{cases*}
-        \S_I = \{(q_i, w) \: | \: w\in\Sigma^\star\} \\
+        \S_I = \set{(q_i, w)}{w\in\Sigma^\star} \\
         \S_F = \{(q_f, \epsilon)\}
     \end{cases*}
 \end{equation*}
@@ -401,7 +401,7 @@ We now look at a more classical imperative language (a bare-bone subset of C), c
 
 \subsection{Traces semantics}
 \begin{definition}[Traces]
-    A \emph{finite trace} is a finite sequence of states $s_0, \dots, s_n$ noted $\langle s_0, \dots, s_n\rangle$. An infinite trace is an infinite sequence of states $\langle s_0, \dots\rangle$. Besides, we write $\S^\star$ for the set of finite traces, $\S^\omega$ for the set of infinite traces, and $S^\alpha=\S^\star\cup\S^\omega$.
+    A \emph{finite trace} is a finite sequence of states $s_0, \dots, s_n$ noted $\trace{s_0, \dots, s_n}$. An infinite trace is an infinite sequence of states $\trace{s_0, \dots}$. Besides, we write $\S^\star$ for the set of finite traces, $\S^\omega$ for the set of infinite traces, and $S^\alpha=\S^\star\cup\S^\omega$.
 \end{definition}
 
 \begin{definition}[Concatenation operator $\cdot$]
@@ -440,12 +440,12 @@ State properties are trace properties. Functional properties and termination are
         \item Absence of runtime errors
         \item State properties
         \item Non-termination 
-        \item "Not reaching state $b$ after visiting state $a$"
+        \item \say{Not reaching state $b$ after visiting state $a$}
     \end{itemize}
     Termination is \textbf{not} a safety property, since no finite execution is a counter-example of its termination.
 \end{example}
 
-We now intend to provide a formal definition of safety. How to refute a safety property? We assume $\Sc$ does not satisfy safety property $\mathcal{P}$. Thus, there exists a counter-example trace $\sigma=<s_0, \dots, s_n, \dots>\in \llbracket S \rrbracket \setminus \mathcal{P}$. At this point of our study, the trace may be finite or infinite. ... A safety property that does not hold can always be refuted with a finite, irrecoverable counter-example.
+We now intend to provide a formal definition of safety. How to refute a safety property? We assume $\Sc$ does not satisfy safety property $\mathcal{P}$. Thus, there exists a counter-example trace $\sigma=\trace{s_0, \dots, s_n, \dots}\in \llbracket S \rrbracket \setminus \mathcal{P}$. At this point of our study, the trace may be finite or infinite. ... A safety property that does not hold can always be refuted with a finite, irrecoverable counter-example.
 
 \paragraph*{A few operators on traces}
 \begin{definition}[Prefix]
@@ -465,30 +465,51 @@ We now intend to provide a formal definition of safety. How to refute a safety p
     \begin{equation*}
         \begin{aligned}
             \pcl : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\star)\\
-            X &\mapsto \{\sigma_{\lceil i} \: | \: \sigma\in X, i\in \N\}
+            X &\mapsto \set{\sigma_{\lceil i}}{\sigma\in X, i\in \N}
         \end{aligned}
     \end{equation*}
+    $\pcl$ is monotone, idempotent, but not extensive on $\mathcal{P}(\S^\alpha)$ (infinite traces do not appear anymore). Its restriction to $\mathcal{P}(\S^\star)$ is extensive.
 \end{definition}
-$\pcl$ is monotone, idempotent, but not extensive on $\mathcal{P}(\S^\alpha)$ (infinite traces do not appear anymore). Its restriction to $\mathcal{P}(\S^\star)$ is extensive.
 
 \begin{definition}[The $\Lim$ operator]
     The limit operator is defined by:
     \begin{equation*}
     \begin{aligned}
         \Lim : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\alpha)\\
-        X &\mapsto X\cup \{\sigma\in\S^\alpha \: | \: \forall i\in\N, \sigma_{\lceil i}\in X\}
+        X &\mapsto X\cup \set{\sigma\in\S^\alpha}{\forall i\in\N, \sigma_{\lceil i}\in X}
     \end{aligned}
     \end{equation*}
-    Operator $\Lim$ is an upper-closure operator.
+    Note that the operator $\Lim$ is an upper-closure operator.
 \end{definition}
+\begin{proof}
+    Left as an exercise!
+\end{proof}
 
-\begin{definition}{The $\safe$ operator}
-    Operator $\safe$ is defined by $\safe = \Lim\circ\pcl$.\\
-    Operator $\safe$ is an upper closure operator over $\mathcal{P}(\S^\alpha)$.
+\begin{example}
+    Assume that:
+    \begin{equation*}
+        \Sc = \{\epsilon, \trace{a}, \trace{a, b}, \trace{a, b, a}, \trace{a, b, a, b}, \trace{a, b, a, b, a}, \dots \}
+    \end{equation*}
+    then, 
+    \begin{equation*}
+        \Lim(\Sc) = \Sc \cup \{\trace{a, b, a, b, a, b, \dots}\}
+    \end{equation*}
+\end{example}
+
+\begin{definition}[The $\safe$ operator]
+    Operator $\safe$ is defined by
+    \begin{equation*}
+        \safe = \Lim\circ\pcl
+    \end{equation*}
+    Note that $\safe$ is an upper closure operator over $\mathcal{P}(\S^\alpha)$.
 \end{definition}
 
 \begin{definition}[Safety property]
-    A trace property $\mathcal{T}$ is a safety property if and only if $\safe(\mathcal{T}) = \mathcal{T}$. If $\mathcal{T}$ is a trace property, then $\safe(\mathcal{T})$ is a safety property.
+    A trace property $\mathcal{T}$ is a safety property if and only if it is a fixpoint of the $\safe$ operator, that is
+    \begin{equation*}
+        \safe(\mathcal{T}) = \mathcal{T}
+    \end{equation*}
+    Furthermore, if $\mathcal{T}$ is a trace property, then $\safe(\mathcal{T})$ is a safety property, since $\safe$ is idempotent.
 \end{definition}
 
 \begin{theorem}
