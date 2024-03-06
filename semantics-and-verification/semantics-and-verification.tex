@@ -529,6 +529,17 @@ Operator $\safe$ saturates a set of traces $S$ with prefixes and infinite traces
 Alternatively, if all finite prefixes of $\sigma$ belong to $S$ or can be observed as a prefix of another trace in $S$, by definition of the limit operator, $\sigma$ belongs to $S$, \emph{even if it is infinite}. Therefore, the definition captures properties that \emph{can be disproved with a finite counter-example}.
 
 \subsubsection{Proof method for safety properties}
+We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety property $\mathcal{T}$. Finite traces semantics is the least fixpoint of $F_*$. We seek a way of verifying that $\Sc$ satisfies $\mathcal{T}$, i.e. that $\llbracket \Sc\rrbracket^\alpha\subseteq\mathcal{T}$.
+
+\begin{definition}[Invariance proofs]
+    Let $\I$ be a set of finite traces; it is said to be an \emph{invariant} if and only if:
+    \begin{equation*}
+        \begin{cases*}
+            \forall s\in\S_{\mathcal{I}}, \trace{s}\in\I\\
+            F_*(\I) \subseteq\I
+        \end{cases*}
+    \end{equation*}
+\end{definition}
 
 \subsection{Liveness properties}
 \subsubsection{Informal and formal definitions}
