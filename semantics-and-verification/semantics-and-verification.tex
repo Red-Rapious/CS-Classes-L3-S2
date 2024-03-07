@@ -786,6 +786,48 @@ We consider a transition system $\Sc = (\S, \to, \S_{\mathcal{I}})$, and livenes
     \end{equation*}
 \end{theorem}
 
+\begin{example}
+    Considering the same program:
+    \begin{figure}[!ht]
+        \centering 
+        \begin{minipage}{0.2\textwidth}
+            \begin{minted}{c}
+s = 0;
+i = 0;
+while (i < n) {
+    s = s + t[i];
+    i = i + 1;
+}
+            \end{minted}
+        \end{minipage}
+        \caption{A simple program which computes the sum of the elements of \texttt{t}}
+    \end{figure}
+    we try to prove its total correctness. We need to show that the program terminates, does not crash, and computes the sum of the elements in the array. We can apply the decomposition principle and express total correctness as the \emph{conjunction of two proofs}: termination can be proved with a ranking function, and the absence of errors and result correctness can be proved with local invariants.
+\end{example}
+
+\begin{example}
+    Likewise, we consider a very simple greatest common divider code function:
+    \begin{figure}[!ht]
+        \centering 
+        \begin{minipage}{0.2\textwidth}
+            \begin{minted}{c}
+int f(int a, int b) {
+    while (a > 0) {
+        int d = b/a;
+        int r = r - a * d;
+        b = a;
+        a = r;
+    }
+    return b;
+}
+            \end{minted}
+        \end{minipage}
+        \caption{A simple program which computes the sum of the elements of \texttt{t}}
+    \end{figure}
+
+    The specification of this function -- that we want to prove -- is: \say{When applied to positive integers, function $f$ should always return their GCD}. The safety part is the conjunction of two properties: no runtime errors, and the final value of $b$ is the GCD. The liveness part is termination on all traces starting with positive inputs.
+\end{example}
+
 \subsection{A specification language: temporal logic}
 
 \subsection{Beyond safety and liveness}
