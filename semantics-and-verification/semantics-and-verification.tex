@@ -411,22 +411,33 @@ We now look at a more classical imperative language (a bare-bone subset of C), c
 \newcommand*{\Sc}{\mathcal{S}}
 \section{Traces Properties}
 \subsection{A high level overview}
+\subsubsection{Introduction}
 The goal of verification is to prove that $\llbracket P \rrbracket\subseteq \Sc$ (i.e. that all behaviors of $P$ satisfy specifications $\Sc$) where $\llbracket P\rrbracket$ is the program semantics and $\Sc$ the desired specification. Today, we will mostly focus on program's properties, $\Sc$. We will see different families of properties, proof techniques, and specification of properties (are there languages to describe properties?).
 
 A property is a set of traces, defining the admissible executions. There are \emph{safety properties}: something will never happen, which is often proven by invariance; \emph{liveness properties}: something will eventually happen, proven by variance; and beyond safety and liveness, there are \emph{hyperproperties}.
 
 As usual, we consider $\Sc = (\S, \to, \S_{\mathcal{I}})$.
 \begin{definition}[Properties as sets of states]
-    A property $\Pc\subseteq\S$. $\Pc$ if all reacheable states belong to $\Pc$.
+    A property $\Pc\subseteq\S$ is a set of states $\Pc\subseteq\S$. $\Pc$ is satisfied if and only if all reacheable states belong to $\Pc$.
 \end{definition}
 This is the case of the absence of runtime errors, and non-termination.
 
 \begin{definition}[Properties as sets of traces]
-    A property $\T$ is a set of traces $\T \subseteq \S^\propto$. $\T$ if and only if all traces belong to $\T$, i.e. $\llbracket\S\rrbracket^\propto \subseteq \T$
+    A property $\T$ is a set of traces $\T \subseteq \S^\propto$. $\T$ is satisfied if and only if all traces belong to $\T$, i.e. $\sem{\S^\propto} \subseteq \T$
 \end{definition}
-State properties are trace properties. Functional properties and termination are trace properties.
+State properties are trace properties. Functional properties (such as \say{program $P$ takes one integer input $x$ and returns its absolute value}) and termination ($\T=\S^\star$) are trace properties.
 
-\begin{property}[Montonicity]
+\subsubsection{A few monotonicity properties}
+\begin{property}
+    Let $\Pc_0, \Pc_1 \subseteq \S$ be two state properties. When $\Pc_0\subseteq\Pc_1$, we say that $\Pc_0$ is \emph{stronger} than $\Pc_1$, i.e. if a program $\Sc$ satisfies $\Pc_0$ then it also satisfies $\Pc_1$.
+\end{property}
+
+\begin{property}
+    Let $\T_0, \T_1 \subseteq \S$ be two trace properties. When $\T_0\subseteq\T_1$, we say that $\T_0$ is \emph{stronger} than $\T_1$, i.e. if a program $\Sc$ satisfies $\T_0$ then it also satisfies $\T_1$.
+\end{property}
+
+\begin{property}
+    Let $\Sc_0, \Sc_1$ be two transition systems. When $\sem{\Sc_0}\subseteq\sem{\Pc_1}$, we say that $\Sc_1$ \emph{has more behaviors than} $\Sc_0$, i.e. if a property $\Pc$ is satisfied by $\Sc_1$ then it is also satisfied by $\Sc_0$.
 \end{property}
 
 \subsection{Safety properties}
@@ -829,7 +840,23 @@ int f(int a, int b) {
 \end{example}
 
 \subsection{A specification language: temporal logic}
+\subsubsection{Notion of specification language}
+Ultimately, we would like to \emph{verify} or \emph{compute} properties, but so far, we simply describe properties with sets of executions or worse, natural language statements. Ideally, we would prefer to use a mathematical language for that, to gain in concision and avoid ambiguity.
+
+\begin{definition}[Specification language]
+    A specification language is a set of terms $\mathbb{L}$ with an interpretation function (or semantics):
+    \begin{equation*}
+        \sem{\cdot} : \mathbb{L} \to \mathcal{P}(\S^\propto)
+    \end{equation*}
+\end{definition}
+
+\subsubsection{A State specification language}
+
+\subsubsection{Propositional temporal logic}
 
 \subsection{Beyond safety and liveness}
+We now consider other interesting properties of programs, and show that they do not all reduce to trace properties.
+
+For example, one can think about security properties. We can consider just one: \say{An unauthorized observer should not be able to guess anything about private information by looking at public information}.
 
 \end{document}
