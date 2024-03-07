@@ -178,15 +178,15 @@ In the following, we illustrate order relations and their usefulness in semantic
 
 We can already define a few semantic properties:
 \begin{itemize}
-    \item $\mathcal{P}_0$: no recognized word contains two consecutive $b$
+    \item $\Pc_0$: no recognized word contains two consecutive $b$
     \begin{equation*}
         \L[\A]\subseteq L^\star\setminus L^\star bb L^\star
     \end{equation*}
-    \item $\mathcal{P}_1$: all recognized words contain at least one occurrence of $a$
+    \item $\Pc_1$: all recognized words contain at least one occurrence of $a$
     \begin{equation*}
         \L[\A]\subseteq L^\star aL^\star
     \end{equation*}
-    \item $\mathcal{P}_2$: recognized words do not contain $b$
+    \item $\Pc_2$: recognized words do not contain $b$
     \begin{equation*}
         \L[\A]\subseteq (L\setminus \{b\})^\star
     \end{equation*}
@@ -224,7 +224,7 @@ We can already define a few semantic properties:
 \end{definition}
 
 \begin{example}
-    In the powerset $(\mathcal{P}(\N), \subseteq)$, 
+    In the powerset $(\Pc(\N), \subseteq)$, 
     \begin{equation*}
         \mathcal{C}:=\set{\{2^0, \dots, 2^i\}}{i\in\N}
     \end{equation*}
@@ -296,7 +296,7 @@ We can already define a few semantic properties:
     We consider a set $\mathcal{E}$, and a subset $\A\subseteq\mathcal{E}$. We let:
     \begin{equation*}
         \begin{aligned}
-            f:\mathcal{P}(\mathcal{E}) &\to \mathcal{P}(\mathcal{E})\\
+            f:\Pc(\mathcal{E}) &\to \Pc(\mathcal{E})\\
             X &\mapsto X\cup\A
         \end{aligned}
     \end{equation*}
@@ -417,12 +417,12 @@ A property is a set of traces, defining the admissible executions. There are \em
 
 As usual, we consider $\Sc = (\S, \to, \S_{\mathcal{I}})$.
 \begin{definition}[Properties as sets of states]
-    A property $\mathcal{P}\subseteq\S$. $\mathcal{P}$ if all reacheable states belong to $\mathcal{P}$.
+    A property $\Pc\subseteq\S$. $\Pc$ if all reacheable states belong to $\Pc$.
 \end{definition}
 This is the case of the absence of runtime errors, and non-termination.
 
 \begin{definition}[Properties as sets of traces]
-    A property $\mathcal{T}$ is a set of traces $\mathcal{T} \subseteq \S^\alpha$. $\mathcal{T}$ if and only if all traces belong to $\mathcal{T}$, i.e. $\llbracket\S\rrbracket^\alpha \subseteq \mathcal{T}$
+    A property $\T$ is a set of traces $\T \subseteq \S^\alpha$. $\T$ if and only if all traces belong to $\T$, i.e. $\llbracket\S\rrbracket^\alpha \subseteq \T$
 \end{definition}
 State properties are trace properties. Functional properties and termination are trace properties.
 
@@ -438,14 +438,14 @@ State properties are trace properties. Functional properties and termination are
     The following properties are safety properties:
     \begin{itemize}
         \item Absence of runtime errors
-        \item State properties (the \say{bad thing} is reaching $\S\setminus\mathcal{T}$)
+        \item State properties (the \say{bad thing} is reaching $\S\setminus\T$)
         \item Non-termination 
         \item \say{Not reaching state $b$ after visiting state $a$}
     \end{itemize}
     Termination is \textbf{not} a safety property, since no finite execution is a counter-example of its termination.
 \end{example}
 
-We now intend to provide a formal definition of safety. How to refute a safety property? We assume $\Sc$ does not satisfy safety property $\mathcal{P}$. Thus, there exists a counter-example trace $\sigma=\trace{s_0, \dots, s_n, \dots}\in \llbracket S \rrbracket \setminus \mathcal{P}$. At this point of our study, the trace may be finite or infinite. The intuitive definition says this trace \emph{eventually exhibits some bad behavior}, that is \emph{irrecoverable} at some \emph{observed at some given time}, thus the observation corresponds to some index $i$. Therefore, trace $\sigma' = \trace{s_0, \dots, s_i}$ violates $\mathcal{P}$, i.e. $\sigma'\notin\mathcal{P}$. Due to the irrecoverability of the observation, the same goes for any trace with the same prefix. We remark that $\sigma'$ is finite.
+We now intend to provide a formal definition of safety. How to refute a safety property? We assume $\Sc$ does not satisfy safety property $\Pc$. Thus, there exists a counter-example trace $\sigma=\trace{s_0, \dots, s_n, \dots}\in \llbracket S \rrbracket \setminus \Pc$. At this point of our study, the trace may be finite or infinite. The intuitive definition says this trace \emph{eventually exhibits some bad behavior}, that is \emph{irrecoverable} at some \emph{observed at some given time}, thus the observation corresponds to some index $i$. Therefore, trace $\sigma' = \trace{s_0, \dots, s_i}$ violates $\Pc$, i.e. $\sigma'\notin\Pc$. Due to the irrecoverability of the observation, the same goes for any trace with the same prefix. We remark that $\sigma'$ is finite.
 \begin{center}
     \bf A safety property that does not hold can always be refuted with a finite, irrecoverable counter-example.
 \end{center}
@@ -467,18 +467,18 @@ We now intend to provide a formal definition of safety. How to refute a safety p
     The prefix closure operator is defined by:
     \begin{equation*}
         \begin{aligned}
-            \pcl : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\star)\\
+            \pcl : \Pc(\S^\alpha) &\to \Pc(\S^\star)\\
             X &\mapsto \set{\sigma_{\lceil i}}{\sigma\in X, i\in \N}
         \end{aligned}
     \end{equation*}
-    $\pcl$ is monotone, idempotent, but not extensive on $\mathcal{P}(\S^\alpha)$ (infinite traces do not appear anymore). Its restriction to $\mathcal{P}(\S^\star)$ is extensive.
+    $\pcl$ is monotone, idempotent, but not extensive on $\Pc(\S^\alpha)$ (infinite traces do not appear anymore). Its restriction to $\Pc(\S^\star)$ is extensive.
 \end{definition}
 
 \begin{definition}[The $\Lim$ operator]
     The limit operator is defined by:
     \begin{equation*}
     \begin{aligned}
-        \Lim : \mathcal{P}(\S^\alpha) &\to \mathcal{P}(\S^\alpha)\\
+        \Lim : \Pc(\S^\alpha) &\to \Pc(\S^\alpha)\\
         X &\mapsto X\cup \set{\sigma\in\S^\alpha}{\forall i\in\N, \sigma_{\lceil i}\in X}
     \end{aligned}
     \end{equation*}
@@ -505,22 +505,32 @@ We now intend to provide a formal definition of safety. How to refute a safety p
     \begin{equation*}
         \safe = \Lim\circ\pcl
     \end{equation*}
-    Note that $\safe$ is an upper closure operator over $\mathcal{P}(\S^\alpha)$.
+    Note that $\safe$ is an upper closure operator over $\Pc(\S^\alpha)$.
 \end{definition}
 
 \begin{definition}[Safety property]
-    A trace property $\mathcal{T}$ is a safety property if and only if it is a fixpoint of the $\safe$ operator, that is
+    A trace property $\T$ is a safety property if and only if it is a fixpoint of the $\safe$ operator, that is
     \begin{equation*}
-        \safe(\mathcal{T}) = \mathcal{T}
+        \safe(\T) = \T
     \end{equation*}
-    Furthermore, if $\mathcal{T}$ is a trace property, then $\safe(\mathcal{T})$ is a safety property, since $\safe$ is idempotent.
+    Furthermore, if $\T$ is a trace property, then $\safe(\T)$ is a safety property, since $\safe$ is idempotent.
 \end{definition}
 
 \begin{theorem}
     Any state property is also a safety property.
 \end{theorem}
 \begin{proof}
-    TBD.
+    Consider a state property $\Pc$. It is equivalent to trace property $\T = \P^\alpha$:
+    \begin{equation*}
+        \begin{aligned}
+            \safe(\T) &= \Lim \circ \pcl (\Pc^\alpha) \\
+            &= \Lim(\Pc^\star) \\
+            &= \Pc^\star \cup \Pc^\omega \\
+            &= \Pc^\alpha \\
+            &= \T
+        \end{aligned}
+    \end{equation*}
+    Therefore, $\T$ is indeed a safety property.
 \end{proof}
 
 \subsubsection{Intuition of the formal definition}
@@ -529,7 +539,7 @@ Operator $\safe$ saturates a set of traces $S$ with prefixes and infinite traces
 Alternatively, if all finite prefixes of $\sigma$ belong to $S$ or can be observed as a prefix of another trace in $S$, by definition of the limit operator, $\sigma$ belongs to $S$, \emph{even if it is infinite}. Therefore, the definition captures properties that \emph{can be disproved with a finite counter-example}.
 
 \subsubsection{Proof method for safety properties}
-We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety property $\mathcal{T}$. Finite traces semantics is the least fixpoint of $F_*$. We seek a way of verifying that $\Sc$ satisfies $\mathcal{T}$, i.e. that $\llbracket \Sc\rrbracket^\alpha\subseteq\mathcal{T}$.
+We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety property $\T$. Finite traces semantics is the least fixpoint of $F_*$. We seek a way of verifying that $\Sc$ satisfies $\T$, i.e. that $\llbracket \Sc\rrbracket^\alpha\subseteq\T$.
 
 \begin{definition}[Invariance proofs]
     Let $\I$ be a set of finite traces; it is said to be an \emph{invariant} if and only if:
@@ -539,7 +549,30 @@ We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety prope
             F_*(\I) \subseteq\I
         \end{cases*}
     \end{equation*}
+    Where $F_*$ is the semantic function, defined previously, that computes the traces of length $i+1$ from the traces of length $i$, and adds the traces of length $1$.
+
+    $\I$ is \emph{stronger} than $\T$ if and only if $\I\subseteq\T$. The proof methode \emph{by invariance} is based on finding an invariant that is stronger than $\T$.
 \end{definition}
+
+\begin{theorem}[Soundness of the invariance proof method]
+    The invariance proof methode is \emph{sound}: if we can find an invariant for $\Sc$, that is stronger than safety property $\T$, then $\Sc$ satisfies $\T$.
+\end{theorem}
+\begin{proof}
+    Assume that $\I$ is an invariant of $\Sc$ and that it is stronger than $\T$. Let's show that $\Sc$ satisfies $\T$.
+
+    By induction over $n$, we can prove that $F_*^n(\set{\trace{s}}{s\in\S_{\mathcal{I}}}) \subseteq F_*^n(\I) \subseteq \I$. Therefore, $\sem{\Sc}^\star \subseteq \I$ and thus, $\safe(\sem{\Sc}^\star)\subseteq\safe(\I)\subseteq\safe(\T)$ since $\safe$ is monotone.
+
+    We remark that $\sem{\Sc}^\alpha = \safe(\sem{\Sc}^\star)$, hence $\sem{\Sc}^\alpha = \safe(\sem{\Sc}^\star) \subseteq \safe{\T} = \T$. We conclude $\sem{\Sc}^\alpha \subseteq \T$, i.e. $\Sc$ statisfies property $\T$.
+\end{proof}
+
+\begin{theorem}[Completeness of the invariance proof method]
+    The invariance proof method is \emph{complete}: if $\Sc$ satisfies safety property $\T$, then we can find an invariant $\I$ for $\Sc$, that is stronger than $\T$.    
+\end{theorem}
+\begin{proof}
+    We choose $\I = \sem{\Sc}^\star$, which is both an invariant of $\Sc$ and is stronger than $\T$ since $\Sc$ satisfies $\T$.
+\end{proof}
+
+Note that $\sem{\S}^\alpha$ is most likely not a very easy to express invariant, but it is just a convenient completeness argument. Therefore, completeness does not mean that the proof is easy.
 
 \subsection{Liveness properties}
 \subsubsection{Informal and formal definitions}
@@ -548,9 +581,9 @@ We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety prope
 
 \subsection{Decomposition of trace properties}
 \begin{theorem}
-    Let $\mathcal{T}\subseteq \S^\alpha$; it can be decomposed into the conjunction of safety property $\safe(\mathcal{T})$ and liveness property $\live(\mathcal{T})$:
+    Let $\T\subseteq \S^\alpha$; it can be decomposed into the conjunction of safety property $\safe(\T)$ and liveness property $\live(\T)$:
     \begin{equation*}
-        \mathcal{T} = \safe(\mathcal{T}) \cap \live(\mathcal{T})
+        \T = \safe(\T) \cap \live(\T)
     \end{equation*}
 \end{theorem}
 
