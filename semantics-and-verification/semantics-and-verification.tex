@@ -574,8 +574,122 @@ We consider transition system $\Sc=(\S,\to,\S_{\mathcal{I}})$ and a safety prope
 
 Note that $\sem{\S}^\alpha$ is most likely not a very easy to express invariant, but it is just a convenient completeness argument. Therefore, completeness does not mean that the proof is easy.
 
+\begin{example}
+    Consider the following program which computed the sum of the elements of an array:
+    \begin{figure}[!ht]
+        \centering 
+        \begin{minipage}{0.2\textwidth}
+            \begin{minted}{c}
+s = 0;
+i = 0;
+while (i < n) {
+    s = s + t[i];
+    i = i + 1;
+}
+            \end{minted}
+        \end{minipage}
+        \caption{A simple program which computes the sum of the elements of \texttt{t}}
+    \end{figure}
+    We want to proove that when the exit is reached, $\texttt{s} = \sum_{k=0}^{n-1}\texttt{t}[k]$. For each program point $l$, we have a local invariant $\I_l$, denoted below by a logical formula instead of a set of states:
+    \begin{figure}[!ht]
+        \centering
+        \begin{minipage}{0.2\textwidth}
+            \baselineskip=1.3\baselineskip
+            \centering
+            \begin{minted}[linenos]{c}
+s = 0;
+i = 0;
+while (i < n) {
+    s = s + t[i];
+    i = i + 1;
+}
+            \end{minted}
+        \end{minipage}
+        \begin{minipage}{.5\textwidth}
+          \begin{equation*}
+            \begin{aligned}
+                l_0 &: \roundsem{\texttt{true}} \\
+                l_1 &: \roundsem{s=0} \\
+                l_2 &: \roundsem{i=1 \land s=0} \\
+                l_3 &: \roundsem{0\leq i<n \land s = \sum_{k=0}^{i-1}t[k]} \\
+                l_4 &: \roundsem{0\leq i<n \land s = \sum_{k=0}^i t[k]} \\
+                l_5 &: \roundsem{0\leq i\leq n \land s = \sum_{k=0}^{i-1}t[k]} \\
+                l_6 &: \roundsem{i=n \land s = \sum_{k=0}^{n-1}t[k]}
+            \end{aligned}
+          \end{equation*}
+        \end{minipage}
+        \caption{The program and the local invariants}
+    \end{figure}
+
+    The global invariant $\I$ is defined by:
+    \begin{equation*}
+        \I := \set{\trace{(l_0, m_0), \dots, (l_n, m_n)}}{\forall n, m_n\in \I_{l_n}}
+    \end{equation*}
+    which is the set of traces satisfying all the local invariants.
+\end{example}
+
 \subsection{Liveness properties}
-\subsubsection{Informal and formal definitions}
+Similarly, we will start by sketching an informal definition of a \emph{liveness property}, before introducing an operator-based formal definition and a proof mechanism.
+
+\subsubsection{Informal definition}
+\begin{definition}[Informal definition of liveness properties]
+    A liveness property is a property which specifies that some (good) behavior \emph{will eventually occur}, and that this behavior \emph{may still occur after any finite observation}.
+\end{definition}
+
+\begin{itemize}
+    \item \emph{Termination} is a liveness property, in which the \say{good behavior} is reaching a blocking state (no more transition are available).
+    \item \say{State $a$ will enventually be reached by any execution} is also a liveness property, in which the \say{good behavior} is reaching the state $a$.
+    \item The absence of runtime errors is \textbf{not} a liveness property.
+\end{itemize}
+
+We can also ask ourselves how to refute a lineveness property. Considering a liveness property $\T$ (i.e. $\T$ is termination), we assume that $\Sc$ does \textbf{not} satisfy liveness property $\T$. Thus, there exists a counter-example trace $\sigma\in\sem{\Sc}\setminus\T$. The informal definition says \say{\dots may still occur after any finite observation}, thus each finite trace $\sigma'$ can be extended into a good trace. Therefore, $\sigma$ is necessarily \emph{infinite}.
+\begin{center}
+    \bf To prove that a liveness property does not hold, we need to look for an infinite counter-example: no finite trace is a counter-example.
+\end{center}
+For example, when $\T$ is the termination property, no finite execution can guarantee us that the program will not eventually stop; to prove that a program will not halt, we need to exhibit an infinite execution.
+
+\subsubsection{Formal definition}
+\begin{definition}[Operator $\live$]
+    The operator $\live$ is defined by:
+    \begin{equation*}
+        \live(\T) = \T \cup (\S^\alpha \setminus \safe(\T))
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Liveness property]
+    $\T$ is a liveness property if and only if it satisfies one of the three following equivalend statements:   
+    \begin{enumerate}[label=(\roman*)]
+        \item $\live(\T) = \T$
+        \item $\pcl(\T) = \S^\star$ (any finite trace is the prefix of a trace in $\T$)
+        \item $\Lim \circ \pcl(\T) = \S^\alpha$
+    \end{enumerate}
+\end{definition}
+\begin{proof}[Proof: $(i) \implies (ii)$]
+    We assume that $\live(\T) = \T$, i.e. that $\T\cup(\S^\alpha\setminus\safe(\T)) = \T$. Therefore, $\S^\alpha\setminus\safe(\T) \subseteq \T$.
+
+    Let $\sigma\in\S^\star$ and let us show that $\sigma\in\pcl(\T)$. Since we must have $\sigma\in\S^\alpha$:
+    \begin{itemize}
+        \item either $\sigma\in\safe(\T) = \Lim(\pcl(\T))$, so all its prefixes are in $\pcl(\T)$ and $\sigma\in\pcl(\T)$;
+        \item or $\sigma\in\T$ which implies that $\sigma\in\pcl(\T)$.
+    \end{itemize}
+\end{proof}
+\begin{proof}[Proof: $(ii) \implies (iii)$]
+    If $\pcl{\T}=\S^\star$, then $\Lim\circ\pcl(\T) = \S^\alpha$.
+\end{proof}
+\begin{proof}[Proof: $(iii) \implies (i)$]
+    If $\Lim\circ\pcl(\T) = \S^\alpha$, then
+    \begin{equation*}
+        \live(\T) = \T\cup(\S^\alpha\setminus(\Lim\circ\pcl(\T))) = \T \cup (\S^\alpha\setminus\S^\alpha) = \T
+    \end{equation*}
+\end{proof}
+
+\begin{example}[Termination]
+    The property $\T = \S^\star$ corresponds to termination: there should be no infinite execution. $\T$ clearly satisfies
+    \begin{equation*}
+        \pcl(\T) = \S^\star
+    \end{equation*}
+    thus termination is indeed a liveness property according to the formal definition.
+\end{example}
 
 \subsubsection{Proof method}
 
