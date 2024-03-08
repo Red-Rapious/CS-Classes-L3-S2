@@ -1,6 +1,6 @@
 \documentclass[toc]{../cs-classes/cs-classes}
 
-\author{Xavier Rival and Jérôme Feret\\ Notes by Antoine Groudiev}
+\author{Xavier Rival, Sylvain Conchon and Jérôme Feret\\ Notes by Antoine Groudiev}
 \title{Semantics and Applications to Verification}
 
 \DeclareMathOperator{\lfp}{lfp}
@@ -12,7 +12,7 @@
 
 \begin{document}
 \section*{Introduction}
-This document is Antoine Groudiev's class notes while following the class \emph{Sémantique et applications à la vérification de programmes} (Semantics and Applications to Verification) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Xavier Rival. 
+This document is Antoine Groudiev's class notes while following the class \emph{Sémantique et applications à la vérification de programmes} (Semantics and Applications to Verification) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Xavier Rival and Sylvain Conchon. 
 
 \section{Introduction to Semantics}
 \subsection{Case studies}
@@ -858,5 +858,58 @@ Ultimately, we would like to \emph{verify} or \emph{compute} properties, but so 
 We now consider other interesting properties of programs, and show that they do not all reduce to trace properties.
 
 For example, one can think about security properties. We can consider just one: \say{An unauthorized observer should not be able to guess anything about private information by looking at public information}.
+
+
+\section{Satisfiability Modulo Theories (SMT)}
+Since 2000, SAT solvers have become extremly performant. SMT is the extension of SAT with clauses instead of simply variables.
+\subsection{Modern SAT solvers}
+\subsubsection{The SAT problem}
+Given a boolean formula without quantifiers, e.g.
+\begin{equation*}
+    (p\lor q\lor \lnot r)\land(r\lor \lnot p)
+\end{equation*}
+we try to find if this formula is satisfiable. Techniques to do so include truth tables, resolution-based procedures, backtracking-based procedure. Since the 80s, there's been a focus on variable selection heuristics, associated with search-pruning techniques (non-chronological backtracking, learning clauses): these are the CDCL algorithms (Conflicts-Driven Clause Learning). New techniques such as indexing and scoring have since emerged.
+
+\subsubsection{Resolution}
+Resolution uses a proof-finder procedure, which tries to reduce the equation.
+
+The state of the procedure is represented by a variable $F$, to which we can apply some rules (Resolve, Empty, Tauto, Subsume, Fail). This allows to construct a proof tree.
+
+\subsubsection{DPLL}
+DPLL is a model-finder procedure that builds incrementally a model $M$ for a CNF formula $F$ by
+\begin{itemize}
+    \item deducing the truth value of a literal $l$ from $M$ and $F$ by Boolean Constraint Propagations (BCP):
+    \begin{center}
+        If $C\lor l\in F$ and $M\vDash \lnot C$ then $l$ must be true
+    \end{center}
+    \item guessing the truth value of an unassigned literal:
+    \begin{center}
+        If $M\cup\{l\}$ leads to a model for which $F$ is unsatisfiable\\ then \emph{backtrack} and try $M\cup\{\lnot l\}$
+    \end{center}
+\end{itemize}
+
+Similarly, DPLL is a set of rules (Success, Unit, Decide, Backtrack, Fail).
+
+\subsubsection{Clause conflict, backjump}
+DPLL remains slow: instead of backtracking, we would prefer to \emph{backjump} multiple steps before, to the node where the conflit has indeed been decided. Conflicts are reflected by backjump clauses. Given a backjump clause $C\lor l$, backjumping can undo several decisions at once: it goes back to the assignment $M$ where $M \vDash \lnot C$.
+
+\subsubsection{CDCL algorithm}
+Conflict-Driven Clause Learning SAT solvers (CDCL) add backjump clauses to $M$ as learned clauses (or lemmas) to prevent future similar conflicts. 
+
+Lemmas can also be removed from $M$.
+
+The algorithm now has two modes: search and resolution. 
+
+\subsubsection{Heuristics, Two-watched literals}
+The Variable State Independent Decaying Sum (VSIDS) heuristic associates a score to each literal in order to select the literal with the hightest score when Decide is used.
+
+CDCL performances are tightly related to their learning clause management. Keeping too many clauses decrease the BCP efficency, but cleaning out too many clauses break the overall learning benefit.
+
+Quality measures for learning clauses are based on scores associated with learned clauses. 
+
+BCP represents 80\% of SAT-solver runtime. The two watched literals technique assigns two non-false watched literals per clause. Only if one of the two watched literal becomes false, the clause is inspected. If the other watched literal is assigned to true, the do nothing. Otherwise, try to find another (unassigned) watched literal. If no such literal exists, then apply Backjump. If the only possible literal is the oother watched literal of the clause, then apply Unit.
+
+Its main advantages are that clauses are inspected only when watched literal are assigned, and that no updating is required when backjumping.
+
 
 \end{document}
