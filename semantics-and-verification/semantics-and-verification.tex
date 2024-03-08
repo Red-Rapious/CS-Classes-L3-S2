@@ -860,7 +860,7 @@ We now consider other interesting properties of programs, and show that they do 
 For example, one can think about security properties. We can consider just one: \say{An unauthorized observer should not be able to guess anything about private information by looking at public information}.
 
 
-\section{Satisfiability Modulo Theories (SMT)}
+\section{SAT and Satisfiability Modulo Theories (SMT)}
 Since 2000, SAT solvers have become extremly performant. SMT is the extension of SAT with clauses instead of simply variables.
 \subsection{Modern SAT solvers}
 \subsubsection{The SAT problem}
@@ -911,5 +911,59 @@ BCP represents 80\% of SAT-solver runtime. The two watched literals technique as
 
 Its main advantages are that clauses are inspected only when watched literal are assigned, and that no updating is required when backjumping.
 
+\subsection{Satisfiability Modulo Theories (SMT)}
+\subsubsection{Introduction}
+The fundamental goal of research in SAT was to be able to solve first-order logic.
+
+The SMT problem asks to decide of the satisfiability of logical formulae with some specific theory symbols. 
+
+In theory, SMT solvers can take as an input any first order logic formula. In pratcice, most SMT solvers only take as input boolean formulas with only one theory (e.g. linear arithmetic over the integers).
+
+\begin{example}
+    \begin{equation*}
+        f(f(f(x))) = x \land f(f(f(f(f(x))))) = x \land f(x) \neq x
+    \end{equation*}
+
+    \begin{equation*}
+        x+y = 19 \land x-y=7 \land x\neq 13
+    \end{equation*}
+\end{example}
+
+Let $F$ be the following formula using arithmetic symbols:
+\begin{equation*}
+    x+y\geq 0 \land (x=z \implies y+z=-1) \land z > 3t
+\end{equation*}
+We want to know whether $F$ is satisfiable.
+We use the following algorithm:
+\begin{figure}[!ht]
+    \centering
+    \begin{minipage}{0.77\textwidth}
+    \begin{enumerate}
+        \item Convertion in CNF
+        \item Replace arithmetical constraints with boolean variables
+        \item Call a SAT solver: a model $M$ is returned if the formula is satisfiable
+        \item Convert $M$ to the original theory
+        \item Check whether $M$ is coherent with the theory
+        \item If not, add $\lnot M$ to $F$ and start over
+    \end{enumerate}
+    \end{minipage}
+    \caption{Simple SMT procedure using a SAT solver}
+\end{figure}
+
+SMT encounters multiple difficulties:
+\begin{itemize}
+    \item The size of formulas (up to multiple Go)
+    \item The complexity of boolean structures (e.g. when the formulas encode logical circuits of microprocessors)
+    \item The combination of Theories
+    \item The efficiency of decision procedures
+    \item Theories over mathematical objects more and more complex
+    \item The handling of quantifiers
+\end{itemize}
+
+\subsubsection{Small proof engines}
+
+\subsubsection{SAT and decision procedures}
+
+\subsubsection{Combination of decision procedures}
 
 \end{document}
