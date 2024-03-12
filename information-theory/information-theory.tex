@@ -1364,7 +1364,115 @@ Recall from Lemma \ref{lem:node-conservation} (Node conservation law for valid t
 \end{corollary}
 
 \begin{proof}
-    
+    Let $\epsilon=\omega_1, \dots, \omega_\alpha$ be the intermediate nodes created during the construction of Tunstall's coding tree. Observe the following ordering of their probabilities
+    \begin{equation*}
+        \begin{aligned}
+            1 = P(\epsilon) &= P(\omega_1)\\
+            &\geq \max_{f\textnormal{ leaves of }\T_1}P(f) = P(\omega_2)\\
+            &\geq \max_{f\textnormal{ leaves of }\T_2}P(f) = P(\omega_3)\\
+            &\dots\\
+            &\geq \max_{f\textnormal{ leaves of }\T_{\alpha-1}}P(f) = P(\omega_\alpha)\\
+            &\geq \max_{f\textnormal{ leaves of }\T_\alpha}P(f)
+        \end{aligned}
+    \end{equation*}
+    where the inequalities follow from
+    \begin{equation*}
+        \forall i\in\llbracket1, \alpha-1\rrbracket, \quad \begin{cases}
+            \{\textnormal{leaves of }\T_{i+1}\} = \{\textnormal{leaves of }\T_i\} \setminus\{\omega_{i+1}\}\cup\set{\omega_{i+1}*z}{z\in\A}\\
+            P(\omega_{i+1}*z)\leq P(\omega_{i+1})
+        \end{cases}
+    \end{equation*}
+
+    Thus, we have
+    \begin{equation*}
+        \forall i\in\llbracket1, \alpha\rrbracket \quad P(\omega_i)\geq P(\omega_\alpha)
+    \end{equation*}
+    \begin{equation*}
+        \forall \textnormal{ leaves } f\in\T_\alpha = \T, \quad P(f)\geq Qp_{\min}
+    \end{equation*}
+    where $p_{\min} = \min_{x\in\A}p(x)>0$.
+    \begin{equation*}
+        \forall \textnormal{ leaves } f\in\T_\alpha = \T, \quad P(f)\leq Q
+    \end{equation*}
+
+    In particular, by the first to equations:
+    \begin{equation*}
+        \forall \textnormal{ leaves } f\in\T_\alpha = \T, \quad Qp_{\min} \leq P(f) \leq Q
+    \end{equation*}
+    Using the left-hand-side and the fact that $M$ is the number of leaves in $\T$, we have
+    \begin{equation*}
+        \begin{aligned}
+            MQP_{\min} &\leq \sum_{f \textnormal{ leaf of }\T} P(f)\\
+            &= P(\epsilon)\\
+            &= 1
+        \end{aligned}
+    \end{equation*}
+
+    Consequently,
+    \begin{equation*}
+        Q \leq \frac{1}{Mp_{\min}}
+    \end{equation*}
+    Therefore, using the previous result,
+    \begin{equation*}
+        \begin{aligned}
+            -\log_2P(f) &\geq -\log_2 q\\
+            &\geq -\log_2\left(\frac{1}{Mp_{\min}}\right)\\
+            &= \log_2(Mp_{\min})
+        \end{aligned}
+    \end{equation*}
+
+    Hence, for a random variable $W$ having the distribution of each message parsed by the Tunstall's code (taking as its value $f$ in the set of leaves of $\T$ with probability $P(f)$):
+    \begin{equation*}
+        \begin{aligned}
+            H_2(W) &= -\sum_{f \textnormal{ leaf of }\T}P(f)\log_2P(f)\\
+            &\geq \phantom{-} \sum_{f \textnormal{ leaf of }\T}P(f)\log_2(Mp_{\min})\\
+            &= \phantom{-} \log_2(Mp_{\min})
+        \end{aligned}
+    \end{equation*}
+
+    By the right-hand-side of \eqref{eq:alpha-b}, we have:
+    \begin{equation*}
+        \begin{aligned}
+            b &< \log_2(M+D-1)\\
+            &= \log_2\left(M\frac{p_{\min}}{P_{\min}}\left(1+\frac{D-1}{M}\right)\right)\\
+            &= \log_2(Mp_{\min}) + \underbrace{\log_2\left(\frac{1}{p_{\min}}\right) + \log_2\left(1+\frac{D-1}{M}\right)}_{:= c}\\
+            &\leq H_2(W) + c\\
+            &= \E[L] H_2(p) + c
+        \end{aligned}
+    \end{equation*}
+    Hence
+    \begin{equation*}
+        \frac{b}{\E[L]} < H_2(p) + \frac{c}{\E[L]}
+    \end{equation*}
+    On the other hand, the uniform distribution entropy bound and the right-hand-side of \eqref{eq:alpha-b} give:
+    \begin{equation*}
+        \begin{aligned}
+            H_2(W)&\leq\log_2M\\
+            &\leq b
+        \end{aligned}
+    \end{equation*}
+    and hence, again by \eqref{eq:parsed-message-entropy},
+    \begin{equation*}
+        H_2(p)\leq\frac{b}{\E[L]}
+    \end{equation*}
+
+    Combining the last two results, it is enough to prove that
+    \begin{equation*}
+        \frac{c}{\E[L]} \xrightarrow[b\to+\infty]{} 0
+    \end{equation*}
+    In this regard, note by \eqref{eq:alpha-b} that
+    \begin{equation*}
+        M=1+\alpha(D-1) \xrightarrow[b\to+\infty]{} +\infty
+    \end{equation*}
+    and hence
+    \begin{equation*}
+        c \xrightarrow[b\to+\infty]{} -\log p_{\min} \in \lbrack0, +\infty\rbrack
+    \end{equation*}
+    The above observation and $H_2(W)\leq b$ implies that
+    \begin{equation*}
+        \E[L] \xrightarrow[b\to+\infty]{} +\infty
+    \end{equation*}
+    which completes the proof.
 \end{proof}
 
 \end{document}
