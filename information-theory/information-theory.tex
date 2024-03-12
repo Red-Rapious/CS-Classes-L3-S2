@@ -37,7 +37,7 @@ We will later on discuss the base of the logarithm.
 Observe that $0\leq H(p) \leq +\infty$, and that $H(p)=0$ if and only if $X$ is constant almost surely.
 
 \begin{property}
-    Entropy is invariant with respect to deterministic injective mapping $f: \X \to \mathcal{Y}$:
+    Entropy is invariant with respect to deterministic injective mapping $f: \X \to \Y$:
     \begin{equation*}
         H(X) = H(f(X))
     \end{equation*}
@@ -401,18 +401,18 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 \end{remark}
 
 \begin{remark}[Source coding rates]
-    In general, one may use different sets of coding symbols $\mathcal{Y}$, having arbitrary number $b:=|\mathcal{Y}|>1$ of elements (set of $b$-digits) together with some coding and decoding functions:
+    In general, one may use different sets of coding symbols $\Y$, having arbitrary number $b:=|\Y|>1$ of elements (set of $b$-digits) together with some coding and decoding functions:
     \begin{equation*}
         \begin{cases}
-            c^{(n)}:\X^n\mapsto \mathcal{Y}^{n''}\\
-            d^{(n)}:\mathcal{Y}^{n''}\mapsto \X^n
+            c^{(n)}:\X^n\mapsto \Y^{n''}\\
+            d^{(n)}:\Y^{n''}\mapsto \X^n
         \end{cases}
     \end{equation*}
     In this more general scheme, the ratio:
     \begin{equation}
         R_s:=\frac{\textnormal{number of $b$-digits used to encode one source message}}{\textnormal{number of source symbols in one source message}} = \frac{n''}{n}
     \end{equation}
-    is called \emph{(source) coding rate}. It is expressed in $b$-digits/(source) symbol. Considering a bijective mapping $\X^{n'}\mapsto \mathcal{Y}^{n''}$ with $n'$, $n''$ such that $D^{n'}=b^{n''}$ in conjunction with Shannon's first theorem, it is straightforward to see that
+    is called \emph{(source) coding rate}. It is expressed in $b$-digits/(source) symbol. Considering a bijective mapping $\X^{n'}\mapsto \Y^{n''}$ with $n'$, $n''$ such that $D^{n'}=b^{n''}$ in conjunction with Shannon's first theorem, it is straightforward to see that
     \begin{equation*}
         H_D(p)\log_bD = H_b(p) \: \textnormal{[$b$-digit/(source) symbol]}
     \end{equation*}
@@ -880,7 +880,7 @@ Let $p$ be a probability distribution on $\X$, with $|\X|<\infty$, and consider 
     We construct a binary tree $\mathcal{T}_H = T_H(p)$ with vertices marked by some probabilities (real values in $[0, 1]$) executing the following algorithm:
     \begin{enumerate}
         \item Assign distinct vertices (of a binary tree to be constructed) to all elements $x\in\X$, \emph{activate} and mark them by the corresponding probability $p(x)$. At this stage, all the vertices are isolated, there are no edges in the graph.
-        \item Take two different active vertices minimizing the sum of their probabilities. Deactivate these vertices and create a new one, being the direct common ancestor of them. Activate and mark this new vertex by the sum of the probaibilities of the two vertices deactivated in this step.
+        \item Take two different active vertices minimizing the sum of their probabilities. Deactivate these vertices and create a new one, being the direct common ancestor of them. Activate and mark this new vertex by the sum of the probabilities of the two vertices deactivated in this step.
         \item Repeat step 2 until there is only one active vertex. Declare this vertex to be the root $\emptyset$ of the constructed graph, which is a tree. The root is marked with probability 1.
     \end{enumerate}
 \end{definition}
@@ -1125,6 +1125,7 @@ The first condition allows one to parse any infinite sequence of letters from $\
 \end{proof}
 
 \begin{lemma}[Node conservation law for complete trees]
+    \label{lem:node-conservation}
     Let $\mathcal{C}$ be a finite dictionary of a valid parsing code. Denote by $M$ and $\alpha$, respectively, the number of leaves and intermediate nodes in the coding tree related to $\mathcal{C}$. Then:
     \begin{equation*}
         M = 1 + \alpha(D-1)
@@ -1249,13 +1250,13 @@ We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., 
     x_1*x_2*\dots = W_1 * W_2 * \dots = C(j_1) * C(j_2) * \dots
 \end{equation*}
 
-\paragraph*{Translation} Indices $j_i\in\llbracket 1, M\rrbracket$ of messages $W_i = C(j_i)$ are then encoded with a \emph{translation code} $c:\llbracket 1, M\rrbracket\to \mathcal{Y}^b$ having code-words of \emph{fixed} length $b\geq1$, and using (possibly different) alphabet $\mathcal{Y}$. Note that the number of new encoding characters $|\mathcal{Y}|$ and the code-word length $b$ should satisfy $M\leq|\mathcal{Y}|^b$ so that we are guaranteed existence of a decipherable translation (injection) $c:\llbracket 1, M\rrbracket\to\mathcal{Y}^b$.
+\paragraph*{Translation} Indices $j_i\in\llbracket 1, M\rrbracket$ of messages $W_i = C(j_i)$ are then encoded with a \emph{translation code} $c:\llbracket 1, M\rrbracket\to \Y^b$ having code-words of \emph{fixed} length $b\geq1$, and using (possibly different) alphabet $\Y$. Note that the number of new encoding characters $|\Y|$ and the code-word length $b$ should satisfy $M\leq|\Y|^b$ so that we are guaranteed existence of a decipherable translation (injection) $c:\llbracket 1, M\rrbracket\to\Y^b$.
 
 The superposition of a valid parsing code $\mathcal{C}$ with an injective translation code of fixed length
 \begin{equation*}
     x_1*x_2*\dots \longrightarrow C(j_1)*C(j_2)*\dots \longrightarrow c(j_1)*c(j_2)*\dots
 \end{equation*}
-is an injective mapping from $\A^\star$ into $\mathcal{Y}^\star$ and one can sequentially decode $x_1*x_2*\dots$ from $c(j_1)*c(j_2)*\dots$.
+is an injective mapping from $\A^\star$ into $\Y^\star$ and one can sequentially decode $x_1*x_2*\dots$ from $c(j_1)*c(j_2)*\dots$.
 
 \begin{example}[Parsing and translating with binary alphabet]
     We will parse the source sequence
@@ -1287,10 +1288,11 @@ is an injective mapping from $\A^\star$ into $\mathcal{Y}^\star$ and one can seq
 \end{example}
 
 \begin{property}[Coding rate for parsing and translation]
-    The coding rate for an i.i.d. sequence $X_1, X_2, \dots$ when using a superposition of parsing and translation into code-words of length $b$ of alphabet $\mathcal{Y}$, by Lemma \ref{lem:distribution-parsed-messages} and by the LLN, is almost surely equal to
-    \begin{equation*}
-        R_s := \lim_{n\to\infty} \frac{nb}{l(W_1)+\dots+l(W_n)} = \frac{b}{\E[L]} \; \left[\frac{|\mathcal{Y}|\textnormal{-digit}}{\textnormal{(source) symbol}}\right]
-    \end{equation*}
+    The coding rate for an i.i.d. sequence $X_1, X_2, \dots$ when using a superposition of parsing and translation into code-words of length $b$ of alphabet $\Y$, by Lemma \ref{lem:distribution-parsed-messages} and by the LLN, is almost surely equal to
+    \begin{equation}
+        \label{eq:parsing-conding-rate-def}
+        R_s := \lim_{n\to\infty} \frac{nb}{l(W_1)+\dots+l(W_n)} = \frac{b}{\E[L]} \; \left[\frac{|\Y|\textnormal{-digit}}{\textnormal{(source) symbol}}\right]
+    \end{equation}
     where $L=l(W)$ is the random variable having the distribution of the parsed message length.
 
     Using \eqref{eq:parsed-message-entropy},
@@ -1301,25 +1303,68 @@ is an injective mapping from $\A^\star$ into $\mathcal{Y}^\star$ and one can seq
 \end{property}
 
 \begin{remark}
-    Note that the uniform entropy bound $H(W)\leq\log M$ and condition $M\leq|\mathcal{Y}|^b$ gives in general
+    Note that the uniform entropy bound $H(W)\leq\log M$ and condition $M\leq|\Y|^b$ gives in general
     \begin{equation*}
-        H_{\mathcal{Y}}(W)\leq\log_{|\mathcal{Y}|} M\leq b
+        H_{\Y}(W)\leq\log_{|\Y|} M\leq b
     \end{equation*}
-    impliying the lower bound on the coding rate $R_s\geq H_{|\mathcal{Y}|}(X)$, which is the entropy of the source, here expressed in $|\mathcal{Y}$-digits per source symbol.
+    impliying the lower bound on the coding rate $R_s\geq H_{|\Y|}(X)$, which is the entropy of the source, here expressed in $|\Y$-digits per source symbol.
 \end{remark}
 
 The superposition of parsing and translation achieves a coding rate close to this lower bound provided
+\begin{equation}
+    \label{eq:entropy-sim-b}
+    H_{|\Y|}(W) \simeq b
+\end{equation}
+which can be achieved when $|\mathcal{C}| = M \simeq |\Y|^b$ and the distribution of the messages $W$ on $\mathcal{C}$ is close to the uniform one:
 \begin{equation*}
-    H_{|\mathcal{Y}|}(W) \simeq b
+    H_{\Y} \simeq \log_{|\Y|}M \simeq b
 \end{equation*}
-which can be achieved when $|\mathcal{C}| = M \simeq |\mathcal{Y}|^b$ and the distribution of the messages $W$ on $\mathcal{C}$ is close to the uniform one:
-\begin{equation*}
-    H_{\mathcal{Y}} \simeq \log_{|\mathcal{Y}|}M \simeq b
-\end{equation*}
-where the first $\simeq$ holds if and only if $W$ follows a uniform distribution of cardinality $\mathcal{C}$, and the second holds if and only if $|\mathcal{C}|=M\simeq|\mathcal{Y}|^b$.
+where the first $\simeq$ holds if and only if $W$ follows a uniform distribution of cardinality $\mathcal{C}$, and the second holds if and only if $|\mathcal{C}|=M\simeq|\Y|^b$.
 
-In what follows, we shall present Tunstall's code, allowing one to achieve the previous semi-equality asymptotically when $b\to\infty$. In general, Tunstall's code transforms sequences of symbols having given distribution $p$ into an i.i.d sequence of messages approximately uniformly distributer.
+In what follows, we shall present Tunstall's code, allowing one to achieve the previous semi-equality asymptotically when $b\to\infty$. In general, Tunstall's code transforms sequences of symbols having given distribution $p$ into an i.i.d sequence of messages approximately uniformly distributed.
 
 \subsection{Tunstall's code}
+Let $\A$ be an alphabet with $A<|\A|=D<\infty$. We shall construct a valid parsing code for sequences of symbols in $\A$. Let $b\geq1$ be a given integer; the parsed messages will undergo a translation using a translation code having code-words of fixed length $b$ in \emph{binary alphabet} $\Y=\{0, 1\}$. We seek at achieving \eqref{eq:entropy-sim-b} for a given probability distribution $p$ of source symbols $X\sim p$.
+
+Select $\alpha>1$ such that:
+\begin{equation}
+    \label{eq:alpha-b}
+    1 + \alpha(D-1)\leq2^b<1+(\alpha+1)(D-1)
+\end{equation}
+The constructed valid parsing code will have $M=1+\alpha(D-1)$ code words in its dictionary $\mathcal{C}$. In fact, we construct its corresponding $D$-ary coding tree, which needs to be complete, with exactly $M$ leaves corresponding to the words of the dictionary $\mathcal{C}$.
+
+Recall from Lemma \ref{lem:node-conservation} (Node conservation law for valid trees) that $\alpha$ corresponds to the number of intermediate nodes in the coding tree of $\mathcal{C}$ that we want to construct.
+
+\begin{definition}[Tunstall's coding tree]
+    For a given source distributon $p$ with $p(x)>0$ for all $x\in\A$, and $\alpha$ and $b$ satisfiying \eqref{eq:alpha-b}, we construct a complete $D$-ary tree, having $\alpha$ intermediate nodes, by executing the following algorithm:
+    \begin{enumerate}
+        \item Consider complete tree $\T_1$ having a root and all its $D$ children. Note that $\T_1$ has $\alpha_1=1$ intermediate node and $M_1=D$ leaves. Mark the nodes of $\T_1$ by probabilities $P(\omega)$ given by \eqref{eq:def-P}.
+        \item For $n=1, \dots, \alpha-1$, take a leaf of $\T_n$ having the largest probability $P(\omega)$ and transform it into an intermediate node by adding all its children as new leaves. This gives a new complete tree $\T_{n+1}$ having $\alpha_{n+1}=\alpha_n + 1$ nodes and $M_{n+1}=M_n+D-1$ leaves. 
+        \item The dictionary of Tunstall's parsing code corresponds to the leaves of $\T:=\T_\alpha$.
+    \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Asymptotic optimality of Tunstall's code]
+    Under the same hypothesis as the definition, let $L=l(W)$ be the length of the generic messages $W$ parsed on the i.i.d. source sequence $X_1, X_2, \dots, X\sim p$, using Tunstall's parsing code. We have:
+    \begin{equation}
+        \lim_{b\to+\infty}\frac{b}{\E[L]} = H_2(p)
+    \end{equation}
+\end{theorem}
+
+\begin{corollary}
+    By the definition of the coding rate in this case \eqref{eq:parsing-conding-rate-def}, Tunstall's code achieves asymptotically optimal coding rate converging to the entropy
+    \begin{equation*}
+        R_S = \frac{b}{\E[L]} \xrightarrow[b\to+\infty]{} H_2(p)
+    \end{equation*}
+    Furthermore, by \eqref{eq:parsed-message-entropy}, the entropy of the block-message satisfies
+    \begin{equation}
+        \lim_{b\to+\infty} \frac{H_2(W)}{b} = 1
+    \end{equation}
+    meaning that it is asymptotically close to $b=\log_22^b=H_2(\textnormal{Unif}(2^b))$, which is the entropy of a uniform random variable on $M=2^b$ messages.
+\end{corollary}
+
+\begin{proof}
+    
+\end{proof}
 
 \end{document}
