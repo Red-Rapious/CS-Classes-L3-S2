@@ -6,7 +6,7 @@
 
 \renewcommand*{\L}{\mathcal{L}}
 \newcommand*{\V}{\mathcal{V}}
-\newcommand*{\T}{\mathcal{T}}
+\DeclareMathOperator{\attr}{attr}
 
 \begin{document}
 \section*{Introduction}
@@ -267,5 +267,194 @@ Grâce à celui-ci, l'évaluation de requêtes est très efficace; cependant, il
 \subsection{Le modèle entité-associations}
 
 \subsection{Normalisation}
+
+\section{Contraintes, dépendances fonctionnelles et multivariées}
+\subsection{Premières définitions}
+On se place dans un cadre relationnel, dans une perspective nommée (par exemple, $R(A, B, C, D)$).
+
+\begin{definition}[Dépendance fonctionnelle (FD)]
+    Soit une table $R$. Une dépendance fonctionnelle sur $R$ est de la forme
+    \begin{equation*}
+        A \to B
+    \end{equation*}
+    où $A\subseteq \attr(R)$ et $B\subseteq \attr(R)$. On dit que $\sigma$ est vérifiée par une instance de $R$ lorsque
+    \begin{equation*}
+        \forall t, t'\in R, \quad t[A]=t'[A]\implies t[B]=t'[B]
+    \end{equation*}
+    Intuitivement, si deux lignes ont la même valeur selon $A$, alors elles ont la même valeur selon $B$. 
+\end{definition}
+
+\begin{remarque}
+    Les clés sont un exemple de dépendance fonctionnelle.
+\end{remarque}
+
+% TODO: mettre sous forme de table
+\begin{exemple}
+    Sur une table $R(A, B, C, D)$, on considère la dépendance fonctionnelle $\{A\} \to \{C\}$. Alors $R(1, 2, 3, 4)$ est correcte, mais $R(1, 2, 4, 3)$ ne peut pas être rajouté à la table tout en respectant la dépendance fonctionnelle.
+\end{exemple}
+
+\begin{definition}[Dépendance multivariée (MVD)]
+    Soit une table $R$, $A\subseteq\attr(R)$ et $B\subseteq\attr(R)$. Une dépendance fonctionnelle multivariée sur $R$ est de la forme:
+    \begin{equation*}
+        A \twoheadrightarrow B
+    \end{equation*}
+    On dit alors que $\sigma$ est vérifiée par une instance de $R$ lorsque:
+    \begin{equation*}
+        \forall t, t', \quad t[A]=t'[A] \implies \exists t'', \begin{cases}
+             t''[B]=t[B] \\
+             t''[A]=t[A]\\
+             t''[C]= t'[C]
+        \end{cases}
+    \end{equation*}
+    où $C:=\attr(R)\setminus (A\cup B)$. Intuitivement, le reste des attributs est indépendant de $A$ et $B$, donc toutes les autres combinaisons doivent exister.
+\end{definition}
+
+\begin{exemple}
+    La table suivante respecte la relation $A \twoheadrightarrow B$:
+    \begin{equation*}
+        \begin{bmatrix}
+            1&2&3&4\\
+            1&3&5&6\\
+            1&2&5&6\\
+            1&3&3&4
+        \end{bmatrix}
+    \end{equation*}
+\end{exemple}
+
+\subsection{Problème d'implication de contraintes}
+Soit $\Sigma$ un ensemble de FD et MVD, et $\sigma$ une FD ou une MVD. On s'intéresse au problème suivant: est-il vrai que si une instance $I$ de $R$ vérifie $\Sigma$, alors $I$ vérifie $\sigma$ ? On notera dans ce cas $\Sigma \vdash \sigma$.
+
+\begin{exemple}
+    Posons:
+    \begin{equation*}
+        \begin{aligned}
+            \Sigma &:= \{\{A\}\twoheadrightarrow\{B, C\}, \{D\}\rightarrow\{C\}\}\\
+            \sigma &:= \{A\} \rightarrow \{C\}
+        \end{aligned}
+    \end{equation*}
+    On cherche à résoudre le problème d'implication de contraintes en construisant un potentiel contre-exemple. On part donc de:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_2&b_2&c_2&d_2
+        \end{bmatrix}
+    \end{equation*}
+    On unifie ensuite les attributs correspondant à la partie gauche de la flèche ($a_2$ devient $a_1$). En appliquant les contraintes, on transforme la table en:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_1&b_2&c_1&d_2\\
+            a_1&b_1&c_1&d_2\\
+            a_1&b_2&c_1&d_1
+        \end{bmatrix}
+    \end{equation*}
+    Cette table respecte la contrainte multivariée, donc tout $\Sigma$. Elle respecte de plus $\sigma$, donc on a bien $\Sigma\vDash\sigma$, car le processus de construction d'un contre-exemple n'a pas réussi.
+\end{exemple}
+
+\begin{exemple}
+    Posons:
+    \begin{equation*}
+        \begin{aligned}
+            \Sigma &:= \{\{A\}\twoheadrightarrow\{B\}, \{B\}\twoheadrightarrow\{C\}\}\\
+            \sigma &:= \{A\} \rightarrow \{C\}
+        \end{aligned}
+    \end{equation*}
+    Similairement, on part de:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_2&b_2&c_2&d_2
+        \end{bmatrix}
+    \end{equation*}
+    En appliquant les contraintes, on arrive à la table:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_1&b_2&c_2&d_2\\
+            a_1&b_1&c_2&d_2\\
+            a_1&b_2&c_1&d_1\\
+            a_1&b_1&c_1&d_2\\
+            a_1&b_1&c_2&d_1\\
+            a_1&b_2&c_2&d_1\\
+            a_1&b_2&c_1&d_2
+        \end{bmatrix}
+    \end{equation*}
+\end{exemple}
+
+\begin{remarque}
+    Un ensemble $\Sigma$ de dépendances exclusivement multivariées ne peut pas impliquer une dépendance simple.
+\end{remarque}
+
+\begin{exemple}
+    Posons:
+    \begin{equation*}
+        \begin{aligned}
+            \Sigma &:= \{\{A\}\twoheadrightarrow\{B, C\}, \{C, D\}\twoheadrightarrow\{B\}\}\\
+            \sigma &:= \{A\} \rightarrow \{B\}
+        \end{aligned}
+    \end{equation*}
+    Similairement, on part de:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_2&b_2&c_2&d_2
+        \end{bmatrix}
+    \end{equation*}
+    et on arrive à:
+    \begin{equation*}
+        \begin{bmatrix}
+            a_1&b_1&c_1&d_1\\
+            a_1&b_2&c_2&d_2\\
+            a_1&b_1&c_1&d_1\\
+            a_1&b_2&c_2&d_1
+        \end{bmatrix}
+    \end{equation*}
+    qui respecte $\Sigma$ (le domaine pour $A$ est $\{a_1\}$), mais pas $\sigma$.
+\end{exemple}
+
+\subsection{EGD et TGD}
+\begin{definition}[Tuple Generating Dependancy (TGD)]
+    \begin{equation*}
+        \forall x, \forall y, \quad \big(B(X, y) \rightarrow \exists z, H(y, z)\big)
+    \end{equation*}
+    avec $B$ et $H$ des conjonctions d'atomes.
+\end{definition}
+
+\begin{exemple}
+    La formule logique suivante est une TGD:
+    \begin{equation*}
+        \forall x_1, x_2, x_3, x_4, \quad \big(R(x_1, x_2, x_3, x_4) \rightarrow \exists z_1, R(x_1, x_2, z_1, z_1)\big)
+    \end{equation*}
+\end{exemple}
+
+\begin{exemple}
+    On cherche une TGD représentant sur $R(A, B, C, D)$ la dépendance multivariée suivante:
+    \begin{equation*}
+        \{A\} \twoheadrightarrow \{C, D\}
+    \end{equation*}
+    On propose alors:
+    \begin{equation*}
+        \forall x_1, x_2, x_3, x_4, x_2', x_3', x_4', \quad \big(R(x_1, x_2, x_3, x_4) \land R(x_1, x_2', x_3', x_4') \rightarrow R(x_1, x_2, x_3', x_4')\big)
+    \end{equation*}
+    Notons que nous n'avons pas utilisé de quantificateur existentiel. Ces derniers sont néanmoins nécessaires, par exemple pour les relations des clés étrangères.
+\end{exemple}
+
+\begin{definition}[Equality Generating Dependancy (EGD)]
+    \begin{equation*}
+        \forall x, y_1, y_2, B(x, y_1, y_2) \rightarrow y_1 = y_2
+    \end{equation*}
+    avec $B$ une conjonction d'atomes.
+\end{definition}
+
+\begin{exemple}
+    Sur $R(A, B, C, D)$, on cherche une EGD pour:
+    \begin{equation*}
+        \{A, B\} \rightarrow \{C, D\}
+    \end{equation*}
+    On propose:
+    \begin{equation*}
+        \forall x, y, c_1, c_2, d_1, d_2, \quad R(x, y, c_1, d_1) \land R(x, y, c_2, d_2) \rightarrow c_1=c_1 \land d_1=d_2
+    \end{equation*}
+\end{exemple}
 
 \end{document}
