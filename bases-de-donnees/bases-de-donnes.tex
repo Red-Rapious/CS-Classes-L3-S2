@@ -301,12 +301,16 @@ On se place dans un cadre relationnel, dans une perspective nommée (par exemple
     On dit alors que $\sigma$ est vérifiée par une instance de $R$ lorsque:
     \begin{equation*}
         \forall t, t', \quad t[A]=t'[A] \implies \exists t'', \begin{cases}
-             t''[B]=t[B] \\
-             t''[A]=t[A]\\
-             t''[C]= t'[C]
+            t''[A]=t[A]\\
+            t''[B]=t[B] \\
+            t''[C]= t'[C]
         \end{cases}
     \end{equation*}
-    où $C:=\attr(R)\setminus (A\cup B)$. Intuitivement, le reste des attributs est indépendant de $A$ et $B$, donc toutes les autres combinaisons doivent exister.
+    où $C:=\attr(R)\setminus (A\cup B)$. Intuitivement, le reste des attributs est indépendant de $A$ et $B$, donc toutes les autres combinaisons doivent exister. Informellement, si l'on dénote par $(x, y, z)$ le tuple regroupant les valeurs respectivement de $A, B$ et $\attr(R)\setminus (A\cup B)$, alors:
+    \begin{equation*}
+        R(a, b, c) \land R(a, d, e) \implies R(a, b, e),
+    \end{equation*}
+    c'est-à-dire que l'on peut \say{garder les valeurs sur $A$ et $B$ du premier tuple en prenant pour le reste des valeurs celles du second}. Notons que $R(a, b, c) \land R(a, d, e) \implies R(a, d, c)$ également, par symétrie des rôles.
 \end{definition}
 
 \begin{exemple}
