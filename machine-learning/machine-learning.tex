@@ -155,4 +155,132 @@ In this case,
 \end{aligned}
 \end{equation*}
 
+\section{Kernels}
+\subsection{Introduction to kernels}
+In this course, we often focused on prediction methods which are \emph{linear}, that is, the input data are vectors and the prediction function is linear (e.g. $f(x)=w^\top x$ for $w\in\R^d$). In this situation with given data $(x_i, y_i)$, the vector $w$ can be obtained by minimizing
+\begin{equation*}
+    \hat{L}(w)=\frac{1}{n}\sum_{i=1}^n l(y_i, w^\top x_i) + \lambda \Omega(w)
+\end{equation*}
+
+Classical examples are logistic regression or least-squares regression. These methods look at first sight of limited practical significance, because input data may not be vectors, and relevant prediction functions may not be linear.
+
+The goal of kernel methods is therefore to go beyond these limitations while keeping the good aspects. The underlying principle is to replace $x$ by a function $\phi(x)\in\R^d$, \emph{explicitly} or \emph{implicitly}, and consider linear predictions in $\Phi(x)$, i.e. $f(x)=w^\top \phi(x)$. We call $\phi(x)$ the \emph{feature} associated to $x$.
+
+\begin{example}[Linear regression]
+    In the case of linear regression, $\phi(x)=x$ for $x\in\R^d$. As expected, this gives us linear models:
+    \begin{equation*}
+        f(x)=w^\top x = \sum_{j=1}^d w_jx_j
+    \end{equation*}
+\end{example}
+
+\begin{example}[Polynomial regression of degree $r$]
+    With $x\in\R$, we have $\phi(x)\in\R^{r+1}$ defined by:
+    \begin{equation*}
+        \phi(x)=(1, x, x^2, \dots, x^r)
+    \end{equation*}
+    Therefore, the prediction functions will be general polynomials of degree at most $r$:
+    \begin{equation*}
+        f(x)=w^\top\phi(x)=\sum_{j=0}^r (\phi(x))_j = \sum_{j=1}^r w_jx^j
+    \end{equation*}
+\end{example}
+
+\begin{example}[Polynomial multivariate regression of degree $r$]
+    We consider $x\in\R^d$ and
+    \begin{equation*}
+        \phi(x)=(x_1^{\alpha_1}, \dots, x_d^{\alpha_d})
+    \end{equation*}
+    with $\sum_{i=1}^d \alpha_i=r$. In this situation, $p=\binom{d+r-1}{r}$ might be too big for an explicit representation to be feasible;
+\end{example}
+
+\begin{example}[Generic set of functions]
+    Let $\varphi_1, \varphi_r : \R^d \to \R$ be a set of functions of interest (e.g. a subset of the Fourier basis); we define $\phi(x) = (\varphi_1(x), \dots, \varphi_r(x))$ to have:
+    \begin{equation*}
+        f(x)=w^\top \phi(x) = \sum_{j=1}^rw_j\varphi_j(x)
+    \end{equation*}
+\end{example}
+
+\subsection{Representer theorem}
+\subsubsection{Theorem statement}
+Given a dataset $x_1, \dots, x_n$, we are able to compute the observed feature maps $\phi_(x_1), \dots, \phi(x_n)$. We can ask ourselves if there exists an easier representation for $w$ in terms of these observed feature maps, i.e. we want to know if it is possible to characterize the minimum $\hat{w}$ of:
+\begin{equation*}
+    \hat{L}(w) = \frac{1}{n}\sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \lambda w^\top w
+\end{equation*}
+in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$. The following theorem guarantees such characterization under basic properties of $\hat{L}$.
+
+\begin{theorem}[Representer theorem]
+    Let $\phi:\X\to\R^d$. Let $(x_1, \dots, x_n)\in\X^n$ and assume that $\Psi:\R^{n+1}\to\R$ is strictly increasing with respect to the last variable. Then, the minimum of
+    \begin{equation*}
+        \hat{L}(w) := \Psi(w^\top\phi(x_1), \dots, w^\top\phi(x_n), w^\top w)
+    \end{equation*}
+    is obtained for
+    \begin{equation*}
+        w=\sum_{i=1}^n \alpha_i \phi(x_i)
+    \end{equation*} for some $\alpha\in\R^n$.
+\end{theorem}
+
+\begin{proof}
+    % TODO
+\end{proof}
+
+\begin{corollary}
+    For $\lambda>0$, 
+    \begin{equation*}
+        \min_{w\in\R^d} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \frac{\lambda}{2} w^\top w
+    \end{equation*}
+    is obtained for
+    \begin{equation*}
+        w = \sum_{i=1}^n \alpha_i\phi(x_i).
+    \end{equation*}
+\end{corollary}
+
+Note that there is no assumption on $l$, and in particular, no convexity assumption. This result is extendable to Hilbert spaces (RKHS), as we will see in the next section.
+
+\subsubsection{Finite dimensional representation of the learning problem}
+Using the representer theorem, we know that the minimum of $\hat{L}$ is of the form $w=\sum_{i=1}^n \alpha_i\phi(x_i)$; we can therefore directly optimize this characterization, i.e. we can then write:
+\begin{equation*}
+    \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \frac{\lambda}{2} w^\top w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n l(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\top K\alpha
+\end{equation*}
+where $K$ is an $n\times n$ matrix with values
+\begin{equation*}
+    K_{i, j} = \phi(x_i)^\top \phi(x_j).
+\end{equation*}
+
+Indeed,
+\begin{equation*}
+    \phi(x_i)^\top w = \sum_{j=1}^n \alpha_j\phi(x_i)^\top\phi(x_j) = (K\alpha)_i
+\end{equation*}
+moreover,
+\begin{equation*}
+    ||w||^2 = w^\top w = \sum_{i=1}^n\sum_{j=1}^n \alpha_i\alpha_j\phi(x_i)^\top\phi(x_j) = \alpha^\top K\alpha
+\end{equation*}
+
+We finally have a closed form representation for the function evaluation. Defining the \emph{kernel function} $k(x, x'):=\phi(x)^\top \phi(x')$, we have:
+\begin{equation*}
+    f(x) = w^\top\phi(x) = \sum_{i=1}^n \alpha_i\phi(x_i)^\top\phi(x) = \sum_{i=1}^n \alpha_i k(x_i, x).
+\end{equation*}
+
+\begin{remark}[Kernel trick]
+    The whole learning problem can be written in terms of the kernel $k$; indeed, $f$ depends only on $k$, $\hat{L}$ depends on $K$ with $K_{i, j} = k(x_i, x_j)$. Therefore, we have the so-called \emph{kernel trick}, i.e. we do not need to compute explicitly the features $\phi$ to be able to represent and solve the learning problem, we just need to be able to compute their inner product.
+\end{remark}
+
+\begin{example}[Power of the kernel trick with infinite dimensional feature maps]
+    \leavevmode
+    
+    \noindent
+    Consider $\X=\lbrack-1, 1\rbrack$ and the feature map
+    \begin{equation*}
+        \phi(x)=(1, x, x^2, \dots).
+    \end{equation*}
+    The resulting model space would have the form
+    \begin{equation*}
+        f(x)=\sum_{j=0}^{+\infty}w_jx^j
+    \end{equation*}
+    with $\sum_{j=1}^{+\infty}w_j^2 < +\infty$. This model space is the set of analytic function on $\X$, which is a very rich space. In particular, it is dense in the space of continuous functions. However, it is not possible to compute $\phi(x)$ explicitly since it is infinite dimensional. The kernel trick provides an elegant way to compute the solution of the learning problem in closed form; indeed, the inner product can be computed in closed form in $O(1)$:
+    \begin{equation*}
+        k(x, x') = \phi(x)^\top\phi(x')=\sum_{j=0}^{+\infty}x^jx^{'j} = \frac{1}{1-xx'}
+    \end{equation*}
+
+    Therefore, the kernel trick allow to replace $\R^d$ by $\R^n$, which is interesting when $d$ is very large. Furthermore, it allows to separate the representation problem (design a kernel on a set $\X$), algorithms, and analysis (which only use the kernel matrix $K$).
+\end{example}
+
 \end{document}
