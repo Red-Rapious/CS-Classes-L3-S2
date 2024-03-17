@@ -1,0 +1,277 @@
+\documentclass{../../cs-classes/cs-classes}
+
+\title{TP 05 - Dependencies and the Chase}
+\author{}%Gabriel Desfrene\and Antoine Groudiev}
+\date{\today}
+
+\DeclareMathOperator{\chase}{chase}
+
+\begin{document}
+%À chaque étape, on a un TGD $B[x, y] \rightarrow \exists z H[y, z]$. Pour voir si la règle est applicable, on cherche un homomorphisme entre $B$ et la base de données. $\hat{h}$ associe à $z$ une nouvelle variable dans $H$.
+\begin{exercise}
+    We apply the Chase algorithm to $D$, denote $D':=\chase(\Sigma, D)$. We claim that this algorithm run in polynomial time:
+    \begin{itemize}
+        \item $v$ is the number of values in the database. We iterate only on tables appearing in $\Sigma$. For the $i$-th table, we add at most $v^{k_i}$ values, where $k_i$ is the arity of $T_i$. We know that $k_i$ is constant since $T_i$ is a table appearing in a formula of $\Sigma$ which is of fixed size.
+        \item One can compute a homomorphism in polynomial time. Therefore, one can add an atom in $D$ in polynomial time.
+        \item Furthermore, we add at most $\sum_i v^{k_i}$ atoms in the database, which is polynomial in $D$.
+        \item One can check that an atom does not appear in the database in linear time in $D$.
+    \end{itemize}
+    Finally, one can check whether $D' \vDash q$ holds in polynomial time in $D'$: we compute the set $\set{\phi(\overline{z})}{\overline{z}\in D}$ and check whether it is not empty. (We assume that $q$ is of the form $q:=\exists \overline{z}, \phi\left(\overline{z}\right)$).
+\end{exercise}
+
+\begin{exercise}
+    Datalog is in \textsc{ExpTime} using the same majoration as in the previous exercise; the difference is that the $k_i$ are not constant anymore, which makes it \textsc{ExpTime}.
+
+    Let's prove that Datalog is \textsc{ExpTime}-complete by showing that a deterministic Turing machine running in time $O(2^{n^k})$ for a constant $k$ can be simulated by a Datalog program. Let $M=(Q, \Gamma, \delta, q_0, F)$ be a deterministic Turing machine running in time $O(2^{n^k})$ for some constant $k$.
+
+    \paragraph*{Tables} To encode the given Turing machine in a Datalog program, we introduce the following tables:
+    \begin{itemize}
+        \item A table $H$ of arity $2\times n^k$, representing the head of the machine. $H(s, p)$ holds when the head is in position $p$ after $s$ steps, where $p$ and $s$ are represented in big-endian binary over $n^k$ bits (since the machine runs in time $O(2^{n^k})$, $p$ and $s$ are at most $2^{n^k}$ and can therefore be represented over $n^k$ bits).
+        \item For each state $q\in Q$, we introduce a table $Q_q$ of arity $1\times n^k$, representing the states. $Q_q(s)$ holds when the machine is in the state $q$ after $s$ steps ($q$ and $s$ are also represented in binary)
+        \item For each symbol $\gamma\in\Gamma$, we introduce a table $S_\gamma$ of arity 2, representing the symbols. $S_\gamma(s, c)$ holds when the tape cell in position $c$ contains the symbol $\gamma$ after $s$ steps ($s$ and $c$ are also represented in binary).
+    \end{itemize}
+
+    \paragraph*{Handling numbers} We now need a way to manipulate binary numbers represented over $n^k$ bits. Sadly, we cannot simply build a table for the relationship of numbers over $n^k$ digits since this would require more than polynomial time in the input size when $n^k$ is very large. To fix this issue, we will use tables and dependencies to do the computation for us, starting from numbers of length 1 (which we can initialize in constant time) and building up a recurring scheme toward $n^k$. We introduce three tables for each number length $l\in\llbracket 1, n^k \rrbracket$:
+    \begin{itemize}
+        \item A table $Z_l$ (for zero) of arity $l$ such that $Z_l(z)$ holds when $z$ is the zero of length $l$.
+        \item A table $M_l$ (for max) of arity $l$ such that $M_l(m)$ holds when $m$ represents $2^l-1$, the maximum value represented over $l$ digits.
+        \item A table $P_l$ (for plus 1) of arity $2\times l$ such that $P^l(a, b)$ holds when $b=a+1$ (with $a$ and $b$ of length $l$).
+              %\item A table $G_l$ (for greater than) of arity $2\times l$ such that $G_l(a, b)$ holds when $b>a$ (with $a$ and $b$ of length $l$).
+    \end{itemize}
+    Tables for $l=1$ are initialized with:
+    \begin{equation*}
+        \begin{cases}
+            Z_1(0) \\
+            M_1(1) \\
+            P_1(0, 1)
+        \end{cases}
+    \end{equation*}
+    We add the following dependencies:
+    \begin{equation*}
+        \begin{aligned}
+            Z_i(z)              & \rightarrow Z_{i+1}(0, z)       \\
+            M_i(m)              & \rightarrow M_{i+1}(1, z)       \\
+            P_i(a, b)           & \rightarrow P_{i+1}(0, a, 0, b) \\
+            P_i(a, b)           & \rightarrow P_{i+1}(1, a, 1, b) \\
+            M_i(a) \land Z_i(b) & \rightarrow P_{i+1}(0, a, 1, b)
+        \end{aligned}
+    \end{equation*}
+
+    Finally, we add a table $G$ (for \emph{greater than}) of arity $2\times n^k$ comparing two number over $n^k$ bits. We introduce the dependencies:
+    \begin{equation*}
+        \begin{aligned}
+            \textnormal{True}           & \rightarrow G(a, a) \\
+            G(a, b) \land P_{n^k}(b, c) & \rightarrow G(a, c)
+        \end{aligned}
+    \end{equation*}
+    corresponding to reflexivity and transitivity ($G$ is the reflexive and transitive closure of $P_{n^k}$).
+
+    \paragraph*{Initial configuration of the Turing machine}
+    Let $\gamma_1, \dots, \gamma_n \in \Gamma^n$ be the input word of the Turing machine.
+    We denote by $i_{n^k}$ the representation over $n^k$ bits of the number $i$, in the form of a tuple of $n^k$ binary variables. To represent the initial configuration of the Turing machine, we add the following entries to the tables:
+    \begin{equation*}
+        \begin{cases*}
+            Q_{q_0}(0_{n^k})                                                              \\
+            H(0_{n^k}, 0_{n^k})                                                           \\
+            S_{\gamma_i}(0_{n^k}, i_{n^k}) & forall $i\in\llbracket1, \dots, n\rrbracket$ \\
+            G((n+1)_{n^k}, c) \rightarrow S_{\textnormal{\textvisiblespace}}(0_{n^k}, c)
+        \end{cases*}
+    \end{equation*}
+
+    \paragraph*{Transitions}
+    Recall that $\delta:Q\times\Gamma \to Q\times\Gamma\times\{\leftarrow, \rightarrow\}$. Foreach $q\in Q, \gamma\in\Gamma$, we note $\delta(q, \gamma) =: (q', \gamma', f)$ we add the dependencies:
+    \begin{equation*}
+        \begin{aligned}
+            \underbrace{P_{n^k}(s, s')}_{s' = s+1} \land \underbrace{H(s, p) \land S_\gamma(s, p) \land Q_q(s)}_{\textnormal{TM is in state }q \textnormal{ and head is in position } p \textnormal{ at step }s} & \longrightarrow \underbrace{S_{\gamma'}(s', p)}_{\textnormal{then }\gamma \textnormal{ is replaced by }\gamma' \textnormal{ at step }s+1} \\
+            \underbrace{P_{n^k}(s, s') \land H(s, p) \land S_\gamma(s, p) \land Q_q(s)}_{\textnormal{idem}} \quad                                                                                                & \longrightarrow \underbrace{Q_{q'}(s')}_{\textnormal{then the TM is in state }q\textnormal{ at step }s+1}
+        \end{aligned}
+    \end{equation*}
+
+    We do the same for setting the head position. If $f=\rightarrow$, we add the dependency:
+    \begin{equation*}
+        \underbrace{P_{n^k}(s, s')}_{s' = s+1} \land \underbrace{P_{n^k}(p, p')}_{p' = p+1} \land \underbrace{H(s, p) \land S_\gamma(s, p) \land Q_q(s)}_{\textnormal{as previously}} \longrightarrow \underbrace{H(s', p')}_{\textnormal{then the head is in position } p+1 \textnormal{ at step }s+1}
+    \end{equation*}
+    If $f=\leftarrow$, we add a similar dependency instead:
+    \begin{equation*}
+        \underbrace{P_{n^k}(s, s')}_{s' = s+1} \land \underbrace{P_{n^k}(p', p)}_{p' = p-1} \land \underbrace{H(s, p) \land S_\gamma(s, p) \land Q_q(s)}_{\textnormal{as previously}}
+        \longrightarrow \underbrace{H(s', p')}_{\textnormal{then the head is in position } p-1 \textnormal{ at step }s+1}
+    \end{equation*}
+    For the sake of the length of the proof, we assume that the machine never moves its head to a position $p<0$, which guarantees that such a $p'$ always exists.
+
+    Finally, for each step, we need to copy the symbols which are not changed by the machine, to make sure that they are still defined at the next step. This is done using two rules, for each $\gamma\in\Gamma$:
+    \begin{equation*}
+        \underbrace{P_{n^k}(s, s')}_{s' = s+1} \land \underbrace{S_\gamma(s, p)}_{\gamma \textnormal{ is written in } p} \land \underbrace{H(s, p') \land P_{n^k}(p', p'') \land G(p'', p)}_{\textnormal{head is in }p' \textnormal{ such that }p'<p \; (p'+1=p''\leq p \implies p'<p)} \longrightarrow \underbrace{S_\gamma(s', p)}_{\gamma \textnormal{ stays in }p}
+    \end{equation*}
+    This dependency guarantees that cells on the left of the head are re-written. We do the same for cells on the right:
+    \begin{equation*}
+        \underbrace{P_{n^k}(s, s')}_{s' = s+1} \land \underbrace{S_\gamma(s, p)}_{\gamma \textnormal{ is written in } p} \land \underbrace{H(s, p') \land P_{n^k}(p'', p') \land G(p, p'')}_{\textnormal{head is in }p' \textnormal{ such that }p'>p \; (p'-1=p''\geq p \implies p'>p)} \longrightarrow \underbrace{S_\gamma(s', p)}_{\gamma \textnormal{ stays in }p}
+    \end{equation*}
+
+    \paragraph*{Accepting}
+    Finally, we introduce a table $A$ (for \emph{accepting}) of arity 0, such that $A()$ holds when the Turing machine accepts. We connect it to the other tables using the following dependencies, for each $q_f\in F$:
+    \begin{equation*}
+        Q_{q_f}(s) \rightarrow A()
+    \end{equation*}
+
+    The number of dependencies is polynomial in the input, therefore the problem can be polynomially reduced. Therefore, Datalog is \textsc{ExpTime}-hard.
+\end{exercise}
+
+\begin{exercise}
+    \leavevmode
+    \begin{enumerate}
+        \item $\{C\} \rightarrow \{B\}$ can be rewritten as:
+              \begin{equation*}
+                  \forall a, a', b, b', c, d, d', e, e', f, f', \quad R(a, b, c, d, e, f) \land R(a', b', c, d', e', f') \rightarrow b=b'
+              \end{equation*}
+        \item $\{D, E\} \rightarrow \{F\}$ can be rewritten as:
+              \begin{equation*}
+                  \forall a, a', b, b', c', d, e, f, f', \quad R(a, b, c, d, e, f) \land R(a', b', c', d, e, f') \rightarrow f=f'
+              \end{equation*}
+        \item $\{A\} \twoheadrightarrow \{C, F\}$ can be rewritten as:
+              \begin{equation*}
+                  \forall a, b, b', c, c', d, d', e, e', f, f', \quad R(a, b, c, d, e, f) \land R(a, b', c', d', e', f') \rightarrow R(a, b', c, d', e', f)
+              \end{equation*}
+    \end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+    Let $(a, b, c, d, e, f)$ be a tuple over $R$. During the decomposition of $R$,
+    it is split into $(a, b, c, d', e', f')$ and $(a, b', c', d, e, f)$.
+    We will now show that using the dependencies of $\Sigma$, one can deduce
+    from $R(a, b, c, d', e', f')$ and $R(a, b', c', d, e, f)$ that $R(a, b, c, d, e, f)$.
+    We start with:
+    \begin{figure}[H]
+        \centering
+        \begin{tabular}{l l l l l l}
+            \multicolumn{6}{c}{$R$}                \\
+            \midrule
+            $a$ & $b$  & $c$  & $d'$ & $e'$ & $f'$ \\
+            $a$ & $b'$ & $c'$ & $d$  & $e$  & $f$
+        \end{tabular}
+    \end{figure}
+    Applying $\{A\} \twoheadrightarrow \{C, F\}$ to the first two tuples, we obtain:
+    \begin{figure}[H]
+        \centering
+        \begin{tabular}{l l l l l l}
+            \multicolumn{6}{c}{$R$}                \\
+            \midrule
+            $a$ & $b$  & $c$  & $d'$ & $e'$ & $f'$ \\
+            $a$ & $b'$ & $c'$ & $d$  & $e$  & $f$  \\
+            $a$ & $b$  & $c'$ & $d'$ & $e'$ & $f$  \\
+            $a$ & $b'$ & $c$  & $d$  & $e$  & $f'$
+        \end{tabular}
+    \end{figure}
+    Then, we apply $\{D, E\} \rightarrow \{F\}$ to the pair of tuples $(a, b, c, d', e', f')$
+    and $(a, b, c', d', e', f)$, which yield $f = f'$. This gives the following updated table:
+    \begin{figure}[H]
+        \centering
+        \begin{tabular}{l l l l l l}
+            \multicolumn{6}{c}{$R$}               \\
+            \midrule
+            $a$ & $b$  & $c$  & $d'$ & $e'$ & $f$ \\
+            $a$ & $b'$ & $c'$ & $d$  & $e$  & $f$ \\
+            $a$ & $b'$ & $c$  & $d$  & $e$  & $f$ \\
+            $a$ & $b$  & $c'$ & $d'$ & $e'$ & $f$
+        \end{tabular}
+    \end{figure}
+    Finally, we apply $\{C\} \rightarrow \{B\}$ to the pair of tuples $(a, b, c, d', e', f)$
+    and $(a, b', c, d, e, f)$, which yield $b = b'$. This gives the following updated table:
+    \begin{figure}[H]
+        \centering
+        \begin{tabular}{l l l l l l}
+            \multicolumn{6}{c}{$R$}              \\
+            \midrule
+            $a$ & $b$ & $c$  & $d'$ & $e'$ & $f$ \\
+            $a$ & $b$ & $c'$ & $d$  & $e$  & $f$ \\
+            $a$ & $b$ & $c$  & $d$  & $e$  & $f$ \\
+            $a$ & $b$ & $c'$ & $d'$ & $e'$ & $f$
+        \end{tabular}
+    \end{figure}
+    We have reached a fixed point and the tuple $(a, b, c, d, e, f)$ is in the table.
+    Therefore, the decomposition is lossless.
+\end{exercise}
+
+\begin{exercise}
+    If a set of TGDs $\Sigma$ is Datalog, then its TGDs feature no existentially quantified variables. Therefore, the graph associated with $\Sigma$ contains no special edge at all, which shows that it is weakly acyclic.
+\end{exercise}
+
+\begin{exercise}
+    Let $t$ be the following TGD :
+    \begin{equation*}
+        t:\forall \overline{x} \forall \overline{y}, ~ B\left[\overline{x}, \overline{y}\right] \rightarrow \exists \overline{z}, ~H\left[\overline{x}, \overline{z}\right]
+    \end{equation*}
+
+    Suppose that during a chase we apply the TDG $t$ with a homomorphism $h$.
+    This leads to the introduction of new tuples in the table, with fresh values
+    $\overline{v}$ for all the variables in $\overline{z}$.
+
+    If we apply the same TDG with a homomorphism $h'$ such that:
+    \begin{equation*}
+        \forall v \in \overline{x} \cup \overline{y},~ h(v) = h'(v)
+    \end{equation*}
+
+    The variables in $\overline{z}$ can be unified with the values $\overline{v}$
+    introduced earlier. No tuples are added to the table and therefore one cannot
+    apply two times the same TGD with the same homomorphism during a chase.
+\end{exercise}
+
+\begin{exercise}
+    % Consider a weakly acyclic set $\Sigma$ of TGDs, a strongly connected
+    % component $C$ of its graph, and $P$ the set of all the predecessors of an
+    % element in $C$, that are not themselves in $C$. Show that if $P$ has a
+    % bounded active domain in the chase from $\Sigma$, then $C$ does too.
+
+    Let's show that $C$ has a bounded active domain. First, only the TGD with a
+    head containing a position in $C$ can introduce new values its active domain.
+    That's why we will only consider shuch TGD in the following.
+
+    In such TGD, the positions occurring in their body only occurs in $P \cup C$.
+    Thus, during the application of a TGD $t$, two cases are possible :
+    \begin{itemize}
+        \item All the position occurring in the body of $t$ is in $P$. Since $P$
+              has a bounded active domain, we can only find a finite number of
+              homomorphisms in $P$ to apply $t$. Moreover, $t$ can only be
+              applied once per homomorphism (as we saw earlier). Thus, only a
+              finite number of new values are introduced by such TGDs.
+        \item The body of $t$ contains position occurring in $C$. Since $C$ is
+              a subset of a weakly acyclic set of TGDs, the introduction of
+              fresh values by $t$ cannot lead to another application of
+              itself, (otherwise, the graph would contain a cycle with a special
+              edge). Thus, combined with the fact that TGDs cannot be applied
+              twice with the same homomorphism. One can only add a finite number
+              of values to the position in $C$ by applying such TGDs.
+    \end{itemize}
+    Finally, if $P$ has a bounded active domain then $C$ does too.
+\end{exercise}
+
+\begin{exercise}
+    Let $\Sigma$ be a weakly acyclic set of TGDs. The associated graph of
+    $\Sigma$ can be split into strongly connected component
+    $\left(\sigma_i\right)_{i\in\llbracket0;n\rrbracket} \in \Sigma^n$.
+    Moreover, theses component form a directed acyclic graph. So, one can find a
+    topological ordering $\leqslant_{\Sigma}$ over theses strongly connected
+    components.
+
+    We suppose without any loss of generality that :
+    \begin{equation*}
+        \sigma_0 \leqslant_{\Sigma} \sigma_1 \leqslant_{\Sigma} \dots \leqslant_{\Sigma} \sigma_{n-1} \leqslant_{\Sigma} \sigma_n
+    \end{equation*}
+    This means that for any $i \in\llbracket0;n\rrbracket$ all predecessors\footnote{as defined in the previous question}
+    of $\sigma_i$ are in $\bigcup_{j\in\llbracket0;i\llbracket} \sigma_j$.
+    By induction, all position occurring in $\Sigma$ have a bounded active
+    domain. Indeed :
+    \begin{itemize}
+        \item The set of predecessors of $\sigma_0$ is empty. Since the chase
+              algorithm begin with a finite number of values for each position,
+              with the previous question, $\sigma_0$ has a bounded active domain.
+        \item If, for one $i \in \llbracket0;n\rrbracket$, all the previous sets
+              $\left(\sigma_i\right)_{i\in\llbracket0;i\llbracket}$ have a
+              bounded active domain, then with the previous question, $\sigma_i$
+              has too.
+    \end{itemize}
+
+    Finally, the chase of $\Sigma$ terminates in a finite amount of time because
+    only a finite number of values are introduced by the TGDs.
+\end{exercise}
+
+\end{document}
