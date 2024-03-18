@@ -1467,4 +1467,83 @@ Recall from Lemma \ref{lem:node-conservation} (Node conservation law for valid t
     The above observation and $H_2(W)\leq b$ implies that $\E[L] \xrightarrow[b\to+\infty]{} +\infty$ which completes the proof.
 \end{proof}
 
+\section{Universal source coding}
+Universal source coding consists in coding without prior knowledge of the source distribution. We shall show that for any coding rate $R$ there exist universal codes (not depending on the source distribution) allowing for asymptotically error-free coding of any i.i.d. source having the entropy smaller than $R$. This is hence an extension of Shannon's first source coding theorem.
+
+\subsection{Empirical distributions}
+\begin{definition}[Hamming weight]
+    For $x\in\X^n$, with $|\X|<+\infty$, we define the \emph{Hamming weight of $a$ in $x$}:
+    \begin{equation*}
+        h_x(a) := \sum_{i=1}^n \mathds{1}_{x_i=a}
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Empirical distribution associated with a vector]
+    For $x\in\X^n$, we define the \emph{empirical distribution $p_x$ associated with vector $x$}:
+    \begin{equation*}
+        p_x(a) := \frac{h_x(a)}{n}=\frac{1}{n}\sum_{i=1}^n \mathds{1}_{x_i=a}
+    \end{equation*}
+    $p_x(a)$ is the fraction of the elements of $x$ equal to $a$.
+\end{definition}
+
+\begin{property}
+    \label{prop:glivenko-cantelli}
+    Let $X_1, X_2, \dots$ i.i.d. with $X_i\sim p$ on $\X$. Then, almost surely:
+    \begin{equation*}
+        p_{X_1} \xrightarrow[n\to+\infty]{\textnormal{CVS}} p
+    \end{equation*}
+    that is:
+    \begin{equation*}
+        \forall a\in\X, \quad \lim_{n\to+\infty}p_{X_1}(a)=p(a)
+    \end{equation*}
+    almost surely.
+\end{property}
+
+\begin{remark}[About the Glivenko-Cantelli theorem]
+    This consequence of the LLN is the discrete version of the Glivenko-Cantelli theorem. Property \ref{prop:glivenko-cantelli} says that in principle, the unknown underlying distribution $p$ can be estimated from a given i.i.d. sequence of the random variable. There remains the question whether one can simultaneously keep learning $p$ and encoding the sequence with a coding rate close to $H(p)$. In this lesson, we give a partial solution to this problem of universal source coding, showing that the explicit learning of $p$ is not necessary. It is enough to know the entropy $H(p)$. Indeed, we shall show that for any given rate $r$ there are universal block codes allowing one to obtain, for any i.i.d. source sequences having the entropy smaller than $r$, the decoding error that is asymptotically negligible (when the block size increases to infinity).
+\end{remark}
+
+\begin{definition}
+    Let $n\geq1$.
+    \begin{itemize}
+        \item Let $\Pc_n$ be the collection of all empirical distributions associated to vectors of length $n$:
+        \begin{equation*}
+            \Pc_n := \set{p_x}{x\in\X}
+        \end{equation*}
+        \item For $q\in\Pc_n$, let $T_n$ be the set of all vectors of length $n$, whose associated empirical distribution is $q$:
+        \begin{equation*}
+            T_n(q) := \set{x}{p_x=q}
+        \end{equation*}
+    \end{itemize}
+\end{definition}
+
+\begin{lemma}
+    We have:
+    \begin{equation}
+        |\Pc_n|=\binom{n+|\X|-1}{|\X|-1}
+    \end{equation}
+    \begin{equation}
+        |\Pc_n|\leq(n+1)^{|\X|}
+    \end{equation}
+
+    For $q=\set{\frac{k_a}{n}}{a\in\X}\in\Pc_n$, we have:
+    \begin{equation}
+        |T_n(q)|=\frac{n!}{\prod_{a\in\X}k_a!}
+    \end{equation}
+    \begin{equation}
+        (n+1)^{-|\X|} \cdot 2^{nH_2(q)} \leq |T_n(q)| \leq 2^{nH_2(q)}
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    Is left as an exercise. Note for the last equation that for $q\in\Pc_n$:
+    \begin{equation*}
+        n^n = \left(\sum_{a\in\X}k_a\right)^n = \sum_{\substack{j>0\\\sum_{a\in\X}j_a=n}} \frac{n!}{\prod_{a\in\X}j_a!} \prod_{a\in\X}k_a^{j_a}
+    \end{equation*}
+    with the maximal term in the right-hand-side corresponding to $j_a=k_a$ for all $a\in\X$.
+\end{proof}
+
+\subsection{Kullback-Leibler divergence}
+\subsection{Universale source coding with errors}
+\subsection{Universal source coding for binary sequences (supplement)}
+
 \end{document}
