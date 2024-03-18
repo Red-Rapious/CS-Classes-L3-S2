@@ -1543,7 +1543,83 @@ Universal source coding consists in coding without prior knowledge of the source
 \end{proof}
 
 \subsection{Kullback-Leibler divergence}
-\subsection{Universale source coding with errors}
+\begin{definition}[Kullback-Leibler (KL) divergence]
+    The \emph{Kullback-Leibler (KL) divergence} betwween two distributions $p, q$ on $\X$ is defined by:
+    \begin{equation*}
+        D(p, q) := \sum_{x\in\X}p(x)\log\frac{p(x)}{q(x)}
+    \end{equation*}
+    If $\log=\log_b$, we note $D=D_b$.
+\end{definition}
+
+\begin{property}[Relationship to the cross entropy]
+    The following relationship with the \emph{cross entropy} $H(p, q)$ holds:
+    \begin{equation}
+        \label{eq:relationship-cross-entropy}
+        H(p, q) := - \sum_{x\in\X}p(x)\log q(x) = H(p) + D(p, q)
+    \end{equation}
+\end{property}
+
+\begin{property}[Positivity]
+    \begin{equation*}
+        \begin{aligned}
+        &D(p, q) \geq 0\\
+        D(p, q) &= 0\iff p=q
+        \end{aligned}
+    \end{equation*}
+\end{property}
+\begin{proof}
+    By Gibbs' inequality.
+\end{proof}
+
+\begin{remark}
+    \begin{itemize}
+        \item KL divergence is not symmetric: in general, $D(p, q)\neq D(q, p)$ and thus is not a distance (metric) on the space of probability measures.
+        \item If $D(p, q)<+\infty$ then $p$ is \emph{absolute continuous} with respect to $q$, denoted by $p << q$, meaning $q(x)=0 \implies p(x)=0$.
+    \end{itemize}
+\end{remark}
+
+\begin{lemma}
+    Let $p$ be a probability distribution on $\X$, with $|\X|<+\infty$. Denote by $p^n$ the $n$-th product of $p$, that is the probability measure:
+    \begin{equation*}
+        p^n(x) := p(x_1)\dots p(x_n)
+    \end{equation*}
+    \begin{enumerate}
+        \item For any vector $x\in\X$,
+        \begin{equation*}
+            p^n(x) = 2^{-n\left[(H_2(p_x))+D_2(p_x, p)\right]}
+        \end{equation*}
+        \item For any empirical distribution $q\in\Pc_n$:
+        \begin{equation*}
+            p^n(T_n(q)) \left(:=\sum_{x\in\T_n(q)} p^n(x)\right) \leq 2^{-nD_2(q, p)}
+        \end{equation*}
+    \end{enumerate}
+\end{lemma}
+\begin{proof}[Proof: first statement]
+    \begin{equation*}
+        \begin{aligned}
+            p^n(x)&=\prod_{i=1}^n p(x_i)\\
+            &= \prod_{a\in\X} p(a)^{h(a, x)}\\
+            &= \prod_{a\in\X} p(a)^{np_x(a)}\\
+            &= 2^{\sum_{a\in\X}np_x(a)\log_2 p(a)}\\
+            &= 2^{-nH_2(p_x, p)}\\
+            &= 2^{-n\left[H_2(p_x)+D_2(p_x, p)\right]}
+        \end{aligned}
+    \end{equation*}
+    where the last line follows from \eqref{eq:relationship-cross-entropy}.
+\end{proof}
+\begin{proof}[Proof: second statement]
+    \begin{equation*}
+        \begin{aligned}
+            p^n(T_n(q))&=\sum_{x\in T_n(q)}p^n(x)\\
+            &= |T_n(q)|\cdot 2^{-n\left[H_2(q)+D_2(q, p)\right]}\\
+            &\leq 2^{nH_2(q)} \cdot 2^{-n[H_2(q)+D_2(q, p)]}\\
+            &= 2^{-nD_2(q, p)}
+        \end{aligned}
+    \end{equation*}
+    By positivity of the divergence and \eqref{eq:relationship-cross-entropy}.
+\end{proof}
+
+\subsection{Universal source coding with errors}
 \subsection{Universal source coding for binary sequences (supplement)}
 
 \end{document}
