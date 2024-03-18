@@ -1620,6 +1620,40 @@ Universal source coding consists in coding without prior knowledge of the source
 \end{proof}
 
 \subsection{Universal source coding with errors}
-\subsection{Universal source coding for binary sequences (supplement)}
+In what follows, we shall prove an extension of Shannon's first theorem, by showing that all coding rates above the entropy $H(p)$ can be achieved on i.i.d. source sequences $X_1, X_2, \dots$ \emph{without prior detailed knowledge of the underlying probability distribution} $p$ of the source $X_i\sim p$.
+
+For simplicity, we formulate the result for the \emph{binary codes}, i.e. assume that the coding alphabet has two different digits $|\A|=2$, say $\A=\{0, 1\}$.
+
+As in the proof of Shannon's first theorem, we shall construct some theoretical codes for block messages consisting of $n\geq 1$ source symbols encoded with blocks of size $\lceil nR\rceil$ of a binary alphabet:
+\begin{equation*}
+    c_n:\X^n \rightarrow \{0, 1\}^{\lceil nR\rceil} \quad\textnormal{and}\quad d_n:\{0, 1\}^{\lceil nR\rceil} \rightarrow \X^n
+\end{equation*}
+thus offering the coding rate $\frac{\lceil nR\rceil}{n} \xrightarrow[n\to+\infty]{} nR$ bits per source symbol.
+
+Unlike all previously considered UD codes, and in particular unlike Shannon's first theorem, we shall not use the distribution $p$ to construct the coding and decoding function. Such codes are called \emph{universal (source) codes}.
+
+Finally, as in the proof of Shannon's first theorem, the codes will be possibly lossy, but the error probability will asymptotically go to zero when the block size $n$ goes to $+\infty$:
+\begin{equation*}
+    P_\epsilon := \P(d_n(c_n(X))\neq X) \xrightarrow[n\to+\infty]{} 0
+\end{equation*}
+
+\begin{theorem}[Universal, asymptotically error-free source coding]
+    Ler $R\geq 0$. There exist \emph{universal} functions of the form:
+    \begin{equation*}
+        c_n:\X^n \rightarrow \{0, 1\}^{\lceil nR\rceil} \quad\textnormal{and}\quad d_n:\{0, 1\}^{\lceil nR\rceil} \rightarrow \X^n
+    \end{equation*}
+    such that for any source distribution $p$ on $\X$ with $H_2(p)<R$ and $X_1, X_2, \dots$ i.i.d. $X\sim p$ we have:
+    \begin{equation*}
+        \lim_{n\to+\infty}P_\epsilon = 0
+    \end{equation*}
+\end{theorem}
+
+\begin{remark}
+    The asymptotically error-free coding of an unknown i.i.d. source offered by the above result still requires the knowledge of the source entropy $H(p)$ in order to choose a code with some rate $R>H(p)$. 
+\end{remark}
+
+\begin{proof}
+    Let $R>H_2(p)$. For simplicity, assume that $nR$ is an integer (the extension to the general case is straightforward).
+\end{proof}
 
 \end{document}
