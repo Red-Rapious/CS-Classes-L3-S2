@@ -850,9 +850,115 @@ Ultimately, we would like to \emph{verify} or \emph{compute} properties, but so 
     \end{equation*}
 \end{definition}
 
-\subsubsection{A State specification language}
+\subsubsection{A state specification language}
+We will consider the following example of a simple specification language.
+\begin{definition}
+    Syntax: we let terms of $\L_{\S}$ be defined by:
+    \begin{equation*}
+        p\in\L_{\S} ::= @l | x<x' | x<n | \lnot p' | p'\land p'' | \Omega
+    \end{equation*}
+    Semantics: $\sem{p}_s\subseteq \S_\Omega$ is defined by:
+    \begin{equation*}
+        \begin{aligned}
+            \sem{@l}_s &= \{l\} \times \mathbb{M}\\
+            \sem{x\leq x'}_s &= \set{(l, m)\in\S}{m(x)\leq m(x')}\\
+            \sem{x\leq n}_s &= \set{(l, m)\in\S}{m(x)\leq n}\\
+            \sem{\lnot p}_s &= \S_\Omega\setminus\sem{p}_s\\
+            \sem{p\land p'}_S &= \sem{p}_s \cap \sem{p'}_s\\
+            \sem{\Omega}_s &= \{\Omega\}
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+
+\noindent This specification language allows to formally express state properties. 
+\begin{example}[Unreachability of control state $l_0$]
+    \begin{equation*}
+        \sem{\lnot@l_0}_s = \S_\Omega \setminus \set{(l_0, m)}{m\in\mathbb{M}}
+    \end{equation*}
+\end{example}
+
+\begin{example}[Absence of runtime errors]
+    \begin{equation*}
+        \sem{\lnot\Omega}_s = \S_\Omega \setminus \{\Omega\} = \S
+    \end{equation*}
+\end{example}
+
+\begin{example}[Intermittent invariant]
+    The principle is to attach a local invariant to each control state.
+
+    \begin{figure}[!ht]
+        \centering
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \begin{minted}[linenos]{c}
+if (x >= 0) {
+    y = x;
+} else {
+    y = -x;
+}
+            \end{minted}
+        \end{minipage}
+        \begin{minipage}{.5\textwidth}
+          \begin{equation*}
+            \begin{aligned}
+                &@l_1 \implies x\geq 0\\
+                &@l_2 \implies x\geq 0 \land y\geq 0\\
+                &@l_2 \implies x<0\\
+                &@l_4 \implies x<0 \land y>0\\
+                &@l_5 \implies y\geq 0
+            \end{aligned}
+          \end{equation*}
+        \end{minipage}
+        \caption{The program and the local invariants}
+    \end{figure}
+\end{example}
 
 \subsubsection{Propositional temporal logic}
+We now consider the specification of trace properties, using temporal logic. Temporal logic specifies the properties in terms of events that occur at distinct times in the execution (hence the name \say{temporal}). There are many instances of temporal logic, but we will study a simple one: Pnueli's Propositional Temporal Logic. 
+
+\begin{definition}[Syntax of PTL (Propositional Temporal Logic)]
+    Properties over traces are defined as terms of the form:
+    \begin{equation*}
+        \begin{aligned}
+            t \in \mathbb{L}_{\textnormal{PTL}} ::&= p\\
+            &| t'\lor t''\\
+            &| \lnot t'\\
+            &| \bigcirc t'\\
+            &| t'\until t''
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+
+The semantics of a temporal property is a set of traces, and it is defined by induction over the syntax:
+\begin{equation*}
+    \begin{aligned}
+        \sem{p}_t &= \set{s\cdot\sigma}{s\in\sem{p}_s\land\sigma\in\S^\propto}\\
+        \sem{t_0\lor t_1}_t &= \sem{t_0}_t\cup\sem{t_1}_t\\
+        \sem{\lnot t_0}_t &= \S^\propto \setminus \sem{t_0}_t\\
+        \sem{\bigcirc t_0}_t &= \set{s\cdot\sigma}{s\in\S\land\sigma\in\sem{t_0}_t}\\
+        \sem{t_0\until t_1}_t &= \set{\sigma\in\S^\propto}{\exists n\in\N, \forall i<n, \sigma_{i\rceil}\in\sem{t_0}_t \land \sigma_{n\rceil}\in\sem{t_1}_t}
+    \end{aligned}
+\end{equation*}
+
+Many useful operators can be added:
+\begin{itemize}
+    \item Boolean constants:
+    \begin{equation*}
+        \begin{aligned}
+            \textnormal{true} &::= (x<0) \land \lnot(x<0)\\
+            \textnormal{false} &::= \lnot \textnormal{true}
+        \end{aligned}
+    \end{equation*}
+    \item Sometime (there exists a rank $n$ at which $t$ holds):
+    \begin{equation*}
+        \lozenge t ::= \textnormal{true} \until t
+    \end{equation*}
+    \item Always (there is no rank at which the negation of $t$ holds):
+    \begin{equation*}
+        \square t ::= \lnot(\lozenge(\lnot t))
+    \end{equation*}
+\end{itemize}
+One can combine these operators to construct interesting properties: $\lozenge\square t$ means that $t$ is true starting from a certain rank, and $\square\lozenge t$ means that $t$ happens an infinite number of times.
 
 \subsection{Beyond safety and liveness}
 We now consider other interesting properties of programs, and show that they do not all reduce to trace properties.
