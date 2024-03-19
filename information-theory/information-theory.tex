@@ -1087,8 +1087,7 @@ It is customary to interpret the process of parsing as some decoding procedure, 
     Let $\mathcal{C} := \{C(1), \dots, C(M)\} \subset \A^\star\setminus\{\epsilon\}$ be a finite subset of words, called \emph{dictionary}, indexed by $\llbracket 1, M\rrbracket$. The function
     \begin{equation*}
         \begin{aligned}
-            C : \llbracket 1, M\rrbracket &\to \mathcal{C}
-            i &\mapsto C(i)
+            C : i\in \llbracket 1, M\rrbracket &\mapsto C(i)
         \end{aligned}
     \end{equation*}
     is called the \emph{parsing code} related to $\mathcal{C}$. We shall often identify the dictionary $\mathcal{C}$ with the corresponding parsing code.
@@ -1109,7 +1108,7 @@ The first condition allows one to parse any infinite sequence of letters from $\
 
 \subsection{Parsing codes and trees}
 \begin{lemma}[Valid paring codes and complete coding trees]
-    Let $\mathcal{C}$ be a finite dictionary over the alphabet $\A$ with $D:=|\A|$. The parsing code related to $\mathcal{C}$ is valid if and only if its coding tree is a complete $D$-ary tree, whose leaves correspond exactly to dstinct elements of $\mathcal{C}$.
+    Let $\mathcal{C}$ be a finite dictionary over the alphabet $\A$ with $D:=|\A|$. The parsing code related to $\mathcal{C}$ is valid if and only if its coding tree is a complete $D$-ary tree, whose leaves correspond exactly to distinct elements of $\mathcal{C}$.
 \end{lemma}
 
 \begin{proof}[$\implies$]
