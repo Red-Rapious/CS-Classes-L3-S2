@@ -1336,7 +1336,7 @@ The constructed valid parsing code will have $M=1+\alpha(D-1)$ code words in its
 Recall from Lemma \ref{lem:node-conservation} (Node conservation law for valid trees) that $\alpha$ corresponds to the number of intermediate nodes in the coding tree of $\mathcal{C}$ that we want to construct.
 
 \begin{definition}[Tunstall's coding tree]
-    For a given source distributon $p$ with $p(x)>0$ for all $x\in\A$, and $\alpha$ and $b$ satisfiying \eqref{eq:alpha-b}, we construct a complete $D$-ary tree, having $\alpha$ intermediate nodes, by executing the following algorithm:
+    For a given source distribution $p$ with $p(x)>0$ for all $x\in\A$, and $\alpha$ and $b$ satisfiying \eqref{eq:alpha-b}, we construct a complete $D$-ary tree, having $\alpha$ intermediate nodes, by executing the following algorithm:
     \begin{enumerate}
         \item Consider complete tree $\T_1$ having a root and all its $D$ children. Note that $\T_1$ has $\alpha_1=1$ intermediate node and $M_1=D$ leaves. Mark the nodes of $\T_1$ by probabilities $P(\omega)$ given by \eqref{eq:def-P}.
         \item For $n=1, \dots, \alpha-1$, take a leaf of $\T_n$ having the largest probability $P(\omega)$ and transform it into an intermediate node by adding all its children as new leaves. This gives a new complete tree $\T_{n+1}$ having $\alpha_{n+1}=\alpha_n + 1$ nodes and $M_{n+1}=M_n+D-1$ leaves. 
@@ -1653,7 +1653,68 @@ Finally, as in the proof of Shannon's first theorem, the codes will be possibly 
 \end{remark}
 
 \begin{proof}
-    Let $R>H_2(p)$. For simplicity, assume that $nR$ is an integer (the extension to the general case is straightforward).
+    Let $R>H_2(p)$. For simplicity, assume that $nR$ is an integer (the extension to the general case is straightforward). Following the same steps as in the proof of Shannon's first theorem, (\ref{th:shannon-first}), it is enough to construct subsets $A_R^{(n)}\subseteq\X^n$ such that:
+    \begin{equation*}
+        |A_R^{(n)}|<2^{nR} \quad \textnormal{and} \quad 1-p^n(A_R^{(n)}) \xrightarrow[n\to+\infty]{} 0
+    \end{equation*}
+
+    The strict inequality is required only to have an extra state (denoted $x_*$ in the proof of Theorem \ref{th:shannon-first}) to encode all elements of $\X^n\setminus A_R^{(n)}$.
+
+    Therefore, we define $A_R^{(n)}$ to be:
+    \begin{equation*}
+        A_R^{(n)} := \set{x\in\X^n}{H_2(p_x)\leq R_n} \quad \textnormal{where} \quad R_n := R-|\X|\frac{\log_2(n+2)}{n}
+    \end{equation*}
+    Note that $\lim_{n\to+\infty}R_n=R$, and thus the sets $A_R^{(n)}$ consist of the sequences which have the entropy of the associated empirical distribution asymptotically smaller than the required rate $R$.
+
+    Observe that:
+    \begin{equation*}
+        \begin{aligned}
+            |A_R^{(n)}|&=\left|\bigcup_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}}T_n(q)\right|\\
+            &\leq \sum_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}}|T_n(q)|\\
+            &\leq \sum_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}}2^{nH_2(q)}\\
+            &\leq \sum_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}}2^{nR_n}\\
+            &\leq |\Pc_n|\cdot 2^{nR_n}\\
+            &\leq (n+1)^{|\X|}2^{nR_n}\\
+            &= 2^{nR}\left(\frac{n+1}{n+2}\right)^{|\X|}\\
+            &< 2^{nR}
+        \end{aligned}
+    \end{equation*}
+
+    Furthermore, note that:
+    \begin{equation*}
+        \begin{aligned}
+            1- p^n(A_R^{(n)}) &= \sum_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}} p^n(T_n(q))\\
+            &\leq \sum_{\substack{q\in\Pc_n\\H_2(q)\leq R_n}} 2^{-nD_2(q, p)}\\
+            &\leq (n+1)^{|\X|}2^{-n\min\set{D_2(q, p)}{q\in\Pc_n, H_2(q)>R_n}}
+        \end{aligned}
+    \end{equation*}
+    Since $\Pc_n$ is a discret set, the $\min$ above is well-defined. Recall $\lim_{n\to+\infty}R_n=R>H_2(q)$. Consider $\epsilon>0$ such that $H_2(p)+\epsilon<R$ and $n$ large enough so that $R_n>H_2(p)+\epsilon$. Denote by $\Pc$ all probability distributions on $\X$. We have:
+    \begin{equation*}
+        \begin{aligned}
+            \min\set{D_2(q, p)}{q\in\Pc_n, H_2(q)>R_n} 
+            &\geq \min\set{D_2(q, p)}{q\in\Pc_n, H_2(q)>H_2(p)+\epsilon}\\
+            &\geq \phantom{i}\inf\set{D_2(q, p)}{q\in\Pc, H_2(q)>H_2(p)+\epsilon} =: \gamma
+        \end{aligned}
+    \end{equation*}
+
+    We shall argue that $\gamma>0$. Observe that the function $f$ such that:
+    \begin{equation*}
+        f:q\in\Pc \longmapsto D(q, p)
+    \end{equation*}
+    considered as a real-valued function defined on a closed subset of $\R^{|\X|}$:
+    \begin{equation*}
+        f : \underbrace{\set{q\in\R^{|\X|}}{\forall x\in\X, q(x)\geq 0 \land \sum_{x\in\X} q(x) = 1}}_{\textnormal{closed subset of }\R^{|\X|}} \longrightarrow \R
+    \end{equation*}
+    is continuous. Furthermore, $\set{q\in\Pc}{H_2(q)\geq H_2(p)+\epsilon}$ interpreted as a subset of $\R^{|\X|}$, is a bounded, closed set. Since $\R^{|\X|}$ is of finite dimension, the set is compact. Thus, there exists $q_*\in\set{q\in\Pc}{H_2(q)\geq H_2(p)+\epsilon}$ such that $\gamma=D(q_*, p)$. By contradiction, suppose that $\gamma=D(q_*, p)=0$. Necessarily, we would have $q_*=p$ and $H_2(q*)=H_2(p)\geq H_2(p)+\epsilon$, thus leading to a contradiction. 
+    
+    Consequently,
+    \begin{equation*}
+        \begin{aligned}
+            1-p^n(A_R^{(n)}) &\leq (n+1)^{|\X|}\cdot 2^{-n\gamma}
+            &= 2^{-n\left(\gamma-|\X|\frac{\log_2(n+1)}{n}\right)} \xrightarrow[n\to+\infty]{} 0
+        \end{aligned}
+    \end{equation*}
+    which completes the proof.
 \end{proof}
 
 \end{document}
