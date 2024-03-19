@@ -965,6 +965,87 @@ We now consider other interesting properties of programs, and show that they do 
 
 For example, one can think about security properties. We can consider just one: \say{An unauthorized observer should not be able to guess anything about private information by looking at public information}.
 
+\subsubsection{Assumptions}
+We let $\Sc=(\S, \to, \S_{\mathcal{I}})$ be a transition system. Its states are of the form $(l, m)\in\mathbb{L}\times\mathbb{M}$. Memory states are of the form $\mathbb{X}\to\mathbb{V}$. We let $l, l'\in\mathbb{L}$ be the program entry and exit, and $x, x'\in\mathbb{X}$ be the private and public variables. We look at the following security property:
+\begin{center}
+    \say{Observing the value $x'$ at $l'$ gives no information on the value of $x$ at $l$.}
+\end{center}
+
+\subsubsection{Examples}
+\begin{itemize}
+    \item A secure program -- no information flow, no way to guess $x$:
+    \begin{equation*}
+        x' = 84;
+    \end{equation*}
+    \item An insecure program -- explicit information flow, $x'$ gives a lot of information about $x$, so that we can simply recompute it:
+    \begin{equation*}
+        x'=x-2;
+    \end{equation*}
+    \item An insecure program -- implicit information flow, through a test:
+    \begin{equation*}
+        \textnormal{if} (x<0) \{ x'=0; \}
+    \end{equation*}
+\end{itemize}
+How can we characterize information flow in the semantic level?
+
+\subsubsection{Non-interference}
+We consider the transformer $\Phi$ defined by:
+\begin{equation*}
+    \begin{aligned}
+        \Phi : \mathbb{M} &\longrightarrow \Pc(\mathbb{M})\\
+        m &\longmapsto \set{m'\in\mathbb{M}}{\exists \sigma = \trace{(l, m), \dots, (l', m')}\in\sem{\Sc}}
+    \end{aligned}
+\end{equation*}
+
+\begin{definition}[Non-interference]
+    There is no interference between $(l, x)$ and $(l', x')$, and we write $(l', x') \not\rightsquigarrow (l, x)$, if and only if the following property holds:
+    \begin{equation*}
+        \forall m\in\mathbb{M}, \forall v_0, v_1\in\mathbb{V}, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} = \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
+    \end{equation*}
+
+    Intuitively, if two observations at point $l$ differ only in the value of $x$, there is no difference in observation $x'$ at $l'$. In other words, observing $x'$ at $l'$ (even on many executions) gives no information about the value of $x$ at point $l$.
+\end{definition}
+
+\begin{property}
+    Non-interference is not a trace property.
+\end{property}
+
+\subsubsection{Dependence properties}
+Many notions of dependences can be defined, but we will consider just one:
+\begin{center}
+    what inputs may have an impact on the observation of a given output
+\end{center}
+This as many applications in reverse engineering, slicing, and corresponds to the negation of non-interference.
+
+\begin{definition}[Interference]
+    There is interference between $(l, x)$ and $(l', x')$, and we write $(l', x')\rightsquigarrow(l, x)$ if and only if the following property holds:
+    \begin{equation*}
+        \exists x\in \mathbb{M}, \exists v_0, v_1\in\mathbb{V}, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} \neq \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
+    \end{equation*}
+    This expresses that there is at least one case, where the value of $x$ at $l$ has an impact on that of $x'$ at $l'$. It may not hold even if the computation of x' reads x:
+    \begin{equation*}
+        x' = 0 \times x;
+    \end{equation*}
+\end{definition}
+
+\begin{property}
+    Interference property is not a trace property.
+\end{property}
+
+\subsubsection{Hyperproperties}
+In conclusion, the absence of interference between $(l, x)$ and $(l', x')$ is not a trace property; one cannot describe as the set of programs the semantics of which is included into a given set of traces. It can however be described by a set of sets of traces: we simply collect the set of program semantics that satisfy the property. This is what we call a hyperproperty: trace hyperproperties are described by sets of sets of executions, while trace properties are described by sets of executions.
+
+To disprove the absence of interference (i.e. to show there exists an interference), we simply need to exhibit two finite traces: this is called \emph{2-safety}.
+
+\subsection{Conclusion}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/semantic-properties.png}
+    \caption{The Zoo of semantic properties}
+\end{figure}
+
+Trace properties allow to express a large range of program properties. Safety represents the absence of bad bahaviors, while liveness expresses the existence of good behaviors. Trace properties can be decomposed as conjuctions of safety and liveness properties, with dedicated proof methods. Nevertheless, some interesting properties are not trace properties: we saw that security properties are sets of sets of executions. Finally, the notion of specification languages is usefull to describe program properties.
+
 \section{Denotational semantics}
 \subsection{Deterministic imperative programs}
 
