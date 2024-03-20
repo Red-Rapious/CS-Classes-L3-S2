@@ -1,6 +1,6 @@
 \documentclass[toc]{../cs-classes/cs-classes}
 
-\author{Xavier Rival, Sylvain Conchon and Jérôme Feret\\ Notes by Antoine Groudiev}
+\author{Xavier Rival, Sylvain Conchon, Jérôme Feret and Antoine Miné\\ Notes by Antoine Groudiev}
 \title{Semantics and Applications to Verification}
 
 \DeclareMathOperator{\lfp}{lfp}
@@ -9,6 +9,9 @@
 \DeclareMathOperator{\Lim}{Lim}
 \DeclareMathOperator{\safe}{Safe}
 \DeclareMathOperator{\live}{Live}
+\newcommand*{\expr}{\textnormal{ expr }}
+\newcommand*{\stat}{\textnormal{ stat }}
+
 
 \begin{document}
 \section*{Introduction}
@@ -918,15 +921,17 @@ We now consider the specification of trace properties, using temporal logic. Tem
 
 \begin{definition}[Syntax of PTL (Propositional Temporal Logic)]
     Properties over traces are defined as terms of the form:
-    \begin{equation*}
-        \begin{aligned}
-            t \in \mathbb{L}_{\textnormal{PTL}} ::&= p\\
-            &| t'\lor t''\\
-            &| \lnot t'\\
-            &| \bigcirc t'\\
-            &| t'\until t''
-        \end{aligned}
-    \end{equation*}
+    \begin{figure}[H]
+        \centering
+        \begin{mgrammar}
+            \firstrule{t \in \mathbb{L}_{\textnormal{PTL}}}{p}{state property, i. $p\in\mathbb{L}_\S$}
+            \grule{t'\lor t''}{disjunction}
+            \grule{\lnot t'}{negation}
+            \grule{\bigcirc t'}{next}
+            \grule{t'\until t''}{$t'$ until $t''$}
+        \end{mgrammar}
+        \caption{Propositional Temporal Logical syntax}
+    \end{figure}
 \end{definition}
 
 The semantics of a temporal property is a set of traces, and it is defined by induction over the syntax:
@@ -1091,19 +1096,88 @@ We will study two denotation worlds:
 \end{itemize}
 
 \subsection{Deterministic imperative programs}
+\subsubsection{Syntax}
+We now consider a simple imperative language: IMP. Variables are in a fixed set: $X\in\mathbb{V}$. Constants are defined as a set $\mathbb{I} := \mathbb{B}\cup\Z$, containing booleans $\mathbb{B}:=\{\true, \false\}$ and integers $\Z$. Furthermore, we include unary and binary operators, represented by $\lozenge$. Such operators can be integer operations $+, -, \times, /, <, \leq$, boolean operations $\lnot, \land, \lor$, or polymorphic operations $=, \neq$.
+\begin{figure}[H]
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \begin{mgrammar}
+            \firstrule{\expr}{X}{variable}
+            \grule{c}{constant}
+            \grule{\lozenge\,\expr}{unary op.}
+            \grule{\expr \,\lozenge\, \expr}{binary op.}
+        \end{mgrammar}
+    \end{minipage}
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \begin{grammar}
+            \firstrule{stat}{\bf skip}{do nothing}
+            \grule{$X\leftarrow$ expr}{assignment}
+            \grule{stat; stat}{sequence}
+            \grule{\textbf{if} e \textbf{then} s \textbf{else} s}{conditional}
+            \grule{\textbf{while} expr \textbf{do} stat}{loop}
+        \end{grammar}
+    \end{minipage}
+    \caption{IMP expressions and statements}
+\end{figure}
+   
+\subsubsection{Semantics}
+\paragraph*{Expression semantics}
+For expressions, we define a function $E$ such that:
+\begin{equation*}
+    E\sem{\expr} : \mathcal{E} \rightharpoonup \mathbb{I}
+\end{equation*}
+where $\mathcal{E} := \mathbb{V}\to\mathbb{I}$ is an environment mapping variables in $\mathbb{V}$ to values in $\mathbb{I}$. The symbol $\rightharpoonup$ denotes a partial function: it is necessary because some operations are undefined for typing reasons ($1+\true$, $1\land 2$), or are undefined ($3/0$, \dots). We will define $E$ by structural induction on the abstract syntax tree.
 
 \begin{figure}[H]
     \centering
-    \setlength\tabcolsep{4pt}
-    \begin{grammar}
-        \firstrule{\textnormal{expr}}{X}
-        \grule{c}
-        \grule{\textnormal{expr}}
-        \grule{\textnormal{expr} \,\lozenge\, \textnormal{expr}}
-    \end{grammar}
-    \caption{IMP expressions}
+    \includegraphics[width=0.8\textwidth]{images/expression-semantics.png}
+    \caption{Expression semantics}
 \end{figure}
-   
+
+\paragraph*{Statement semantics}
+Similarly, we define for statements a function $S$ of the form:
+\begin{equation*}
+    S\sem{\stat} : \mathcal{E} \rightharpoonup \mathcal{E}
+\end{equation*}
+It maps an environment before the statement to an environment after the statement. Likewise, it is a partial function due to errors in expressions or non-termination. We also define it by strucutral induction as described in what follows:
+\begin{itemize}
+    \item \textbf{Skip} -- do nothing:
+    \begin{equation*}
+        S\sem{\textnormal{\bf skip}} \rho := \rho
+    \end{equation*}
+    \item \textbf{Assignment} -- evaluate expression and mutate environment:
+    \begin{equation*}
+        S\sem{X \leftarrow e} \rho := \rho[X\mapsto v] \quad \textnormal{if } E\sem{e}\rho = v
+    \end{equation*}
+    where $f[x\mapsto y]$ denotes the function that maps $x$ to $y$, and any $z\neq x$ to $f(z)$.
+    \item \textbf{Sequence} -- function composition:
+    \begin{equation*}
+        S\sem{s_1; s_2} := S\sem{s_2} \circ S\sem{s_1}
+    \end{equation*}
+    \item \textbf{Conditional}:
+    \begin{equation*}
+        S\sem{\textnormal{\textbf{if} e \textbf{then} $s_2$ \textbf{else} $s_2$}} \rho := \begin{cases*}
+            S\sem{s_1}\rho & if $E\sem{e}\rho = \true$\\
+            S\sem{s_2}\rho & if $E\sem{e}\rho = \false$\\
+            \textnormal{undefined} & otherwise
+        \end{cases*}
+    \end{equation*}
+    \item \textbf{Loops} -- the semantics of loops must satisfy:
+    \begin{equation*}
+        S\sem{\textnormal{\textbf{while} e \textbf{do} s}} = \begin{cases*}
+            \rho & if $E\sem{e}\rho = \false$\\
+            S\sem{\textnormal{\textbf{while} e \textbf{do} s}}(S\sem{s}\rho) & if $E\sem{e}\rho = \true$\\
+            \textnormal{undefined} & otherwise
+        \end{cases*}
+    \end{equation*}
+    This is a recursive definition, and we must therefore prove that the equation has solution(s); in case there are several solutions, there is a single \say{right} one. To do so, we will use fixpoints of operators over partially ordered sets.
+\end{itemize}
+
+\paragraph*{Fixpoint semantics of loops} 
+We introduce the \emph{flat ordering} $(\mathbb{I}_\bot, \sqsubseteq)$ on $\mathbb{I}$:
+
+\subsubsection{Error vs. non-termination}
 
 \subsection{Non-determinism}
 
