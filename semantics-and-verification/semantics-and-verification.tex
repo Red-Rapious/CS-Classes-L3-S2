@@ -1047,7 +1047,63 @@ To disprove the absence of interference (i.e. to show there exists an interferen
 Trace properties allow to express a large range of program properties. Safety represents the absence of bad bahaviors, while liveness expresses the existence of good behaviors. Trace properties can be decomposed as conjuctions of safety and liveness properties, with dedicated proof methods. Nevertheless, some interesting properties are not trace properties: we saw that security properties are sets of sets of executions. Finally, the notion of specification languages is usefull to describe program properties.
 
 \section{Denotational semantics}
+The first chapters of this class focused on \emph{operational semantics}, through state and trace properties. Such semantics are defined as small execution steps, over low-level internal configurations, with transitions chianed to define maximal traces.
+
+In this chapter, we will delve into denotational semantics. We will study direct function from programs to mathematical objects (denotations), defined by induction on the program syntax (compositional), ignoring intermediate steps and execution details. This is a higher-level, more abstract and modular approach, trying to decouple a program meaning from its execution, and focused on the mathematical structures that represent programs.
+
+Consider the following two programs:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \begin{minted}{c}
+int swapped;
+do {
+    swapped = 0;
+    for (int i=1; i<n; i++) {
+        if (a[i-1]>a[i]) {
+            swap(&a[i-1], &a[i]);
+            swapped = 1;
+        }
+    }
+} while (swapped);
+        \end{minted}
+    \end{minipage}
+    \begin{minipage}{.49\textwidth}
+        \begin{minted}{ocaml}
+let rec sort = function
+| [] -> []
+| a::rest ->
+    let lo, hi = List.partition 
+        (fun y -> y < x) rest
+    in
+    (sort lo) @ [x] @ (sort hi)
+        \end{minted}
+    \end{minipage}
+    \caption{Bubble sort in \texttt{C} (left) and quicksort in \texttt{OCaml} (right)}
+\end{figure}
+These programs use different languages, algorithms, programming principles and data types; nevertheless, can we give them the same semantics?
+
+We will study two denotation worlds:
+\begin{itemize}
+    \item Imperative programs, which mutate a memory state. The natural denotation of such a program is an input/output function, over a domain $\mathcal{D} \simeq \textnormal{memory} \rightarrow \textnormal{memory}$.
+    \item Functional programs, returning a value without any side effect. One can model a program of type \texttt{a -> b} as a function $\mathcal{D}_a \rightarrow \mathcal{D}_b$.
+\end{itemize}
+
 \subsection{Deterministic imperative programs}
+
+\begin{figure}[H]
+    \centering
+    \setlength\tabcolsep{4pt}
+    \begin{grammar}
+        \firstrule{\textnormal{expr}}{X}
+        \grule{c}
+        \grule{\textnormal{expr}}
+        \grule{\textnormal{expr} \,\lozenge\, \textnormal{expr}}
+    \end{grammar}
+    \caption{IMP expressions}
+\end{figure}
+   
 
 \subsection{Non-determinism}
 

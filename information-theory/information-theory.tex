@@ -1219,7 +1219,7 @@ We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., 
     \end{equation}
 \end{property}
 \begin{proof}
-    Since $\mathds{1}_{L_1<i}$ is a function of the vector $(X_1, \dots, X_{i-1})$, it is independent of $X_i$. Consequently, $\mathds{1}_{L_1\geq i}$ and $X_i$ are also independent random variables. By Lemma \ref{lem:distribution-parsed-messages} and \eqref{eq:def-P}, we have
+    Since $\ind_{L_1<i}$ is a function of the vector $(X_1, \dots, X_{i-1})$, it is independent of $X_i$. Consequently, $\ind_{L_1\geq i}$ and $X_i$ are also independent random variables. By Lemma \ref{lem:distribution-parsed-messages} and \eqref{eq:def-P}, we have
     \begin{equation*}
         \P(W_1 = \underbrace{(x_1, \dots, x_l)}_{:=\omega}) = P(w) = \prod_{i=1}^l p(x_i)
     \end{equation*}
@@ -1234,8 +1234,8 @@ We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., 
     Furthermore,
     \begin{equation*}
         \begin{aligned}
-            H(W) = -\E\left[\sum_{i=1}^{L_1}\log p(X_i)\right] &= -\E\left[\sum_{i=1}^\infty \mathds{1}_{i\leq L_1}\log p(X_i)\right]\\
-            &= - \sum_{i=1}^\infty \E[\mathds{1}_{i\leq L_1} \log p(X_i)]\\
+            H(W) = -\E\left[\sum_{i=1}^{L_1}\log p(X_i)\right] &= -\E\left[\sum_{i=1}^\infty \ind_{i\leq L_1}\log p(X_i)\right]\\
+            &= - \sum_{i=1}^\infty \E[ind_{i\leq L_1} \log p(X_i)]\\
             &= - \sum_{i=1}^\infty \P(i\leq L_1) \E[\log p(X_i)]\\
             &= -\E[\log p(X) \sum_{i=1}^\infty \P(i\leq L_1)]\\
             &= H(X) \E[L_1] = H(X)\E[L]
@@ -1473,14 +1473,14 @@ Universal source coding consists in coding without prior knowledge of the source
 \begin{definition}[Hamming weight]
     For $x\in\X^n$, with $|\X|<+\infty$, we define the \emph{Hamming weight of $a$ in $x$}:
     \begin{equation*}
-        h_x(a) := \sum_{i=1}^n \mathds{1}_{x_i=a}
+        h_x(a) := \sum_{i=1}^n \ind_{x_i=a}
     \end{equation*}
 \end{definition}
 
 \begin{definition}[Empirical distribution associated with a vector]
     For $x\in\X^n$, we define the \emph{empirical distribution $p_x$ associated with vector $x$}:
     \begin{equation*}
-        p_x(a) := \frac{h_x(a)}{n}=\frac{1}{n}\sum_{i=1}^n \mathds{1}_{x_i=a}
+        p_x(a) := \frac{h_x(a)}{n}=\frac{1}{n}\sum_{i=1}^n \ind_{x_i=a}
     \end{equation*}
     $p_x(a)$ is the fraction of the elements of $x$ equal to $a$.
 \end{definition}
