@@ -283,4 +283,47 @@ We finally have a closed form representation for the function evaluation. Defini
     Therefore, the kernel trick allow to replace $\R^d$ by $\R^n$, which is interesting when $d$ is very large. Furthermore, it allows to separate the representation problem (design a kernel on a set $\X$), algorithms, and analysis (which only use the kernel matrix $K$).
 \end{example}
 
+\subsection{Properties of kernels}
+Since the learning problem is completely defined in terms of the kernel function, the explicit knowledge of the feature map is not required anymore. In particular, given a function $k:X\times X \to \R$, tu use it in a learning problem, we need to be sure that it is a \emph{positive definite kernel}, i.e. that there exists a feature map $\phi$ such that
+\begin{equation*}
+    \forall x, x'\in\X, \quad k(x, x") = \phi(x)^\top \phi(x')
+\end{equation*}
+Kernel functions admits many characterizations, which we will now present.
+
+\begin{property}[Characterization in terms of positive-definitness]
+    $k$ is a positive definite kernel if and only if the kernel matrix $k$ is positive semi-definite (i.e. all its eigenvalues are non-negative).
+\end{property}
+
+\begin{theorem}[Aronsazjn]
+    $k$ is a positive definite kernel if and only if there exists a Hilbert space $\mathcal{F}$, and $\phi:X\to\mathcal{F}$ such that
+    \begin{equation*}
+        \forall x, y\in X, \quad k(x, y) = \trace{\phi(x), \phi(y)}
+    \end{equation*}
+    If such objects exist, $\mathcal{F}$ is called the \emph{feature space} and $\phi$ the \emph{feature map}.
+\end{theorem}
+
+\begin{property}
+    The sum and product of kernels are kernels.
+\end{property}
+
+\begin{example}[Linear kernel]
+    The linear kernel corresponds to $\phi = x \mapsto x$:
+    \begin{equation*}
+        k(x, y) = x^\top y
+    \end{equation*}
+\end{example}
+
+\begin{example}[Polynomial kernel]
+    The kernel $k(x, y) = (x^\top y)^r$ can be expanded as:
+    \begin{equation*}
+        k(x, y) = \left(\sum_{i=1}^d x_iy_i\right)^r = \sum_{\alpha_1 + \dots + \alpha_p=r} \binom{r}{\alpha_1, \dots, \alpha_p} \underbrace{(x_1y_1)^{\alpha_1} \dots (x_py_p)^{\alpha_p}}_{(x_1^{\alpha_1}\dots x_p^{\alpha_p})(y_1^{\alpha_1}\dots y_p^{\alpha_p})}
+    \end{equation*}
+\end{example}
+
+\begin{example}[Translation-invariant kernels on a bounded interval]
+\end{example}
+
+\begin{example}[Translation-invariant kernels on $\R^d$]
+\end{example}
+
 \end{document}
