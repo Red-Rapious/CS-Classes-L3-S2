@@ -1292,28 +1292,110 @@ where $P[e/X]$ is $P$ in which all free occurrences of $X$ are replaced with $e$
     \end{equation*}
 \end{example}
 
-\paragraph*{Consequence}
+\paragraph*{Consequence (weaknening)}
 The rule of consequence expresses that we can weaken a Hoare triple by both weakening its postcondition $Q\impliedby Q'$ and strengthening its precondition $P\implies P'$. We assume a logic system to be available to prove formulas on assertions, such as $P\implies P'$.
 
 \begin{figure}[H]
     \centering
     \begin{prooftree}
         \hypo{P\implies P'}
-        \hypo{Q' \implies Q}
+        \hypo{Q'\implies Q}
         \hypo{\hoare{P'}{c}{Q'}}
-        \infer3[Cons.]{\hoare{P}{c}{Q}}
+        \infer3[Weak.]{\hoare{P}{c}{Q}}
     \end{prooftree}
 \end{figure}
 
+\begin{example}[Consequence rule]
+    The axiom for \textnormal{\textbf{fail}} can be replaced with:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{}
+            \infer1[Ax.]{\hoare{\true}{\textnormal{\bf fail}}{\false}}
+        \end{prooftree}
+    \end{figure}
+    as $P\implies\true$ and $\false\implies Q$ always hold. Another example is:
+    \begin{equation*}
+        \hoare{X=99\land Y\in[1, 10]}{X\leftarrow Y+10}{X=Y+10\land Y\in[1, 10]}
+    \end{equation*}
+\end{example}
+
 \paragraph*{Tests}
+To prove that $Q$ holds after a test, we prove that it holds after each branch $(s, t)$ under the assumption that the branch is executed, i.e. $e$ or $\lnot e$:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\hoare{P\land e}{s}{Q}}
+        \hypo{\hoare{P\land\lnot e}{t}{Q}}
+        \infer2[Test]{\hoare{X\neq 0}{\textnormal{\textbf{if} $X<0$ \textbf{then} $X\leftarrow -X$ \textbf{else skip}}}{X>0}}
+    \end{prooftree}
+\end{figure}
+
+\begin{example}[Test rule]
+    $ $
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{}
+            \infer1[Ax.]{\hoare{X<0}{X\leftarrow -X}{X>0}}
+            \infer1[Weak.]{\hoare{(X\neq 0)}{X\leftarrow -X}{X>0}}
+            \hypo{}
+            \infer1[Ax.]{\hoare{X>0}{\textnormal{\bf skip}}{X>0}}
+            \infer1[Weak.]{\hoare{(X\neq 0) \land (X\geq0)}{\textnormal{\bf skip}}{X>0}}
+            \infer2[\textnormal{Test}]{\hoare{P}{\textnormal{\textbf{if} e \textbf{then} s \textbf{else} t}}{Q}}
+        \end{prooftree}
+    \end{figure}
+\end{example}
 
 \paragraph*{Sequences}
+To prove a sequence $s; t$, we must invent an intermediate assertion $R$ implied by $P$ after $s$, and implying $Q$ after $t$:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\hoare{P}{s}{R}}
+        \hypo{\hoare{R}{t}{Q}}
+        \infer2[Seq.]{\hoare{P}{s; t}{Q}}
+    \end{prooftree}
+\end{figure}
+This is also often denoted by $\{P\}\, s \,\{R\}\, t\,\{Q\}$.
+
+\begin{example}[Sequence rule]
+    \begin{equation*}
+        \{X=1\land Y=1\}\, X\leftarrow X+1 \,\{X=2\land Y=1\}\, Y\leftarrow Y-1\,\{X+1\land Y=0\}
+    \end{equation*}
+\end{example}
 
 \paragraph*{Loops}
+To prove that $P$ -- true before a loop -- still holds after the loop, we can prove that $P$ is a loop invariant: $P$ holds before each loop iteration, before even testing $e$. This is expressed with the following rule:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\hoare{P\land e}{s}{P}}
+        \infer1[Loop]{\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{P\land\lnot e}}
+    \end{prooftree}
+\end{figure}
+
+\noindent In practice, we would rather prove the triple $\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{Q}$. To do so, it is sufficient to invent an assertion $I$ that:
+\begin{itemize}
+    \item holds when the loop starts: $P\implies I$
+    \item is invariant by the body $s$: $\hoare{I\land e}{s}{I}$
+    \item implies the assertion when the loop stops: $(I\land \lnot e)\implies Q$
+\end{itemize}
+We can therefore derive the rule:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{P\implies I}
+        \hypo{I\land\lnot e\implies Q}
+        \hypo{\hoare{I\land e}{s}{I}}
+        \infer1{\hoare{I}{\textnormal{\textbf{while} e \textbf{do} s}}{I\land\lnot e}}
+        \infer3[Inv.]{\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{Q}}
+    \end{prooftree}
+\end{figure}
 
 \subsubsection{Proof tree example}
 
-\subsubsection{INvariants and inductive invariants}
+\subsubsection{Invariants and inductive invariants}
 
 \subsection{Dijkstra's predicate calculus}
 
