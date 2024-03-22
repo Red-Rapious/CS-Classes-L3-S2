@@ -1,6 +1,8 @@
 .DS_Store
 .vscode
 slides
+nt_toolbox
+*.mat
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
