@@ -29,6 +29,7 @@ Several solutions would have prevented this mishappening:
 \begin{itemize}
     \item Desactivate interruptions on overflows
     \item Fix the SRI code, so that no overflow can happen. All conversions must be \emph{guarded against overflows}:
+    % TODO: avoid tabs
     \begin{minted}{c}
                         double x = /* ... */ ;
                         short i = /* ... */ ;
@@ -91,6 +92,9 @@ This course will contain two main parts. The first part will be about Semantics,
 \end{property}
 \begin{proof}
     We assum there exists a program $Pa$ such that $Pa$ always terminates, and returns $1$ if and only if $P$ terminates on input $X$. We consider the following program:
+    \begin{figure}[H]
+    \centering
+    \begin{minipage}{0.4\textwidth}
     \begin{minted}{c}
 void P0 ( P ) {
     if ( Pa ( P , P ) == 1 ) {
@@ -102,6 +106,8 @@ void P0 ( P ) {
     }
 }
     \end{minted}
+    \end{minipage}
+    \end{figure}
     and we consider the return value of $Pa(P0, P0)$. If $Pa(P0, P0) == 1$, then $P0$ loops forever, and if $Pa(P0, P0) == 0$, then $P0$ terminates. This is a contradiction, and the termination problem is not computable.
 \end{proof}
 
@@ -971,7 +977,7 @@ We now consider other interesting properties of programs, and show that they do 
 For example, one can think about security properties. We can consider just one: \say{An unauthorized observer should not be able to guess anything about private information by looking at public information}.
 
 \subsubsection{Assumptions}
-We let $\Sc=(\S, \to, \S_{\mathcal{I}})$ be a transition system. Its states are of the form $(l, m)\in\mathbb{L}\times\mathbb{M}$. Memory states are of the form $\mathbb{X}\to\mathbb{V}$. We let $l, l'\in\mathbb{L}$ be the program entry and exit, and $x, x'\in\mathbb{X}$ be the private and public variables. We look at the following security property:
+We let $\Sc=(\S, \to, \S_{\mathcal{I}})$ be a transition system. Its states are of the form $(l, m)\in\mathbb{L}\times\mathbb{M}$. Memory states are of the form $\mathbb{X}\to\V$. We let $l, l'\in\mathbb{L}$ be the program entry and exit, and $x, x'\in\mathbb{X}$ be the private and public variables. We look at the following security property:
 \begin{center}
     \say{Observing the value $x'$ at $l'$ gives no information on the value of $x$ at $l$.}
 \end{center}
@@ -1005,7 +1011,7 @@ We consider the transformer $\Phi$ defined by:
 \begin{definition}[Non-interference]
     There is no interference between $(l, x)$ and $(l', x')$, and we write $(l', x') \not\rightsquigarrow (l, x)$, if and only if the following property holds:
     \begin{equation*}
-        \forall m\in\mathbb{M}, \forall v_0, v_1\in\mathbb{V}, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} = \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
+        \forall m\in\mathbb{M}, \forall v_0, v_1\in\V, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} = \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
     \end{equation*}
 
     Intuitively, if two observations at point $l$ differ only in the value of $x$, there is no difference in observation $x'$ at $l'$. In other words, observing $x'$ at $l'$ (even on many executions) gives no information about the value of $x$ at point $l$.
@@ -1025,7 +1031,7 @@ This as many applications in reverse engineering, slicing, and corresponds to th
 \begin{definition}[Interference]
     There is interference between $(l, x)$ and $(l', x')$, and we write $(l', x')\rightsquigarrow(l, x)$ if and only if the following property holds:
     \begin{equation*}
-        \exists x\in \mathbb{M}, \exists v_0, v_1\in\mathbb{V}, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} \neq \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
+        \exists x\in \mathbb{M}, \exists v_0, v_1\in\V, \quad \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_0])} \neq \set{m'(x')}{m'\in\Phi(m[x\leftarrow v_1])}
     \end{equation*}
     This expresses that there is at least one case, where the value of $x$ at $l$ has an impact on that of $x'$ at $l'$. It may not hold even if the computation of x' reads x:
     \begin{equation*}
@@ -1097,7 +1103,7 @@ We will study two denotation worlds:
 
 \subsection{Deterministic imperative programs}
 \subsubsection{Syntax}
-We now consider a simple imperative language: IMP. Variables are in a fixed set: $X\in\mathbb{V}$. Constants are defined as a set $\mathbb{I} := \mathbb{B}\cup\Z$, containing booleans $\mathbb{B}:=\{\true, \false\}$ and integers $\Z$. Furthermore, we include unary and binary operators, represented by $\lozenge$. Such operators can be integer operations $+, -, \times, /, <, \leq$, boolean operations $\lnot, \land, \lor$, or polymorphic operations $=, \neq$.
+We now consider a simple imperative language: IMP. Variables are in a fixed set: $X\in\V$. Constants are defined as a set $\mathbb{I} := \mathbb{B}\cup\Z$, containing booleans $\mathbb{B}:=\{\true, \false\}$ and integers $\Z$. Furthermore, we include unary and binary operators, represented by $\lozenge$. Such operators can be integer operations $+, -, \times, /, <, \leq$, boolean operations $\lnot, \land, \lor$, or polymorphic operations $=, \neq$.
 \begin{figure}[H]
     \begin{minipage}{0.49\textwidth}
         \centering
@@ -1127,7 +1133,7 @@ For expressions, we define a function $E$ such that:
 \begin{equation*}
     E\sem{\expr} : \mathcal{E} \rightharpoonup \mathbb{I}
 \end{equation*}
-where $\mathcal{E} := \mathbb{V}\to\mathbb{I}$ is an environment mapping variables in $\mathbb{V}$ to values in $\mathbb{I}$. The symbol $\rightharpoonup$ denotes a partial function: it is necessary because some operations are undefined for typing reasons ($1+\true$, $1\land 2$), or are undefined ($3/0$, \dots). We will define $E$ by structural induction on the abstract syntax tree.
+where $\mathcal{E} := \V\to\mathbb{I}$ is an environment mapping variables in $\V$ to values in $\mathbb{I}$. The symbol $\rightharpoonup$ denotes a partial function: it is necessary because some operations are undefined for typing reasons ($1+\true$, $1\land 2$), or are undefined ($3/0$, \dots). We will define $E$ by structural induction on the abstract syntax tree.
 
 \begin{figure}[H]
     \centering
@@ -1186,6 +1192,142 @@ We introduce the \emph{flat ordering} $(\mathbb{I}_\bot, \sqsubseteq)$ on $\math
 \subsection{Higher-order programs}
 
 \subsection{Recursive domain equations}
+
+
+\section{Axiomatic semantics}
+\subsection{Introduction}
+
+\subsection{Specifications}
+\subsubsection{An example of function specification}
+Consider the following program:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \begin{minted}{c}
+int mod(int A, int B) {
+    int Q = 0;
+    int R = A;
+    while (R >= B) {
+        R = R - B;
+        Q = Q + 1;
+    }
+    return R;
+}
+        \end{minted}
+    \end{minipage}
+    \caption{An example of \texttt{mod} function}
+\end{figure}
+
+\subsection{Floyd-Hoare logic}
+\subsubsection{Hoare triples and a small language}
+\begin{definition}[Hoare triple]
+    A Hoare triple is of the form:
+    \begin{equation*}
+        \{P\} \textnormal{ prog } \{Q\}
+    \end{equation*}
+    where $P$ (the \emph{precondition}) and $Q$ (the \emph{postcondition}) are \emph{logical assertions} over program variables, and \texttt{prog} is a program fragment. As an example, we could have:
+    \begin{equation*}
+        P := (X \geq 0 \land Y \geq 0) \lor (X<0 \land Y<0)
+    \end{equation*}
+    A triple means that if $P$ holds before \texttt{prog} is executed, then $Q$ holds after the execution of \texttt{prog}, unless \texttt{prog} does not terminate or encounters an error. It is important to note that $\{P\} \textnormal{ prog } \{Q\}$ expresses \emph{partial correctness}, but does not rule out errors and non-termination. Hoare triples serve as judgements in a proof system.
+\end{definition}
+
+\paragraph*{Language}
+In what follow, we will consider the language defined by the following grammar:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{stat}{X $\leftarrow$ expr}{assignment}
+        \grule{\bf skip}{do nothing}
+        \grule{\bf fail}{error}
+        \grule{stat; stat}{sequence}
+        \grule{\textbf{if} expr \textbf{then} stat \textbf{else} stat}{conditional}
+        \grule{\textbf{while} expr \textbf{do} stat}{loop}
+    \end{grammar}
+    \caption{The formal grammar of the considered language statements}
+\end{figure}
+where $X\in\V$ are integer-valued variables, \texttt{expr} are integer arithmetic expressions, which we assume to be deterministic and causing no error. For instance, this can be achieved by assuming that all divisions are explicitly guarded by an \textbf{if} construction.
+
+\subsubsection{Hoare rules}
+We now introduce Hoare rules to infer Hoare triples.
+
+\paragraph*{Axioms}
+Intuitively, any property true before \textbf{skip} is true afterwards. We formalize this using the following axiom:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P}{\textnormal{\textbf{skip}}}{P}}
+    \end{prooftree}
+\end{figure}
+
+\noindent Similarly, any property is true after fail:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P}{\textnormal{\textbf{fail}}}{Q}}
+    \end{prooftree}
+\end{figure}
+
+\noindent Finally, we can introduce the \emph{assignment axiom}: for $P$ over $X$ to be true after $X \leftarrow e$, $P$ must be true over $e$ before the assignment:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P[e/X]}{X \leftarrow e}{P}}
+    \end{prooftree}
+\end{figure}
+where $P[e/X]$ is $P$ in which all free occurrences of $X$ are replaced with $e$. Note that $e$ must be deterministic, and that the rule is \emph{backwards}: $P$ appears as a postcondition.
+
+\begin{example}[Assignment examples]
+    \begin{equation*}
+        \begin{aligned}
+            \hoare{\true}{X&\leftarrow 5}{X=5}\\
+            \hoare{Y=5}{X&\leftarrow Y}{X=5}\\
+            \hoare{X+1\geq 0}{X&\leftarrow X+1}{X\geq 0}\\
+            \hoare{\false}{X&\leftarrow Y+3}{Y=0\land X=12}\\
+            \hoare{Y\in[0, 10]}{X&\leftarrow Y+3}{X+Y+2\land Y\in[0, 10]}
+        \end{aligned}
+    \end{equation*}
+\end{example}
+
+\paragraph*{Consequence}
+The rule of consequence expresses that we can weaken a Hoare triple by both weakening its postcondition $Q\impliedby Q'$ and strengthening its precondition $P\implies P'$. We assume a logic system to be available to prove formulas on assertions, such as $P\implies P'$.
+
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{P\implies P'}
+        \hypo{Q' \implies Q}
+        \hypo{\hoare{P'}{c}{Q'}}
+        \infer3[Cons.]{\hoare{P}{c}{Q}}
+    \end{prooftree}
+\end{figure}
+
+\paragraph*{Tests}
+
+\paragraph*{Sequences}
+
+\paragraph*{Loops}
+
+\subsubsection{Proof tree example}
+
+\subsubsection{INvariants and inductive invariants}
+
+\subsection{Dijkstra's predicate calculus}
+
+\subsection{Verification conditions}
+
+\subsection{Total correctness (termination)}
+
+\subsection{Non-determinism}
+
+\subsection{Arrays}
+
+\subsection{Concurrency}
+
+
 
 \newpage
 \section{Complement: SAT and Satisfiability Modulo Theories (SMT)}
