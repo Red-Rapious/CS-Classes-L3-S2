@@ -1791,9 +1791,116 @@ In the remaining part of this lesson, we shall relate the parsing entropy to the
     where the upper bound follows from \eqref{eq:lds-bound}. Both bound values, $0$ and $1$, are achieved on some sequences.
 \end{corollary}
 \begin{proof}
-    
+    TODO.
 \end{proof}
 
 \subsection{Finite coding automata}
+We shall define some class of source coding algorithms and show that the parsing entropy is a lower bound of their coding rates.
+
+\begin{definition}[Automaton]
+    An automaton is a sixtet $(\X, \Y, Q, q_i, f, \delta)$ where:
+    \begin{itemize}
+        \item $\X$ is a finite set called \emph{input alphabet}
+        \item $\Y$ is a finite set called \emph{output alphabet}
+        \item $Q$ is a set called automaton \emph{state space}
+        \item $q_1\in Q$ is the initial state of the automaton
+        \item $f:Q\times\X\rightarrow\Y^\star$ is an \emph{output function}
+        \item $\delta:Q\times\X\rightarrow Q$ is a \emph{transition function}
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[Finite automaton]
+    An automaton is called \emph{finite} if its state space $Q$ if finite:
+    \begin{equation*}
+        |Q|<+\infty
+    \end{equation*}
+\end{definition}
+
+In what follows we consider \emph{binary coding automata} with the input alphabet $\X$ corresponding to the source symbols, $\X=\A$, and the output set $\Y=\{0, 1\}$.
+
+\begin{definition}[Source coding with a binary automaton]
+    Consider a binary coding automaton $(\A, \{0, 1\}, Q, q_1, f, \delta)$, and an infinite source sequence $x:=x_1*x_2\dots\in\A^\N$.
+    We consider the following recursion:
+    \begin{itemize}
+        \item Initialization:
+        \begin{equation*}
+            \begin{aligned}
+                y_1 &:= f(q_1, x_1) \in \{0, 1\}\\
+                q_2 &:= \delta(q_1, x_1) \in Q
+            \end{aligned}
+        \end{equation*}
+        \item Recursion step, for some $n\geq2$:
+        \begin{equation*}
+            \begin{aligned}
+                y_n &:= f(q_n, x_n) \in \{0, 1\}\\
+                q_{n+1} &:= \delta(q_n, x_n) \in Q
+            \end{aligned}
+        \end{equation*}
+    \end{itemize}
+    The source coding of $x$ by the automaton is the mapping:
+    \begin{equation*}
+        \begin{aligned}
+            \A^\N &\longrightarrow \{0, 1\}^\N\\
+            x_1*x_1*\dots &\longmapsto y_1*y_2*\dots
+        \end{aligned}
+    \end{equation*}
+    Note that the output function can take the empty word $\epsilon_{\{0, 1\}^\star}$ as its value. Consequently, some outputs $y_n$ can be empty. Furthermore, we extend the definition of $f$ and $\delta$ to $f^\star$ and $\delta^\star$ taking as an input words of various length.
+\end{definition}
+
+\begin{definition}[Uniquely decodable and information lossless coding automata]
+    A binary coding automaton $(\A, \{0, 1\}, Q, q_1, f, \delta)$ is:
+    \begin{itemize}
+        \item \emph{Uniquely decodable} (UD) if the function
+        \begin{equation*}
+            \begin{aligned}
+               \A^\star \cup \A^\N &\longrightarrow \{0, 1\}^\star \cup \{0, 1\}^\N\\
+                x &\longmapsto f^\star(q_1, x)
+            \end{aligned}
+        \end{equation*}
+        is injective.
+        \item \emph{Information lossless} (IL) if the function
+        \begin{equation*}
+            \begin{aligned}
+                \A^\star \cup \A^\N &\longrightarrow (\{0, 1\}^\star \cup \{0, 1\}^\N) \times Q\\
+                x &\longmapsto (f^\star(q_1, x), \delta^\star(q_1, x))
+            \end{aligned}
+        \end{equation*}
+        is injective.
+    \end{itemize}
+\end{definition}
+
+\begin{remark}
+    If the automaton is UD, one can uniquely decode any finite source sequence $x$ from the output $f^\star(q_1, x)$. If the automaton is IL, one can uniquely decode any finite source sequence $x$ from the output $f^\star(q_1, x)$ knowing the final state $\delta^\star(q_1, x)$. We obviously have UD $\implies$ IL, the converse being false in general.
+\end{remark}
+
+\begin{example}[UD block codes as finite IL automata]
+    Any UD code, for example Kraft's or Huffman's, applied per block, can be represented as a finite IL coding automaton. The output is non-null only when the reading of the full block is completed. The state of the automaton represents the non-encoded block portion. \emph{Exercise: show that the UD assumption implies that the corresponding automaton is IL.}
+\end{example}
+
+\begin{definition}[Coding rate of finite IL automata]
+    The \emph{coding rate} of finite coding automata $\rho_{\textnormal{IL}}(x)$ achieved on $x$ is defined as:
+    \begin{equation*}
+        \rho_{\textnormal{IL}}(x) := \inf_{s\geq1}\limsup_{n\to+\infty} \min_{\substack{\textnormal{IL automaton}\\|Q|\leq s}} \frac{l(f^\star(q_1, x))}{n}
+    \end{equation*}
+    where the minimum is taken over all IL binary coding automata on $\A$, with the number of states bounded by $s$. In particular, it is taken over all initial states since this is a characterization of the automata.
+\end{definition}
+
+\begin{property}[Parsing entropy and the coding rates of finite IL automata]
+    For any $x\in\A^\N$, with $2\leq|\A|<\infty$, we have:
+    \begin{equation*}
+        h_2(x)\leq\rho_{\textnormal{IL}}(x)
+    \end{equation*}
+\end{property}
+
+\begin{lemma}
+    Consider a binary IL coding automaton $(\A, \{0, 1\}, Q, q_1, f, \delta)$ with a bounded state space $|Q|\leq s$ for some $s\geq1$. Let $x_{:n}\in\A^n$ be an input vector of size $n$. The length $l(f^\star(q_1, x))$ of the binary output $f^\star(q_1, x)\in\{0, 1\}^\star$ of the automaton on $x_{:n}$ is lower-bounded by:
+    \begin{equation*}
+        l(f^\star(q_1, x_{:n})) \geq \lds(x) \log_2\left(\frac{\lds(x_{:n})}{8s^2}\right)
+    \end{equation*}
+\end{lemma}
+
+\begin{proof}
+    TODO.
+\end{proof}
 
 \end{document}
