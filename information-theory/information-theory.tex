@@ -3,6 +3,8 @@
 \title{Information theory and coding}
 \author{Bartek Blaszczyszyn\\ Notes by Antoine Groudiev}
 
+\newcommand*{\lds}{\ell_{\textnormal{DS}}}
+
 \begin{document}
 \section*{Introduction}
 This document is Antoine Groudiev's class notes while following the class \emph{Théorie de l'information et codage} (Information theory and coding) at the Computer Science Department of ENS Ulm. It is freely inspired by Bartek Blaszczyszyn's class notes. 
@@ -1715,5 +1717,83 @@ Finally, as in the proof of Shannon's first theorem, the codes will be possibly 
     \end{equation*}
     which completes the proof.
 \end{proof}
+
+
+\section{Deterministic source coding}
+For any given deterministic source sequence we shall define a parsing entropy that is a substitute of Shannon's entropy, equivalent to it in the case of a sequence of i.i.d. random variables. Parsing entropy bounds from below the source coding rates achievable in same large class of source coding automata. We shall also present the Lempel-Ziv algorithm introduced in 1977-1978, which allows one to encode without errors an arbitrary source sequence. The corresponding coding rate is not larger than the parsing entropy on any deterministic source sequence and is equal to Shannon's entropy in any i.i.d. case.
+
+\subsection{Parsing entropy}
+Consider a source alphabet $\A$, with $|\A|<+\infty$. Recall that $\A^\star$ is the set of all finite sequences (words) in alphabet $\A$. Recall that $w:=(w_1, \dots, w_k)\in(\A^\star)^k$ is a \emph{parsing} of $x\in\A^\star$ when
+\begin{equation*}
+    w_1*\dots *w_k=x.
+\end{equation*}
+The number of blocks $k$ is called the \emph{length} of the parsing $w$.
+
+\begin{definition}[Distinctive parsing]
+    A parsing $w$ is called distinctive if:
+    \begin{equation*}
+        \forall 1\leq i\neq j\leq k, \quad w_i\neq w_j
+    \end{equation*}
+\end{definition}
+
+\begin{example}
+    Let $x=aaabbc$. The parsing:
+    \begin{itemize}
+        \item $w \simeq a|aa|b|bc$ is distinctive
+        \item $w \simeq \epsilon|a|aa|b|bc$ is also distinctive
+        \item $w \simeq \epsilon|a|a|a|b|bc$ is not distinctive since $w_2=w_3$.
+    \end{itemize}
+\end{example}
+
+\begin{definition}[Longest distinctive parsing]
+    For $x\in\A^\star$, denote by:
+    \begin{equation*}
+        \lds(x) := \max \set{k\geq 1}{\textnormal{there exists a distinctive parsing of $x$ of length $k$}}
+    \end{equation*}
+    the maximal length of a distinctive parsing of $x$. Note that the null block $\epsilon$ counts in $\lds$, therefore the maximal distinctive parsing will always contain $\epsilon$.
+\end{definition}
+
+\begin{example}
+    \leavevmode
+    \begin{itemize}
+        \item $\lds(\epsilon) = 1$
+        \item $\lds(aaabbc) = 5$. Several parsings have the maximal length 5, for example $\epsilon|a|aa|b|bc$, $aa|a|\epsilon|b|bc$ or $|aa|a|b|bc|\epsilon$.
+    \end{itemize}
+\end{example}
+
+\begin{definition}[Parsing entropy]
+    For an infinite sequence $x\in\A^\N$, we define its \emph{parsing entropy per symbol} as:
+    \begin{equation*}
+        h(x):=h_D(x) := \limsup_{n\to+\infty} \frac{\lds(x_{:n}) \log(\lds(x_{:n}))}{n}
+    \end{equation*}
+    where $x_{:n}$ is the truncated sequence of length $n$ starting at the beginning of the infinite sequence.
+\end{definition}
+In the remaining part of this lesson, we shall relate the parsing entropy to the coding rate of some algorithms. The following properties will be used.
+
+\begin{lemma}[Distinctive parsing length bounds]
+    For $x\in\A^n$, with $2\leq|\A|=:D<+\infty$, we have:
+    \begin{equation}
+        \label{eq:lds-bound}
+        \lds(x)\log_D\left(\frac{\lds(x)}{D^3}\right) < n
+    \end{equation}
+    \begin{equation}
+        \label{eq:lds-O}
+        \lds(x) = O\left(\frac{n}{\log_n}\right)_{n\to+\infty}
+    \end{equation}
+    where the $O$ in \eqref{eq:lds-O} is uniform in $x$, meaning that $\lds(x) \leq C \frac{n}{\log n}$ for some constant $C$ independent of $x$.
+\end{lemma}
+
+\begin{corollary}
+    Similarly to Shannon's entropy, for $x\in\A^\N$ with $2\leq|\A|=:D<+\infty$, we have:
+    \begin{equation}
+        0\leq h_D(x) \leq 1
+    \end{equation}
+    where the upper bound follows from \eqref{eq:lds-bound}. Both bound values, $0$ and $1$, are achieved on some sequences.
+\end{corollary}
+\begin{proof}
+    
+\end{proof}
+
+\subsection{Finite coding automata}
 
 \end{document}
