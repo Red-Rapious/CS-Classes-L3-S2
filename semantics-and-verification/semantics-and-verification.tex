@@ -9,6 +9,7 @@
 \DeclareMathOperator{\Lim}{Lim}
 \DeclareMathOperator{\safe}{Safe}
 \DeclareMathOperator{\live}{Live}
+\DeclareMathOperator{\wlp}{wlp}
 \newcommand*{\expr}{\textnormal{ expr }}
 \newcommand*{\stat}{\textnormal{ stat }}
 
@@ -1327,7 +1328,7 @@ To prove that $Q$ holds after a test, we prove that it holds after each branch $
     \begin{prooftree}
         \hypo{\hoare{P\land e}{s}{Q}}
         \hypo{\hoare{P\land\lnot e}{t}{Q}}
-        \infer2[Test]{\hoare{X\neq 0}{\textnormal{\textbf{if} $X<0$ \textbf{then} $X\leftarrow -X$ \textbf{else skip}}}{X>0}}
+        \infer2[\textnormal{Test}]{\hoare{P}{\textnormal{\textbf{if} e \textbf{then} s \textbf{else} t}}{Q}}
     \end{prooftree}
 \end{figure}
 
@@ -1342,7 +1343,8 @@ To prove that $Q$ holds after a test, we prove that it holds after each branch $
             \hypo{}
             \infer1[Ax.]{\hoare{X>0}{\textnormal{\bf skip}}{X>0}}
             \infer1[Weak.]{\hoare{(X\neq 0) \land (X\geq0)}{\textnormal{\bf skip}}{X>0}}
-            \infer2[\textnormal{Test}]{\hoare{P}{\textnormal{\textbf{if} e \textbf{then} s \textbf{else} t}}{Q}}
+            \infer2[Test]{\hoare{X\neq 0}{\textnormal{\textbf{if} $X<0$ \textbf{then} $X\leftarrow -X$ \textbf{else skip}}}{X>0}}
+            
         \end{prooftree}
     \end{figure}
 \end{example}
@@ -1393,11 +1395,184 @@ We can therefore derive the rule:
     \end{prooftree}
 \end{figure}
 
+\begin{remark}
+    Hoare logic is parametrized by the choice of logical theory of assertions. The logical theory is used both to prove properties of the form $P\implies Q$, and to simply formulas by replacing a formula with a simpler one, equivalent in a logical sense ($\iff$). 
+
+    In practice, we often use first order theories, such as booleans $(\mathbb{B}, \lnot, \land, \lor)$, Peano arithmetic $(\N, +, \times)$, ZF set theory or theory of arrays. Theories have different expressiveness, decidability and complexity results. This is an important factor when trying to automate program verification.
+\end{remark}
+
+\subsubsection{Summary of Hoare rules}
+\vspace*{-2em}
+\begin{figure}[H]
+    \centering
+    \setlength{\tabcolsep}{10pt}
+    \renewcommand{\arraystretch}{4}
+    \begin{tabular}{c}
+        \begin{tabular}{c c c}
+            \begin{prooftree}
+                \hypo{}
+                \infer1[Ax.]{\hoare{P}{\textnormal{\textbf{skip}}}{P}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{}
+                \infer1[Ax.]{\hoare{P}{\textnormal{\textbf{fail}}}{Q}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{}
+                \infer1[Ax.]{\hoare{P[e/X]}{X \leftarrow e}{P}}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c c}
+        \begin{prooftree}
+            \hypo{\hoare{P\land e}{s}{Q}}
+            \hypo{\hoare{P\land\lnot e}{t}{Q}}
+            \infer2[\textnormal{Test}]{\hoare{P}{\textnormal{\textbf{if} e \textbf{then} s \textbf{else} t}}{Q}}
+        \end{prooftree}
+        &
+        \begin{prooftree}
+            \hypo{\hoare{P}{s}{R}}
+            \hypo{\hoare{R}{t}{Q}}
+            \infer2[Seq.]{\hoare{P}{s; t}{Q}}
+        \end{prooftree}
+
+        \end{tabular}
+        \\
+        \begin{tabular}{c c}
+            \begin{prooftree}
+                \hypo{P\implies P'}
+                \hypo{Q'\implies Q}
+                \hypo{\hoare{P'}{c}{Q'}}
+                \infer3[Weak.]{\hoare{P}{c}{Q}}
+            \end{prooftree}
+        &
+        \begin{prooftree}
+            \hypo{\hoare{P\land e}{s}{P}}
+            \infer1[Loop]{\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{P\land\lnot e}}
+        \end{prooftree}
+        \end{tabular}\\
+    \end{tabular}
+
+\end{figure}
+
 \subsubsection{Proof tree example}
 
 \subsubsection{Invariants and inductive invariants}
 
+\subsubsection{Auxiliary variables}
+Auxiliary variables are mathematical variables that do not appear in the program. They are constant during the program execution. Such objects are widely used to simplify proofs, achieve more properties and relative completeness on extended languages (concurrency, recursive procedures). 
+
+\begin{example}
+    We consider the simple program:
+    \begin{equation*}
+        \textnormal{\textbf{if} $X<Y$ \textbf{then} $Y\leftarrow X$ \textbf{else skip}}
+    \end{equation*}
+    and we want to express the fact that at the end of the execution, $Y$ is equal to the minimum value between the initial values of $X$ and $Y$. We might use the following auxiliary-variables-free Hoare triple to express such a behavior:
+    \begin{equation*}
+        \hoare{\true}{\textnormal{\textbf{if} $X<Y$ \textbf{then} $Y\leftarrow X$ \textbf{else skip}}}{Y=\min(X, Y)}
+    \end{equation*}
+    Nevertheless, this is much less useful as a specification of a min function; indeed, even though the expected triple holds, the following also holds:
+    \begin{equation*}
+        \hoare{\true}{Y\leftarrow X+1}{Y=\min(X, Y)}
+    \end{equation*}
+    Any program ending with $Y<X$ satisfies the conditions. To express a more interesting property -- the fact that $Y$ ends with a value that was present initially -- we introduce auxiliary variables:
+    \begin{equation*}
+        \hoare{X=x\land Y=y}{\textnormal{\textbf{if} $X<Y$ \textbf{then} $Y\leftarrow X$ \textbf{else skip}}}{Y=\min(x, y)}
+    \end{equation*}
+\end{example}
+
+\subsubsection{Link with denotational semantics}
+
 \subsection{Dijkstra's predicate calculus}
+We will now study \emph{predicate calculus}, which is calculus to derive preconditions from postconditions. It orders and mechanizes the search for intermediate assertions. Note that similarly to manual techniques, it is easier to go backwards, mainly due to assignments.
+
+\subsubsection{Dijkstra's weakest liberal preconditions}
+\begin{definition}[Weakest liberal preconditions]
+    We denote by \emph{wlp} the function such that:
+    \begin{equation*}
+        \wlp: (\textnormal{prog} \times \textnormal{Prop}) \longrightarrow \textnormal{Prop}
+    \end{equation*}
+    and that $\wlp(c, P)$ is the weakest, i.e. most general, precondition ensuring that $\hoare{\wlp(c, P)}{c}{P}$ is a Hoare triple. Said otherwise, it is the greatest set that ensures that the computation ends up in $P$. Formally:
+    \begin{equation*}
+        \hoare{P}{c}{Q} \iff (P\implies\wlp(c, Q))
+    \end{equation*}
+    \say{Liberal} means that we do not care about termination and errors.
+\end{definition}
+
+\begin{example}
+    \begin{equation*}
+        \begin{aligned}
+            \wlp(X\leftarrow X+1, X=1) &= (X=0)\\
+            \wlp(\textnormal{\textbf{while} $X<0$ \textbf{do} $X\leftarrow X+1$}, X\geq0) &= \true\\
+            \wlp(X\leftarrow X+1, X\geq0) &= \true\\
+        \end{aligned}
+    \end{equation*}
+    Note how in cases 2 and 3 we did not take into account non-terminating cases.
+\end{example}
+
+\begin{definition}[Calculus definition for \emph{wlp}]
+    \begin{equation*}
+        \begin{aligned}
+            \wlp(\textnormal{\bf skip}, P) &:= P\\
+            \wlp(\textnormal{\bf fail}, P) &:= \true\\
+            \wlp(X\leftarrow e, P) &:= P[e/X]\\
+            \wlp(s;t, P) &:= \wlp(s, \wlp(t, P))\\
+            \wlp(\textnormal{\textbf{if} $e$ \textbf{then} $s$ \textbf{else} $t$}, P) &:= (e\implies\wlp(s, P)) \land (\lnot e\implies\wlp(t, P))\\
+            \wlp(\textnormal{\textbf{while} $e$ \textbf{do} $s$}, P) &:= I\land((e\land I)\implies\wlp(s, I)) \land ((\lnot e\land I)\implies P)
+        \end{aligned}
+    \end{equation*}
+    Note that \textbf{while} loops require providing an invariant predicate $I$. Intuitively, \emph{wlp} checks that $I$ is an inductive invariant implying $P$. If so, it returns $I$, otherwise it returns $\false$. \emph{wlp} is the weakest precondition only if $I$ is well-chosen.
+\end{definition}
+
+\begin{example}
+    We will compute the weakest liberal precondition of a simple program using the inductive definition of \emph{wlp}:
+    \begin{equation*}
+        \begin{aligned}
+            &\wlp(\textnormal{\textbf{if} $X<0$ \textbf{then} $Y\leftarrow-X$ \textbf{else} $Y\leftarrow X$}, Y\geq10)\\
+            = &(X<0\implies\wlp(Y\leftarrow-X, Y\geq10)) \land (X\geq0 \implies \wlp(Y\leftarrow X, Y\geq10))\\
+            = &(X<0\implies \quad\qquad -X\geq10 \quad\qquad) \land (X\geq0\implies \quad\qquad X\geq10\qquad\quad)\\
+            = &(X\geq0\land-X\geq10) \land (X<0\lor X\geq10)\\
+            = &X\geq10\lor X\leq-10
+        \end{aligned}
+    \end{equation*}
+    As seen in this example, this definition generates complex formulas. It is important to simplify them from time to time to avoid huge computational costs.
+\end{example}
+
+In what follows, $A\equiv B$ means that formulas $A$ and $B$ are equivalent. It is stronger that syntactic equality. Formally,
+\begin{equation*}
+    \forall\rho, \quad \rho \vDash A \iff \rho \vDash B
+\end{equation*}
+
+\begin{property}[Excluded miracle]
+    \begin{equation*}
+        \wlp(c, \false) \equiv \false
+    \end{equation*}
+\end{property}
+
+\begin{property}[$\land$-distributivity]
+    \begin{equation*}
+        \wlp(c, P) \land \wlp(d, Q) \equiv \wlp(c, P\land Q)
+    \end{equation*}
+\end{property}
+
+\begin{property}[$\lor$-distributivity]
+    \begin{equation*}
+        \wlp(c, P) \lor \wlp(d, Q) \equiv \wlp(c, P\lor Q)
+    \end{equation*}
+
+    \noindent Note that $\implies$ is always true, while $\impliedby$ is only true for deterministic, error-free programs.
+\end{property}
+
+\begin{property}[Monotonicity]
+    \begin{equation*}
+        (P\implies Q) \implies (\wlp(c, P) \implies \wlp(c, Q))
+    \end{equation*}
+\end{property}
+
+
+\subsubsection{Strongest liberal postconditions}
 
 \subsection{Verification conditions}
 
