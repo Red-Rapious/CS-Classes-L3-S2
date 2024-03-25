@@ -10,6 +10,8 @@
 \DeclareMathOperator{\safe}{Safe}
 \DeclareMathOperator{\live}{Live}
 \DeclareMathOperator{\wlp}{wlp}
+\DeclareMathOperator{\weakestprecondition}{wp}
+\renewcommand*{\wp}{\weakestprecondition}
 \DeclareMathOperator{\slp}{slp}
 \DeclareMathOperator{\vcgp}{vcg_p}
 \DeclareMathOperator{\vcgs}{vcg_s}
@@ -1709,6 +1711,75 @@ Some problems can be circumvented: you can see for instance how solutions to suc
 
 
 \subsection{Total correctness (termination)}
+\subsubsection{Total correctness}
+We now want to take into account the termination of our program. To do so, we introduce a new type of Hoare triple:
+\begin{equation*}
+    \sqhoare{P}{\textnormal{prog}}{Q}
+\end{equation*}
+It has the following meaning: if $P$ holds before prog is executed, then prog always terminates and $Q$ holds after its execution. To adapt our Hoare rules, we only need to change the rule for \textbf{while}, as it is the only source of non-termination:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\forall t\in W, \; \sqhoare{P\land e\land u=t}{s}{P\land u \prec t}}
+        \infer1[Loop]{\sqhoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{P\land\lnot e}}
+    \end{prooftree}    
+\end{figure}
+\noindent in which we require $(W, \prec)$ to be a well-founded ordering. This ensures that we cannot decrease infinitely by $\prec$ in $W$. In general, we simply use $(\N, <)$, even though lexicographic orders and ordinals can also come handy. Intuitively, in addition to the loop invariant $P$, we invent an expression $u$ that strictly decreases by $s$. Such a $u$ is called a \emph{ranking function}; often, $\lnot e\implies u=0$: $u$ counts the number of steps until termination.
+
+To simplify, we can decompose a proof of total correctness into two proofs. The first proof is a proof of partial correctness $\hoare{P}{c}{Q}$, ignoring termination. The second one is a proof of termination, meaning $\sqhoare{P}{c}{\true}$, ignoring the specification. We must still include the precondition $P$ as the program may not terminate for all inputs. This decomposition can be justified by:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\hoare{P}{c}{Q}}
+        \hypo{\sqhoare{P}{c}{\true}}
+        \infer2{\sqhoare{P}{c}{Q}}
+    \end{prooftree}
+\end{figure}
+
+\begin{example}
+    For this example, we will use a simpler rule for integer ranking function over $(\N, \leq)$ using an integer expression $r$ over program variables:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{\forall n\in \N, \; \sqhoare{P\land e\land r=n}{s}{P\land r<n}}
+            \hypo{(P\land e)\implies(r\geq0)}
+            \infer2[Loop]{\sqhoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{P\land\lnot e}}
+        \end{prooftree}    
+    \end{figure}
+
+    We consider the following program:
+    \begin{equation*}
+        p := \textnormal{\textbf{while} $I<N$ \textbf{do} } I\leftarrow I+1; X\leftarrow 2X
+    \end{equation*}
+    Using $r:=N-I$ and $P:=\true$ as ranking function and precondition, we have:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{\forall n\in \N, \; \sqhoare{I<N\land N-I=n}{s}{N-I=n-1}}
+            \hypo{(I<N)\implies(N-I\geq0)}
+            \infer2[Loop]{\sqhoare{\true}{p}{I\geq N}}
+        \end{prooftree}
+    \end{figure}
+\end{example}
+
+\subsubsection{Weakest precondition}
+Similarly to \emph{wlp}, we can define the weakest precondition; it will additionally impose termination, conversely to the liberal precondition:
+\begin{equation*}
+    \wp : \textnormal{prog} \times \textnormal{Prop} \rightarrow \textnormal{Prop}
+\end{equation*}
+As before, it is defined as the weakest precondition such that:
+\begin{equation*}
+    \sqhoare{P}{c}{Q} \iff (P\implies\wp(c, Q))
+\end{equation*}
+Only the definition for \textbf{while} needs to be modified:
+\begin{equation*}
+    \begin{aligned}
+        \wp(\textnormal{\textbf{while} e \textbf{do} s}, P) := \, &I \land (I\implies v\geq0)\\
+        &\land \forall n, ((e\land I\land v=n) \Rightarrow \wp(s, I\land v<n))\\
+        &\land ((\lnot e\land I)\Rightarrow P)
+    \end{aligned}
+\end{equation*}
+The invariant predicate $I$ is combined with a variant expression $v$, which is positive and decreases at each loop iteration. We can define similarly a strongest postcondition.
 
 \subsection{Non-determinism}
 
