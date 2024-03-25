@@ -19,9 +19,12 @@
 
 \begin{document}
 \section*{Introduction}
-This document is Antoine Groudiev's class notes while following the class \emph{Sémantique et applications à la vérification de programmes} (Semantics and Applications to Verification) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Xavier Rival and Sylvain Conchon. 
+This document is Antoine Groudiev's class notes while following the class \emph{Sémantique et applications à la vérification de programmes} (Semantics and Applications to Verification) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Xavier Rival and Jérôme Feret. 
 
 \section{Introduction to Semantics}
+In this first chapter, we will introduce verification: we will see real-life uses of verification, different approaches to it, and will start building mathematical tools to define semantics and walk our first steps towards program verification.
+
+The first chapter is purely an explanation of the practical need for verification, and can be skipped without loss of comprenhension.
 \subsection{Case studies}
 We will study some examples of software errors: what are the causes of these, what kind of properties do we want to verify in order to prevent such failures?
 \subsubsection{Ariane 5 -- Flight 501}
@@ -100,9 +103,9 @@ This course will contain two main parts. The first part will be about Semantics,
     \centering
     \begin{minipage}{0.4\textwidth}
     \begin{minted}{c}
-void P0 ( P ) {
-    if ( Pa ( P , P ) == 1 ) {
-        while ( 1 ) {
+void P0(P) {
+    if (Pa(P, P) == 1) {
+        while (1) {
             // loop forever
         }
     } else {
@@ -112,7 +115,7 @@ void P0 ( P ) {
     \end{minted}
     \end{minipage}
     \end{figure}
-    and we consider the return value of $Pa(P0, P0)$. If $Pa(P0, P0) == 1$, then $P0$ loops forever, and if $Pa(P0, P0) == 0$, then $P0$ terminates. This is a contradiction, and the termination problem is not computable.
+    \noindent and we consider the return value of $Pa(P0, P0)$. If $Pa(P0, P0) == 1$, then $P0$ loops forever, and if $Pa(P0, P0) == 0$, then $P0$ terminates. This is a contradiction, and the termination problem is not computable.
 \end{proof}
 
 \begin{property}
@@ -161,7 +164,7 @@ If it succedds, then we have proven that $\llbracket P\rrbracket\subseteq\S$. It
 \subsubsection{A summary of common verification techniques}
 \begin{figure}[!ht]
     \centering
-    \begin{tabular}{|c|c|c|c|c|}
+    \begin{tabular}{|c||c|c|c|c|}
         \hline
         &Automatic&Sound&Complete&Source level\\
         \hline
@@ -181,11 +184,21 @@ If it succedds, then we have proven that $\llbracket P\rrbracket\subseteq\S$. It
 
 \subsection{Orderings, lattices and fixpoints}
 \subsubsection{Basic definitions on orderings}
+Orderings are very useful in semantics and verification. Logical ordering expresses implication of logical facts, and computational ordering is useful to establish well-foundness of fixpoint definitions, and for proving termination.
+
 \begin{definition}[Partially ordered set (poset)]
     Let a set $\S$ and a binary relation $(\sqsubseteq)\subseteq\S\times\S$ over $\S$. Then, $\sqsubseteq$ is an order relation if and only if it is reflexive, transitive, antisymettric. Furthermore, we define $x\sqsubset y::=(x\sqsubseteq y \land x\neq y)$. Most orders in this class won't be total.
 \end{definition}
 
 We often use Hasse diagrams to represent posets.
+
+\begin{example}[Hasse diagram]
+    The following order (given by the extensive definition) can simply be represented in a diagram:
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.6]{images/hass-diagram.png}
+    \end{figure}
+\end{example}
 
 In the following, we illustrate order relations and their usefulness in semantics using the standard definition of \emph{word automata}. The semantics of an automaton is the set of words recognized by it.
 
