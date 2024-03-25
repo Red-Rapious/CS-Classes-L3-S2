@@ -1214,9 +1214,12 @@ We introduce the \emph{flat ordering} $(\mathbb{I}_\bot, \sqsubseteq)$ on $\math
 
 
 \section{Axiomatic semantics}
-\subsection{Introduction}
+We previously studied \emph{operational semantics}, which models precisely program execution as low-level transitions between internal states. This was done using transition systems, execution traces, and big-step semantics. We then analysed \emph{denotational semantics}, which maps programs into objects in a mathematical domain; it is higher-level, compositional, and domain oriented. 
+
+In this chapter, we will study axiomatic semantics, used to prove properties about programs. We will consider programs annotated with logical assertions, and introduce a rule system to define the validity of assertion. This approach clearly separates programs from specifications, which are user-provided abstractions of the behavior. This enables the use of logic tools and partial automation with increased confidence.
 
 \subsection{Specifications}
+% TODO
 \subsubsection{An example of function specification}
 Consider the following program:
 \begin{figure}[H]
@@ -1236,6 +1239,68 @@ int mod(int A, int B) {
     \end{minipage}
     \caption{An example of \texttt{mod} function}
 \end{figure}
+We will progressively add assertions in ACSL\footnote{\href{https://www.frama-c.com/html/acsl.html}{ANSI/ISO C Specification Language}} to give details about the program goal, internal computations, and why and how contracts are fulfilled. We can start by expressing the intended behavior of the function, using the line:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.4\textwidth}
+        \begin{minted}{c}
+//@ ensures \result == A mod B;
+        \end{minted}
+    \end{minipage}
+\end{figure}
+We can add requirements for the function to actually behave as intended. We say that a requires/ensures pair is a \emph{function contract}. This give:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.4\textwidth}
+        \begin{minted}[mathescape]{c}
+//@ requires A >= 0 $&&$ B >= 0;
+        \end{minted}
+    \end{minipage}
+\end{figure}
+We can even strengthen this requirement to ensure termination:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.4\textwidth}
+        \begin{minted}[mathescape]{c}
+//@ requires A >= 0 $&&$ B>0;
+        \end{minted}
+    \end{minipage}
+\end{figure}
+Finally, we add details about the internal computations:
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.7\textwidth}
+        \begin{minted}[mathescape]{c}
+//@ requires A>=0 $&&$ B>0;
+//@ ensures \result == A mod B;
+int mod(int A, int B) {
+    int Q = 0;
+    int R = A;
+    //@ assert A>=0 $&&$ B>0 && Q=0 $&&$ R==A;
+    while (R >= B) {
+        //@ assert A>=0 $&&$ B>0 && R>=B $&&$ A==Q*B+R;
+        R = R - B;
+        Q = Q + 1;
+    }
+    //@ assert A>=0 $&&$ B>0 $&&$ R>=0 $&&$ R<B $&&$ A==Q*B+R;
+    return R;
+}
+        \end{minted}
+    \end{minipage}
+    \caption{The original function with full assertions}
+\end{figure}
+
+\begin{remark}
+    The variable \texttt{Q} is actually not usefull in the program. We could simply remove it without change of behavior. This would nevertheless make the verification harder, as we would need to find the condition:
+    \begin{equation*}
+        \exists Q, \; A=QB+R \land 0\leq R<B
+    \end{equation*}
+    Such variables are caled \emph{ghost variables}, and can be freely added by the assertions to simplify and add expressiveness to proofs. This shows that annotations can be more complex than the program itself.
+\end{remark}
+
+Contracts and class invariants are build in a few languages (mostly Eiffel), but are available as a library or external tool in most languages such as C, Java, C\#, \dots Contracts can be checked dynamically, statically, or inferred statically.
+
+In this course, we will use deductive methods using logic to check statically and partiallyautomatically whether contracts hold.
 
 \subsection{Floyd-Hoare logic}
 \subsubsection{Hoare triples and a small language}
