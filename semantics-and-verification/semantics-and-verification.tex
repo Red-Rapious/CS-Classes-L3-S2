@@ -11,6 +11,8 @@
 \DeclareMathOperator{\live}{Live}
 \DeclareMathOperator{\wlp}{wlp}
 \DeclareMathOperator{\slp}{slp}
+\DeclareMathOperator{\vcgp}{vcg_p}
+\DeclareMathOperator{\vcgs}{vcg_s}
 \newcommand*{\expr}{\textnormal{ expr }}
 \newcommand*{\stat}{\textnormal{ stat }}
 
@@ -1608,6 +1610,56 @@ Similarly, we can define the strongest liberal postcondition.
 \end{definition}
 
 \subsection{Verification conditions}
+\subsubsection{Verification condition generation}
+The previously introduced notions define a framework to verify programs. How can we automate program verification using logic? Hoare logic is a deductive system and can therefore only automate the checking of proofs. Predicate transformers, such as \emph{wlp} and \emph{slp} calculus, allow constructing (big) formulas mechanically, but invention is still needed, for example in loops.
+
+Such tools can nevertheless be used in verification condition generation: a verificator takes as input a program with annotations, such as contracts and loop invariants, and generates mechanically logic formlas ensuring the correctness. It reduces the input to a mathematical problem, which contains no reference to a program. Finally, an automatic SAT/SMT solver or an interactive theorem prover is used to discharge (prove) the formulas.
+
+To do so, we slightly modifiy the grammar of statements to introduce optional assertions at any point:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{stat}{X $\leftarrow$ expr}{}
+        \grule{\bf skip}{}
+        \grule{\bf fail}{}
+        \grule{stat; stat}{}
+        \grule{\textbf{if} expr \textbf{then} stat \textbf{else} stat}{}
+        \grule{\textbf{while} expr \textbf{do} stat}{}
+        \grule{\textbf{assert} expr}{assertion}
+        \gskip{}
+        \firstrule{prog}{$\hoare{\textnormal{Prop}}{\textnormal{stat}}{\textnormal{Prop}}$}{}
+    \end{grammar}
+    \caption{Statements with assertions and programs annotated with a contract}
+\end{figure}
+
+\subsubsection{Verification algorithm}
+We define two OCaml-like functions, $\vcgp$ and $\vcgs$, which inductively define an algorithm for verification condition generation.
+
+\paragraph*{Program verification} 
+$\vcgp$ is of the form:
+\begin{equation*}
+    \vcgp : \textnormal{prog} \rightarrow \mathcal{P}(\textnormal{Prop})
+\end{equation*}
+Since prog contains only one construction, its definition is simply:
+\begin{equation*}
+    \vcgp(\hoare{P}{c}{Q}) := \textnormal{let } (R, C) = \vcgs(c, Q) \textnormal{ in } C\cup\{P\implies R\}
+\end{equation*}
+
+\paragraph*{Statement verification} 
+$\vcgs$ is of the form: $\vcgs:(\textnormal{stat}\times\textnormal{Prop}) \rightarrow (\textnormal{Prop}\times\mathcal{P}(\textnormal{Prop}))$, and is defined inductively by:
+\begin{equation*}
+    \begin{aligned}
+        \vcgs(\textnormal{\bf skip}, Q) &:= (Q, \emptyset)\\
+        \vcgs(X\leftarrow e, Q) &:= (Q[e/X], \emptyset)\\
+        \vcgs(s; t, Q) &:= \textnormal{let } (R, C) = \vcgs(t, Q)\textnormal{ in}\\ 
+        &\;\;\quad\textnormal{let } (P, D) = \vcgs(s, R) \textnormal{ in } (P, C\cup D)\\
+        \vcgs(\textnormal{\bf if } e \textnormal{\textbf{ then }} s \textnormal{\textbf{ else }} t, Q) &:= \textnormal{let } (S, C) = \vcgs(s, Q)\textnormal{ in}\\ 
+        &\;\;\quad\textnormal{let } (T, D) = \vcgs(t, Q) \textnormal{ in } ((e\Rightarrow S) \land (\lnot e\Rightarrow T), C\cup D)\\
+        \vcgs(\textnormal{\bf while}_{\{I\}} \; e \textnormal{\textbf{ do }} s, Q) &:= \textnormal{let } (R, C) = \vcgs(s, I)\textnormal{ in } (I, C\cup\{(I\land e) \Rightarrow R, (I\land \lnot e) \ Q\})\\
+        \vcgs(\textbf{\bf assert } e, Q) &:= (e\Rightarrow Q, \emptyset)
+    \end{aligned}
+\end{equation*}
+We use \emph{wlp} to infer assertions automatically when possible. $\vcgs(c, P)=(P', C)$ propagates postconditions backwards and accumulates into $C$ verification conditions (from loops).
 
 \subsection{Total correctness (termination)}
 
@@ -1616,6 +1668,10 @@ Similarly, we can define the strongest liberal postcondition.
 \subsection{Arrays}
 
 \subsection{Concurrency}
+
+
+
+
 
 
 
