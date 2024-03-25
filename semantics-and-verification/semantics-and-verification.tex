@@ -1659,7 +1659,41 @@ $\vcgs$ is of the form: $\vcgs:(\textnormal{stat}\times\textnormal{Prop}) \right
         \vcgs(\textbf{\bf assert } e, Q) &:= (e\Rightarrow Q, \emptyset)
     \end{aligned}
 \end{equation*}
-We use \emph{wlp} to infer assertions automatically when possible. $\vcgs(c, P)=(P', C)$ propagates postconditions backwards and accumulates into $C$ verification conditions (from loops).
+We use \emph{wlp} to infer assertions automatically when possible. $\vcgs(c, P)=(P', C)$ propagates postconditions backwards and accumulates into $C$ the verification conditions (from loops).
+
+\begin{example}
+    Consider the following program:
+    \begin{equation*}
+        X\leftarrow 1 \,;\, I\leftarrow 0 \,;\, \textnormal{\bf while } I<N \textnormal{\textbf{ do }} (X\leftarrow 2X; I\leftarrow I+1)
+    \end{equation*}
+    We want to prove that under the precondition $\{N\geq 0\}$, the postcondition $\{X=2^N\}$ holds. To do so, we anotate the loop with the invariant:
+    \begin{equation*}
+        \{X=2^I \land 0\leq I\leq N\}
+    \end{equation*}
+    Applying the foredescribed algorithm, we obtain three verification cconditions:
+    \begin{equation*}
+        \begin{aligned}
+            C_1 &:= (X=2^I) \land (0\leq I\leq N) \land (I\geq N \implies X=2^N)\\
+            C_2 &:= (X=2^I) \land (0\leq I\leq N) \land (I<N \implies 2X=2^{I+1}\land 0\leq I+1\leq N)\\
+            C_3 &:= N\geq 0 \implies 1=2^0 \land 0\leq 0 \leq N
+        \end{aligned}
+    \end{equation*}
+    These three conditions can be checked independently using a SAT solver.
+\end{example}
+
+\subsubsection{What about real languages?}
+We described verification rules in a minimal example; in a real language such as C, the rules are not so simple. Take as an example the assignement rule:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P[e/X]}{X \leftarrow e}{P}}
+    \end{prooftree}
+\end{figure}
+It requires that $e$ has no effect, that there is no pointer aliasing, that $e$ has no runtime error\dots Moreover, the operations in the program and in the logic may not match: for integers, logic uses $\Z$ while computers use $\Z/2^n\Z$. The same remark applies to continuous sets (logic uses $\Q$ or $\R$ while program use floating-point numbers) which might cause rounding-related differences. Finally, a logic for pointers and dynamic allocation is also required.
+
+Some problems can be circumvented: you can see for instance how solutions to such differences have be implemented in the tool \href{https://www.why3.org}{Why3}.
+
 
 \subsection{Total correctness (termination)}
 
