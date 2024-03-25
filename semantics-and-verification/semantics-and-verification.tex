@@ -10,6 +10,7 @@
 \DeclareMathOperator{\safe}{Safe}
 \DeclareMathOperator{\live}{Live}
 \DeclareMathOperator{\wlp}{wlp}
+\DeclareMathOperator{\slp}{slp}
 \newcommand*{\expr}{\textnormal{ expr }}
 \newcommand*{\stat}{\textnormal{ stat }}
 
@@ -1494,7 +1495,7 @@ We will now study \emph{predicate calculus}, which is calculus to derive precond
     \begin{equation*}
         \wlp: (\textnormal{prog} \times \textnormal{Prop}) \longrightarrow \textnormal{Prop}
     \end{equation*}
-    and that $\wlp(c, P)$ is the weakest, i.e. most general, precondition ensuring that $\hoare{\wlp(c, P)}{c}{P}$ is a Hoare triple. Said otherwise, it is the greatest set that ensures that the computation ends up in $P$. Formally:
+    and that $\wlp(c, P)$ is the weakest, i.e. most general, precondition ensuring that $\hoare{\wlp(c, P)}{c}{P}$ holds. Said otherwise, it is the greatest set that ensures that the computation ends up in $P$. Formally:
     \begin{equation*}
         \hoare{P}{c}{Q} \iff (P\implies\wlp(c, Q))
     \end{equation*}
@@ -1573,6 +1574,38 @@ In what follows, $A\equiv B$ means that formulas $A$ and $B$ are equivalent. It 
 
 
 \subsubsection{Strongest liberal postconditions}
+Similarly, we can define the strongest liberal postcondition.
+\begin{definition}
+    We denote by \emph{slp} the function such that:
+    \begin{equation*}
+        \slp: (\textnormal{prog} \times \textnormal{Prop}) \longrightarrow \textnormal{Prop}
+    \end{equation*}
+    and that $\slp(c, P)$ is the strongest, i.e. most general, postcondition ensuring that $\hoare{P}{c}{\slp(P, c)}$ holds. Said otherwise, it is the smallest state set. Formally:
+    \begin{equation*}
+        \hoare{P}{c}{Q} \iff (\slp(P, c)\implies Q)
+    \end{equation*}
+    Like \emph{wlp}, \emph{slp} does not care about non-termination. It allows forward reasoning.
+\end{definition}
+
+\begin{property}[Duality]
+    \begin{equation*}
+        (P\implies\wlp(c, Q)) \iff (\slp(P, c) \implies Q)
+    \end{equation*}
+\end{property}
+
+\begin{definition}[Calculus definition for \emph{slp}]
+    \begin{equation*}
+        \begin{aligned}
+            \slp(P, \textnormal{\bf skip}) &:= P\\
+            \slp(P, \textnormal{\bf fail}) &:= \false\\
+            \slp(P, X\leftarrow e) &:= \exists v, \; P[v/X] \land X=e[v/X]\\
+            \slp(P, s;t) &:= \slp(\slp(s, P), t)\\
+            \slp(P, \textnormal{\textbf{if} $e$ \textbf{then} $s$ \textbf{else} $t$}) &:= \slp(P\land e, s)\lor\slp(P\land\lnot e, t)\\
+            \slp(P, \textnormal{\textbf{while} $e$ \textbf{do} $s$}) &:= (P\implies I)\land(\slp(I\land e, s) \implies I) \land (\lnot e\land I)
+        \end{aligned}
+    \end{equation*}
+    Similarly, \textbf{while} loops require providing an invariant predicate $I$. 
+\end{definition}
 
 \subsection{Verification conditions}
 
