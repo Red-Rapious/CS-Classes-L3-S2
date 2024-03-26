@@ -1963,11 +1963,115 @@ Using these definitions, we have:
 \end{equation*}
 
 \subsection{Arrays}
+We enrich our language with a set $\Ab$ of \emph{array variables}, array access in expressions: $A(\textnormal{expr})$, and array assignment: $A(\textnormal{expr})\leftarrow\textnormal{expr}$, for some $A\in\Ab$. Note that arrays have unbouded size here, we do not care about overflow. 
+
+A natural idea is to generalize the assignment axiom:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P[f/A(e)]}{A(e)\leftarrow f}{P}}
+    \end{prooftree}
+\end{figure}
+but this is not sound, due to aliasing.
+
+\begin{example}
+    We would derive the invalid triple:
+    \begin{equation*}
+        \hoare{A(J)=1\land I=J}{A(I)\leftarrow 0}{A(J)=1\land I=J}
+    \end{equation*}
+    as $(A(J)=1)[0/A(I)] = (A(J)=1)$.
+\end{example}
+
+The solution to this issue is to use a specific theory of arrays, enriching the assertion language with expressions $A\{e\mapsto f\}$, meaning the array equal to $A$ except that index $e$ maps to value $f$.
+This allows to add the axiom:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P[A\{e\mapsto f\}/A]}{A(e)\leftarrow f}{P}}
+    \end{prooftree}
+\end{figure}
+Intuitively, we use functional arrays in the logic world. We also add logical axioms to reason about our arrays in assertions:
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{cc}
+        
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{A\{e\mapsto f\}(e)=f}
+    \end{prooftree}
+    &
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{(e\neq e')\implies(A\{e\mapsto f\}(e')=A(e'))}
+    \end{prooftree}
+    \end{tabular}
+\end{figure}
+
+\begin{example}[Swap]
+    We consider the program:
+    \begin{equation*}
+        p := T\leftarrow A(I) ; A(I) \leftarrow A(j) ; A(J) \leftarrow T
+    \end{equation*}
+    which swaps values of $A$ at indices $I$ and $J$. We wish to prove that the values are indeed swapped:
+    \begin{equation*}
+        \hoare{A(I)=x\land A(J)=y}{p}{A(I)=y\land A(J)=x}
+    \end{equation*}
+    We propagate $A(I)=y$ backwards by the assignment rule, and we get:
+    \begin{equation*}
+        \begin{aligned}
+            &A\{J\mapsto T\}(I) = y\\
+            &A\{I\mapsto A(J)\}\{J\mapsto T\}(I)=y\\
+            &A\{I\mapsto A(J)\}\{J\mapsto A(I)\}(I)=y
+        \end{aligned}
+    \end{equation*}
+    We now consider two cases.
+    \begin{itemize}
+        \item If $I=J$, then $A\{I\mapsto A(J)\}\{J\mapsto A(I)\}=A$ and therefore
+        \begin{equation*}
+            A\{I\mapsto A(J)\}\{J\mapsto A(I)\}(I)=A(I)=A(J)
+        \end{equation*}
+        \item If $I\neq J$, then
+        \begin{equation*}
+            A\{I\mapsto A(J)\}\{J\mapsto A(I)\}(I)=A\{I\mapsto A(J)\}(I)=A(J)
+        \end{equation*}
+    \end{itemize}
+    In both cases, we get $A(J)=y$ in the precondition. Likewise, $A(I)=x$ in the precondition.
+\end{example}
 
 \subsection{Concurrency}
+We want to add a syntax to build concurrent programs. We add a parallel composition statement:
+\begin{center}
+    stat $||$ stat
+\end{center}
 
+We want its semantics $s_1 || s_2$ to express the execution of $s_1$ and $s_2$ in parallel, allowing an arbitrary interleaving of atomic statements. It terminates when both $s_1$ and $s_2$ terminate. The first idea to include it in Hoare logic is to add the following rule:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\hoare{P_1}{s_1}{Q_1}}
+        \hypo{\hoare{P_2}{s_2}{Q_2}}
+        \infer2[Conc.]{\hoare{P_1\land P_2}{s_1 || s_2}{Q_1\land Q_2}}
+    \end{prooftree}
+\end{figure}
+Nevertheless, this rule is unsound. 
 
+\begin{example}
+    We define $s_1:=X\leftarrow 1$ and $s_2:=\textbf{if } X=0 \textbf{ then } Y=1$, and we derive:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{}
+            \infer1{\hoare{X=Y=0}{s_1}{X=1\land Y=0}}
+            \hypo{}
+            \infer1{\hoare{X=Y=0}{s_2}{X=0\land Y=1}}
+            \infer2[Conc.]{\hoare{X=Y=0}{s_1 || s_2}{\false}}
+        \end{prooftree}
+    \end{figure}
+\end{example}
 
+The solution to this issue is to require that the proofs of $\hoare{P_1}{s_1}{Q_1}$ and $\hoare{P_2}{s_2}{Q_2}$ must not interfere.
 
 
 
