@@ -321,14 +321,14 @@ We can already define a few semantic properties:
 \end{theorem}
 
 \begin{example}
-    We consider a set $\mathcal{E}$, and a subset $\A\subseteq\mathcal{E}$. We let:
+    We consider a set $\Ec$, and a subset $\A\subseteq\Ec$. We let:
     \begin{equation*}
         \begin{aligned}
-            f:\Pc(\mathcal{E}) &\to \Pc(\mathcal{E})\\
+            f:\Pc(\Ec) &\to \Pc(\Ec)\\
             X &\mapsto X\cup\A
         \end{aligned}
     \end{equation*}
-    According to Tarski's theorem, the smallest fixpoint of $f$ is $\A$, and the greastest is $\mathcal{E}$.
+    According to Tarski's theorem, the smallest fixpoint of $f$ is $\A$, and the greastest is $\Ec$.
 \end{example}
 
 \begin{theorem}[Kleene's]
@@ -1150,9 +1150,9 @@ We now consider a simple imperative language: IMP. Variables are in a fixed set:
 \paragraph*{Expression semantics}
 For expressions, we define a function $E$ such that:
 \begin{equation*}
-    E\sem{\expr} : \mathcal{E} \rightharpoonup \mathbb{I}
+    E\sem{\expr} : \Ec \rightharpoonup \mathbb{I}
 \end{equation*}
-where $\mathcal{E} := \V\to\mathbb{I}$ is an environment mapping variables in $\V$ to values in $\mathbb{I}$. The symbol $\rightharpoonup$ denotes a partial function: it is necessary because some operations are undefined for typing reasons ($1+\true$, $1\land 2$), or are undefined ($3/0$, \dots). We will define $E$ by structural induction on the abstract syntax tree.
+where $\Ec := \V\to\mathbb{I}$ is an environment mapping variables in $\V$ to values in $\mathbb{I}$. The symbol $\rightharpoonup$ denotes a partial function: it is necessary because some operations are undefined for typing reasons ($1+\true$, $1\land 2$), or are undefined ($3/0$, \dots). We will define $E$ by structural induction on the abstract syntax tree.
 
 \begin{figure}[H]
     \centering
@@ -1163,7 +1163,7 @@ where $\mathcal{E} := \V\to\mathbb{I}$ is an environment mapping variables in $\
 \paragraph*{Statement semantics}
 Similarly, we define for statements a function $S$ of the form:
 \begin{equation*}
-    S\sem{\stat} : \mathcal{E} \rightharpoonup \mathcal{E}
+    S\sem{\stat} : \Ec \rightharpoonup \Ec
 \end{equation*}
 It maps an environment before the statement to an environment after the statement. Likewise, it is a partial function due to errors in expressions or non-termination. We also define it by strucutral induction as described in what follows:
 \begin{itemize}
@@ -1199,8 +1199,55 @@ It maps an environment before the statement to an environment after the statemen
     This is a recursive definition, and we must therefore prove that the equation has solution(s); in case there are several solutions, there is a single \say{right} one. To do so, we will use fixpoints of operators over partially ordered sets.
 \end{itemize}
 
-\paragraph*{Fixpoint semantics of loops} 
-We introduce the \emph{flat ordering} $(\mathbb{I}_\bot, \sqsubseteq)$ on $\mathbb{I}$:
+\subsubsection{Fixpoint semantics of loops} 
+\begin{definition}[Flat ordering]
+    We introduce the \emph{flat ordering} $(\I_\bot, \sqsubseteq)$ on $\I$. We let $\I_\bot := \I\cup\{\bot\}$, which is a pointed set, and define:
+    \begin{equation*}
+        a\sqsubseteq b \iff a = \bot \lor a=b
+    \end{equation*}
+    Every chain is finite, and therefore has a lub $\sqcup$. Thus, $(\I_\bot, \sqsubseteq)$ is a pointed complete partial order (cpo). 
+    $\bot$ denotes the value \emph{undefined}: $\sqsubseteq$ is an information order. We can similarly introduce $\Ec_\bot := \Ec\cup\{\bot\}$, and note that $(\Ec\rightharpoonup\Ec) \simeq (\Ec\rightarrow\Ec_\bot)$. This allows us to now use total functions only: if the value is undefined, we define its result to $\bot$.
+\end{definition}
+
+\begin{definition}[Poset of continuous partial functions]
+    We introduce a partial order structure on partial function $(\Ec_\bot\xrightarrow{c}\Ec_\bot, \dot{\sqsubseteq})$.
+    \begin{itemize}
+        \item $\Ec_\bot\rightarrow\Ec_\bot$ extends $\Ec\rightarrow\Ec_\bot$: since the domain of functions is now equal to their co-domain, it allows composition $\circ$. To do this extension, we extend $f\in\Ec\rightarrow\Ec_\bot$ with $f(\bot):=\bot$. That way, if $S\sem{s}x$ is undefined, so is $(S\sem{s'}\circ S\sem{s})x$. Such functions are therefore monotonic\footnote{$a\sqsubseteq b\implies f(a)\sqsubseteq f(b)$} and continuous\footnote{$f(\sqcup X)=\sqcup\set{f(x)}{x\in\X}$}.
+        \item We restrict $\Ec_\bot\rightarrow\Ec_\bot$ to continuous functions $\Ec_\bot\xrightarrow{c}\Ec_\bot$.
+        \item $\dot{\sqsubseteq}$ is the point-wise order on functions, defined by:
+        \begin{equation*}
+            f\,\dot{\sqsubseteq}\,g \iff \forall x, \, f(x)\sqsubseteq g(x)
+        \end{equation*}
+        \item $\Ec_\bot\xrightarrow{c}\Ec_\bot$ has a least element $\dot{\bot} := \lambda x.\bot = x \mapsto \bot$.
+        \item Finally, it is also complete for point-wise lub $\dot{\sqcup}$ of chains, which makes the order structure on partial functions a \emph{cpo}:
+        \begin{equation*}
+            \dot{\sqcup}F := x \longmapsto \sqcup\set{f(x)}{f\in F}
+        \end{equation*}
+    \end{itemize}
+\end{definition}
+
+To solve the semantic equation, we use a \emph{fixpoint} of a functional -- actually, we will even use the \emph{least fixpoint}, which is more precise for the information order. To do so, we introduce the following operator $F$:
+\begin{equation*}
+    F : (\Ec_\bot \to \Ec_\bot) \to (\Ec_\bot\to\Ec_\bot)
+\end{equation*}
+\begin{equation*}
+    F(f)(\rho) = \begin{cases*}
+        \rho & if $\E\sem{e}\rho = \false$\\
+        f(S\sem{s}\rho) & if $E\sem{e}\rho = \true$\\
+        \bot & otherwise
+    \end{cases*}
+\end{equation*}
+Using this operator, we define:
+\begin{equation*}
+    S\sem{\textnormal{\textbf{while} $e$ \textbf{do} $s$}} := \lfp F
+\end{equation*}
+
+\begin{theorem}
+    $\lfp F$ is well-defined
+\end{theorem}
+\begin{proof}[Proof sketch]
+    We prove that $S\sem{\textnormal{stat}}$ is continuous by induction on the syntax, and use Kleene's theorem. The base cases $S\sem{\textbf{skip}}$ and $S[X\leftarrow e]$ are continuous, and we use the induction hypotheses and the fact that $\circ$ respects continuity to handle the other cases.
+\end{proof}
 
 \subsubsection{Error vs. non-termination}
 
