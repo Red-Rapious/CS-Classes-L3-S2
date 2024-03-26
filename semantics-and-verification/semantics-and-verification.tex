@@ -2073,7 +2073,48 @@ Nevertheless, this rule is unsound.
 
 The solution to this issue is to require that the proofs of $\hoare{P_1}{s_1}{Q_1}$ and $\hoare{P_2}{s_2}{Q_2}$ must not interfere.
 
+\begin{definition}[Interference freedom]
+    Given proofs $\Delta_1$ and $\Delta_2$ of $\hoare{P_1}{s_1}{Q_1}$ and $\hoare{P_2}{s_2}{Q_2}$, we say that $\Delta_1$ do not interfere with $\Delta_2$ if:
+    \begin{center}
+        for any $\Phi$ appearing before a statement in $\Delta_1$, for any $\hoare{P_2'}{s_2'}{Q_2'}$ appearing in $\Delta_2$, $\hoare{\Phi\land P_2'}{s_2'}{\Phi}$ and $\hoare{Q_1\land P_2'}{s_2'}{Q_1}$ hold
+    \end{center}
+    Intuitively, the assertions used to prove $\hoare{P_1}{s_1}{Q_1}$ are stable by $s_2$.
+\end{definition}
 
+\begin{example}
+    Given the same statements $s_1:=X\leftarrow 1$ and $s_2:=\textbf{if } X=0 \textbf{ then } Y=1$, we derive:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{}
+            \infer1{\hoare{X=0\land Y\in[0, 1]}{s_1}{X=1\land Y\in[0, 1]}}
+            \hypo{}
+            \infer1{\hoare{X\in[0, 1]\land Y=0}{s_2}{X\in[0, 1]\land Y\in[0, 1]}}
+            \infer2{\hoare{X=Y=0}{s_1 ||\;s_2}{X=1\land Y\in[0, 1]}}
+        \end{prooftree}
+    \end{figure}
+\end{example}
+
+Another issue remains in the handling of concurrent programs, which is rule completeness. Take as an example:
+\begin{equation*}
+    \hoare{X=0}{X\leftarrow X+1 \:||\: X\leftarrow X+1}{X=2}
+\end{equation*}
+This Hoare triple is valid, but no proof of it can be derived. A solution to this is to include auxiliary variables to introduce explicitly program points and program counters.
+
+\begin{example}
+    We change our program into:
+    \begin{equation*}
+        {}^{l_1}X\leftarrow X+1^{l_2} \:||\: {}^{l_3}X\leftarrow X+1^{l_4}
+    \end{equation*}
+    with auxiliary variables $pc_1\in\{1, 2\}$, $pc_2\in\{3, 4\}$. We can now express that a process is at a given control point and distinguish assertions based on the location of other processes.
+\end{example}
+
+Auxiliary variables make the proof method complete.
+
+\subsection*{Conclusion}
+Logic allows us to reason about program correctness; verification can be reduced to proofs of simple logic statements. The main issue of this approach to verification is automation: annotations are required -- taking the form of loop invariants, contracts -- and verification conditions must be proven. To scale up to realistic programs, we need to automate as much as possible. 
+
+Some solutions are provided by automatic logic solvers to discharge proof obligations. Another option is abstract interpretation to approximate the semantics: it is fully automatic and is able to infer invariants.
 
 
 \newpage
