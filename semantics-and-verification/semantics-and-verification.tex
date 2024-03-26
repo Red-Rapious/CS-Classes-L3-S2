@@ -1894,6 +1894,73 @@ Only the definition for \textbf{while} needs to be modified:
 The invariant predicate $I$ is combined with a variant expression $v$, which is positive and decreases at each loop iteration. We can define similarly a strongest postcondition.
 
 \subsection{Non-determinism}
+We model non-determinism with the statement $X\leftarrow ?$, meaning that $X$ is assigned a random value. We can also model $X\leftarrow[a, b]$ (assigning to $X$ a random value in the $[a, b]$ interval) by:
+\begin{equation*}
+    \textbf{if } X<A\lor X>b \textbf{ then fail} 
+\end{equation*}
+
+\subsubsection{Non-detereminism in Hoare logic}
+To handle non-determinism in Hoare logic, we add the following axiom:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{\forall X, P}{X\leftarrow\;?}{P}}
+    \end{prooftree}
+\end{figure}
+This translates the fact that if $P$ holds whatever the value of $X$ is, $P$ is true after assigning a random value to $X$. Often, $X$ does not appear in $P$ and we simply write:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{}
+        \infer1[Ax.]{\hoare{P}{X\leftarrow\;?}{P}}
+    \end{prooftree}
+\end{figure}
+
+\begin{example}
+    We consider a simple program in which we save the value of $X$ before assigning a random value to it, and finally restoring its value. We prove that the value of $X$ stays the same after the execution:
+    \begin{figure}[H]
+        \centering
+        \begin{prooftree}
+            \hypo{}
+            \infer1{\hoare{X=x}{Y\leftarrow X}{Y=x}}
+            \hypo{}
+            \infer1{\hoare{Y=x}{X\leftarrow\;?}{Y=x}}
+            \hypo{}
+            \infer1{\hoare{Y=x}{X\leftarrow Y}{X=x}}
+            \infer3[Seq.]{\hoare{X=x}{X\leftarrow X; X\leftarrow\;?; X\leftarrow Y}{X=x}}
+        \end{prooftree}
+    \end{figure}
+\end{example}
+
+\subsubsection{Non-determinism in predicate calculus}
+We complete the structural induction of the definition of \emph{wlp} and \emph{slp}, using the following definition:
+\begin{equation*}
+    \wlp(X\leftarrow\;?, P) := \forall X, P
+\end{equation*}
+translating the fact that $P$ must hold whatever the value of $X$ is before the assignment. For \emph{slp}:
+\begin{equation*}
+    \slp(P, X\leftarrow\;?) := \exists X, P
+\end{equation*}
+translating the fact that if $P$ held for one value of $X$, $P$ holds for all values of $X$ after the assignment. Said otherwise, if $P$ held before $X\leftarrow\;?$ and holds after, one can only say that there exists a certain value (the random value) for which $P$ holds.
+
+\subsubsection{Link with operational semantics}
+We briefly analyse the link with operational semantics seen as transition systems. We see predicates $P$ as sets of states: $P\subseteq\Sigma$, and commands $c$ as transition relations: $c\subseteq\Sigma\times\Sigma$. We want to define \emph{slp} and \emph{wlp} as operational predicates, i.e. sets of states. 
+
+To do so, we define for a relation $\tau\subseteq\Sigma\times\Sigma$ and a predicate $P\subseteq\Sigma$:
+\begin{equation*}
+    \begin{aligned}
+        \textnormal{post}[\tau](P) &:= \set{\sigma'}{\exists\sigma\in P, (\sigma, \sigma')\in\tau}\\
+        \textnormal{pre}[\tau](P) &:= \set{\sigma}{\forall\sigma'\in\Sigma, (\sigma, \sigma')\in\tau\implies\sigma'\in P}
+    \end{aligned}
+\end{equation*}
+Using these definitions, we have:
+\begin{equation*}
+    \begin{aligned}
+        \slp(P, c) &= \textnormal{post}[c](P)\\
+        \wlp(c, P) &= \phantom{p}\textnormal{pre}[c](P)
+    \end{aligned}
+\end{equation*}
 
 \subsection{Arrays}
 
