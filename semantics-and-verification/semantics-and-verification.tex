@@ -1386,7 +1386,7 @@ In this course, we will use deductive methods using logic to check statically an
     \begin{equation*}
         P := (X \geq 0 \land Y \geq 0) \lor (X<0 \land Y<0)
     \end{equation*}
-    A triple means that if $P$ holds before \texttt{prog} is executed, then $Q$ holds after the execution of \texttt{prog}, unless \texttt{prog} does not terminate or encounters an error. It is important to note that $\{P\} \textnormal{ prog } \{Q\}$ expresses \emph{partial correctness}, but does not rule out errors and non-termination. Hoare triples serve as judgements in a proof system.
+    A triple means that if $P$ holds before \texttt{prog} is executed, then $Q$ holds after the execution of \texttt{prog}, unless \texttt{prog} does not terminate or encounters an error. It is important to note that $\{P\} \textnormal{ prog } \{Q\}$ expresses \emph{partial correctness}, but does not rule out errors and non-termination. Hoare triples serve as judgments in a proof system.
 \end{definition}
 
 \paragraph*{Language}
@@ -2173,6 +2173,194 @@ Type \emph{checking} checks the consistency of variable use according to user de
 
 \subsubsection{Overview}
 Our goal will be to introduce strong static typing for imperative programs. We will follow a classic workflow to introduce types: we will design a type system, which is a set of logical rules stating whether a program is "well typed"; then, we will prove the soundness with respect to the operational semantics; finally, we will design algorithms to check typing from user-given type annotations, or to infer type annotations that make the program well typed. Finally, we will take a less classic view, typing design by abstraction of the semantics, which will be sound by construction: this is static analysis.
+
+\subsection{Type systems}
+\subsubsection{Simple imperative language}
+We once again use the simple imperative language introduced previously:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{expr}{X}{variable}
+        \grule{c}{constant}
+        \grule{$\lozenge$ expr}{unary operation}
+        \grule{expr $\lozenge$ expr}{binary operation}
+
+        \gskip{}
+
+        \firstrule{stat}{X $\leftarrow$ expr}{assignment}
+        \grule{\bf skip}{do nothing}
+        \grule{stat; stat}{sequence}
+        \grule{\textbf{if} expr \textbf{then} stat \textbf{else} stat}{conditional}
+        \grule{\textbf{while} expr \textbf{do} stat}{loop}
+        \grule{\textbf{local} X \textbf{in} stat}{loop}
+    \end{grammar}
+\end{figure}
+where constants $c$ are taken in the set $\I:=\Z\cup\B$ (integers and booleans), operators $\lozenge$ in $\{+, -, \times, /, <, \leq, \lnot, \land, \lor, =, \neq\}$, and variables in the set $\V$ of all program variables. Note that variables are now local, with limited scope, and must be declared with no type information\dots yet!
+
+\subsubsection{Deductive systems}
+A deductive system is a set of axioms and logical rules to derive theorems, which define what is provable in a formal way. We introduce  \emph{judgments} $\Gamma\vdash \textnormal{Prop}$, a fact meaning \say{under hypotheses $\Gamma$, we can prove Prop}. Similarly to Hoare, logic, we structure rules (hoptheses-conclusion rules, and axioms) into proof trees, which complete application of rules from axioms to conclusion.
+
+\subsubsection{Typing judgments}
+We define simple types:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{type}{\textbf{int}}{integers}
+        \grule{\textbf{bool}}{booleans}
+    \end{grammar}
+\end{figure}
+
+To define hypotheses $\Gamma$ for typing judgments, we introduce a set of type assignments $X : t$ with $X\in\V$, $t\in\textnormal{type}$, intuitively meaning that variable $V$ has type $t$.
+
+Judgments can be of two types:
+\begin{itemize}
+    \item $\Gamma\vdash \textnormal{stat}$, meaning that given the type assignments $\Gamma$, stat is well typed
+    \item $\Gamma\vdash \expr : \textnormal{type}$, meaning that given the type of variables $\gamma$, expr is well-typed and has type \emph{type}
+\end{itemize}
+
+We add the following rules and axioms to derive theorems:
+\vspace*{-0.8cm}
+\begin{figure}[H]
+    \centering
+    \setlength{\tabcolsep}{20pt}
+    \renewcommand{\arraystretch}{3}
+    \begin{tabular}{c}
+        \begin{tabular}{c c c}
+            \begin{prooftree}
+                \hypo{}
+                \infer1[($c\in\Z$)]{\Gamma\vdash c:\textbf{int}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{}
+                \infer1[($c\in\B$)]{\Gamma\vdash c:\textbf{bool}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{}
+                \infer1[($(X:t)\in\Gamma$)]{\Gamma\vdash X:t}
+            \end{prooftree}
+        \end{tabular}
+        \\
+
+        \begin{tabular}{c c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e: \textbf{int}}
+                \infer1{\Gamma\vdash -e: \textbf{int}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e: \textbf{bool}}
+                \infer1{\Gamma\vdash \lnot e: \textbf{bool}}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e_1: \textbf{int}}
+                \hypo{\Gamma\vdash e_2: \textbf{int}}
+                \infer2[($\lozenge\in\{+, -, \times, /\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{int}}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e_1: \textbf{int}}
+                \hypo{\Gamma\vdash e_2: \textbf{int}}
+                \infer2[($\lozenge\in\{=,\neq,<,\leq\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{bool}}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e_1: \textbf{bool}}
+                \hypo{\Gamma\vdash e_2: \textbf{bool}}
+                \infer2[($\lozenge\in\{=,\neq,\land,\lor\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{bool}}
+            \end{prooftree}
+        \end{tabular}
+    \end{tabular}
+    \caption{Expression typing rules}
+\end{figure}
+Note that the syntax of an expression uniquely identifies a rule to apply, except for $=$ and $\neq$, where it depends upon the choice of a type for $e_1$ and $e_2$.
+
+\subsubsection{Statement typing}
+We introduce the following rules for statement typing:
+\vspace*{-0.8cm}
+\begin{figure}[H]
+    \centering
+    \setlength{\tabcolsep}{20pt}
+    \renewcommand{\arraystretch}{3}
+    \begin{tabular}{c}
+        \begin{tabular}{c c}
+            \begin{prooftree}
+                \hypo{}
+                \infer1{\Gamma\vdash\textbf{skip}}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{\Gamma\vdash e:t}
+                \infer1[($(X:t)\in\Gamma$)]{\Gamma\vdash\textbf{skip}}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash s_1}
+                \hypo{\Gamma\vdash s_2}
+                \infer2{\Gamma\vdash s_1;s_2}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{\Gamma\vdash s_1}
+                \hypo{\Gamma\vdash s_2}
+                \hypo{\Gamma\vdash e:\textbf{bool}}
+                \infer3{\Gamma\vdash\textbf{if } e \textbf{ then } s_1 \textbf{ else } s_2}
+            \end{prooftree}
+        \end{tabular}
+        \\
+        \begin{tabular}{c c}
+            \begin{prooftree}
+                \hypo{\Gamma\vdash s}
+                \hypo{\Gamma\vdash e:\textbf{bool}}
+                \infer2{\Gamma\vdash \textbf{while } e \textbf{ do } s}
+            \end{prooftree}
+            &
+            \begin{prooftree}
+                \hypo{\Gamma\cup\{(X:t)\}\vdash s}
+                \infer1{\Gamma\vdash\textbf{local } X \textbf{ in } s}
+            \end{prooftree}
+        \end{tabular}
+    \end{tabular}
+\end{figure}
+Similarly, the syntax of a statement uniquely identifies a rule to apply, up to the choice of $t$ in the rule for local variables.
+
+\begin{definition}[Well-typed statement]
+    A statement $s$ is well-typed if we can prove $\emptyset\vdash s$.
+\end{definition}
+
+\subsection{Soundness of typing}
+We want to prove the following result:
+\begin{theorem}
+    Well-typed program \say{cannot go wrong}.
+\end{theorem}
+
+The operational semantics has several kinds of errors: type mismatch in operators ($1\lor 2$, $\true+2$), and value errors (divide or modulo by 0, use of uninitialized variables). Typing seeks only to prevent statically the first kind of errors.
+
+Value errors can be prevented with static analysis; this is a much more complex and costly process, which we will discuss later in the course. Typing aims at a sweet point, to detect at compile-time all errors of a certain kind.
+
+\begin{property}[Soundness]
+    Well-typed programs have no type mismatch error. It is proved based on an operational semantic of the program.
+\end{property}
+
+\subsection{Typing checking}
+
+\subsection{Type inference}
+
+\subsection{Object-oriented languages}
+
+\subsection{Types as semantic abstraction}
+
+\subsection*{Conclusion}
 
 \newpage
 \section{Complement: SAT and Satisfiability Modulo Theories (SMT)}
