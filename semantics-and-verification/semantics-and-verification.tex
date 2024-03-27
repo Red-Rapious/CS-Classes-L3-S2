@@ -2143,6 +2143,37 @@ Logic allows us to reason about program correctness; verification can be reduced
 Some solutions are provided by automatic logic solvers to discharge proof obligations. Another option is abstract interpretation to approximate the semantics: it is fully automatic and is able to infer invariants.
 
 
+\section{Types}
+\subsection{Introduction}
+The purpose of typing is to avoid errors during the execution of programs, by restricting the programs accepted at compilation time. It helps the compiler produce efficient code, and document properties of programs.
+
+In this course, we look at typing from a formal and semantic view: what semantics can we give to types and typing? What semantic information is guaranteed by types?
+
+We won't discuss type systems in language design and implementation, relations between type theory and proof theory, and type theory as an alternative to set theory.
+
+\subsubsection{Classification}
+A type is a set of values with a specific machine representation. Often, distinct types denote non-overlapping value sets, but this is not always the case: \texttt{short/int/long} in C, or subtyping in Java and C++ show that some values might have different types. Variables are assigned a type that defines its possible values.
+
+\paragraph*{Static vs. dynamic typing}
+The typing is said to be \emph{static} when the type of each variable is known at compile time. This is the case of languages like C, Java, OCaml, \dots Conversely, \emph{dynamic} typing allows the type of each variable to be discovered during the execution, and may change, like in Python or Javascript.
+
+\paragraph*{Strongly vs. loosely typed languages}
+\emph{Loose} typing does not prevent invalid construction and use: in C, C++, or assembly, an integer can be view as a pointer without an error from the compiler. \emph{Strong} typing detects all type errors -- whether at compile time or at run time -- this is the case in Java, OCaml, Python, and Javascript.
+
+\begin{theorem}[Static strong typing]
+    Well-typed programs cannot go wrong.
+\end{theorem}
+
+\paragraph*{Type checking vs. type inference}
+Type \emph{checking} checks the consistency of variable use according to user declarations (C, Java), while type \emph{inference} discovers almost automatically a most general type, consistent with the use of the variable (OCaml, except modules\dots).
+
+\begin{example}[Javascript, a dynamically typed safe language]
+    Dynamic type checking comes with multiple drawbacks: errors are detected late, during execution. This has the tendency to reduce the amount of type errors by adding implicit conversions, which creates complex and unpredictable semantics. It is costly in time, as it requires many type checks, and an optimizing compiler or JIT generates type-specialized versions of the code. Finally, it is costly in memory, as we must tag each value wit type information at run-time.
+\end{example}
+
+\subsubsection{Overview}
+Our goal will be to introduce strong static typing for imperative programs. We will follow a classic workflow to introduce types: we will design a type system, which is a set of logical rules stating whether a program is "well typed"; then, we will prove the soundness with respect to the operational semantics; finally, we will design algorithms to check typing from user-given type annotations, or to infer type annotations that make the program well typed. Finally, we will take a less classic view, typing design by abstraction of the semantics, which will be sound by construction: this is static analysis.
+
 \newpage
 \section{Complement: SAT and Satisfiability Modulo Theories (SMT)}
 Since 2000, SAT solvers have become extremely performant. SMT is the extension of SAT with clauses instead of simply variables.
