@@ -1243,11 +1243,37 @@ Using this operator, we define:
 \end{equation*}
 
 \begin{theorem}
-    $\lfp F$ is well-defined
+    $\lfp F$ is well-defined, and we have $\lfp F=\dot{\bigsqcup}_{n\in\N}F^n(\dot{\bot})$.
 \end{theorem}
 \begin{proof}[Proof sketch]
     We prove that $S\sem{\textnormal{stat}}$ is continuous by induction on the syntax, and use Kleene's theorem. The base cases $S\sem{\textbf{skip}}$ and $S[X\leftarrow e]$ are continuous, and we use the induction hypotheses and the fact that $\circ$ respects continuity to handle the other cases.
 \end{proof}
+
+We have the following:
+\begin{itemize}
+    \item $F^0(\dot{\bot}) = \dot{\bot}$ is completely undefined, giving no information
+    \item If the loop is never entered (providing partial information), we have the following environment:
+    \begin{equation*}
+        F^1(\dot{\bot})(\rho) = \begin{cases*}
+            \rho  & if $E\sem{e}\rho = \false$\\
+            \bot & otherwise
+        \end{cases*}
+    \end{equation*}
+    \item If the loop is iterated at most once:
+    \begin{equation*}
+        F^2(\dot{\bot})(\rho) = \begin{cases*}
+            \rho  & if $E\sem{e}\rho = \false$\\
+            S\sem{s}\rho & else if $E\sem{e}(S\sem{s}\rho) =\false$\\
+            \bot & otherwise
+        \end{cases*}
+    \end{equation*}
+    \item If the loop is iterated at most $n-1$ times, the environment is $F^n(\dot{\bot})(\rho)$.
+    \item The environment when exiting the loop, whatever the number of iterations, is $\dot{\bigsqcup}_{n\in\N}F^n(\dot{\bot})$, providing total information.
+\end{itemize}
+
+\begin{remark}
+    In our semantics, $S\sem{\textnormal{stat}}\rho=\bot$ can either mean that the statement starting on input $\rho$ loops for ever, or that it stops prematurely with an error. We could distinguish between the two cases by adding an error value $\Omega$ distinct from $\bot$, and propagating it in the semantics, bypassing coputations.
+\end{remark}
 
 \subsubsection{Error vs. non-termination}
 
