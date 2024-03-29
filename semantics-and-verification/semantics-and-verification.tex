@@ -981,14 +981,14 @@ Many useful operators can be added:
     \end{equation*}
     \item Sometime (there exists a rank $n$ at which $t$ holds):
     \begin{equation*}
-        \lozenge t ::= \textnormal{true} \until t
+        \diamond t ::= \textnormal{true} \until t
     \end{equation*}
     \item Always (there is no rank at which the negation of $t$ holds):
     \begin{equation*}
-        \square t ::= \lnot(\lozenge(\lnot t))
+        \square t ::= \lnot(\diamond(\lnot t))
     \end{equation*}
 \end{itemize}
-One can combine these operators to construct interesting properties: $\lozenge\square t$ means that $t$ is true starting from a certain rank, and $\square\lozenge t$ means that $t$ happens an infinite number of times.
+One can combine these operators to construct interesting properties: $\diamond\square t$ means that $t$ is true starting from a certain rank, and $\square\diamond t$ means that $t$ happens an infinite number of times.
 
 \subsection{Beyond safety and liveness}
 We now consider other interesting properties of programs, and show that they do not all reduce to trace properties.
@@ -1122,15 +1122,15 @@ We will study two denotation worlds:
 
 \subsection{Deterministic imperative programs}
 \subsubsection{Syntax}
-We now consider a simple imperative language: IMP. Variables are in a fixed set: $X\in\V$. Constants are defined as a set $\mathbb{I} := \mathbb{B}\cup\Z$, containing booleans $\mathbb{B}:=\{\true, \false\}$ and integers $\Z$. Furthermore, we include unary and binary operators, represented by $\lozenge$. Such operators can be integer operations $+, -, \times, /, <, \leq$, boolean operations $\lnot, \land, \lor$, or polymorphic operations $=, \neq$.
+We now consider a simple imperative language: IMP. Variables are in a fixed set: $X\in\V$. Constants are defined as a set $\mathbb{I} := \mathbb{B}\cup\Z$, containing booleans $\mathbb{B}:=\{\true, \false\}$ and integers $\Z$. Furthermore, we include unary and binary operators, represented by $\diamond$. Such operators can be integer operations $+, -, \times, /, <, \leq$, boolean operations $\lnot, \land, \lor$, or polymorphic operations $=, \neq$.
 \begin{figure}[H]
     \begin{minipage}{0.49\textwidth}
         \centering
         \begin{mgrammar}
             \firstrule{\expr}{X}{variable}
             \grule{c}{constant}
-            \grule{\lozenge\,\expr}{unary op.}
-            \grule{\expr \,\lozenge\, \expr}{binary op.}
+            \grule{\diamond\,\expr}{unary op.}
+            \grule{\expr \,\diamond\, \expr}{binary op.}
         \end{mgrammar}
     \end{minipage}
     \begin{minipage}{0.49\textwidth}
@@ -2145,7 +2145,7 @@ Some solutions are provided by automatic logic solvers to discharge proof obliga
 
 \section{Types}
 \subsection{Introduction}
-The purpose of typing is to avoid errors during the execution of programs, by restricting the programs accepted at compilation time. It helps the compiler produce efficient code, and document properties of programs.
+The purpose of typing is to avoid errors during the execution of programs, by restricting the programs accepted at compilation time. It helps the compiler produce efficient code, and document properties of programs (e.g. in OCaml, typing can give important hints about the content of a function).
 
 In this course, we look at typing from a formal and semantic view: what semantics can we give to types and typing? What semantic information is guaranteed by types?
 
@@ -2182,8 +2182,8 @@ We once again use the simple imperative language introduced previously:
     \begin{grammar}
         \firstrule{expr}{X}{variable}
         \grule{c}{constant}
-        \grule{$\lozenge$ expr}{unary operation}
-        \grule{expr $\lozenge$ expr}{binary operation}
+        \grule{$\diamond$ expr}{unary operation}
+        \grule{expr $\diamond$ expr}{binary operation}
 
         \gskip{}
 
@@ -2195,7 +2195,7 @@ We once again use the simple imperative language introduced previously:
         \grule{\textbf{local} X \textbf{in} stat}{loop}
     \end{grammar}
 \end{figure}
-where constants $c$ are taken in the set $\I:=\Z\cup\B$ (integers and booleans), operators $\lozenge$ in $\{+, -, \times, /, <, \leq, \lnot, \land, \lor, =, \neq\}$, and variables in the set $\V$ of all program variables. Note that variables are now local, with limited scope, and must be declared with no type information\dots yet!
+where constants $c$ are taken in the set $\I:=\Z\cup\B$ (integers and booleans), operators $\diamond$ in $\{+, -, \times, /, <, \leq, \lnot, \land, \lor, =, \neq\}$, and variables in the set $\V$ of all program variables. Note that variables are now local, with limited scope, and must be declared with no type information\dots yet!
 
 \subsubsection{Deductive systems}
 A deductive system is a set of axioms and logical rules to derive theorems, which define what is provable in a formal way. We introduce  \emph{judgments} $\Gamma\vdash \textnormal{Prop}$, a fact meaning \say{under hypotheses $\Gamma$, we can prove Prop}. Similarly to Hoare, logic, we structure rules (hoptheses-conclusion rules, and axioms) into proof trees, which complete application of rules from axioms to conclusion.
@@ -2259,7 +2259,7 @@ We add the following rules and axioms to derive theorems:
             \begin{prooftree}
                 \hypo{\Gamma\vdash e_1: \textbf{int}}
                 \hypo{\Gamma\vdash e_2: \textbf{int}}
-                \infer2[($\lozenge\in\{+, -, \times, /\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{int}}
+                \infer2[($\diamond\in\{+, -, \times, /\}$)]{\Gamma\vdash e_1\diamond e_2: \textbf{int}}
             \end{prooftree}
         \end{tabular}
         \\
@@ -2267,7 +2267,7 @@ We add the following rules and axioms to derive theorems:
             \begin{prooftree}
                 \hypo{\Gamma\vdash e_1: \textbf{int}}
                 \hypo{\Gamma\vdash e_2: \textbf{int}}
-                \infer2[($\lozenge\in\{=,\neq,<,\leq\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{bool}}
+                \infer2[($\diamond\in\{=,\neq,<,\leq\}$)]{\Gamma\vdash e_1\diamond e_2: \textbf{bool}}
             \end{prooftree}
         \end{tabular}
         \\
@@ -2275,7 +2275,7 @@ We add the following rules and axioms to derive theorems:
             \begin{prooftree}
                 \hypo{\Gamma\vdash e_1: \textbf{bool}}
                 \hypo{\Gamma\vdash e_2: \textbf{bool}}
-                \infer2[($\lozenge\in\{=,\neq,\land,\lor\}$)]{\Gamma\vdash e_1\lozenge e_2: \textbf{bool}}
+                \infer2[($\diamond\in\{=,\neq,\land,\lor\}$)]{\Gamma\vdash e_1\diamond e_2: \textbf{bool}}
             \end{prooftree}
         \end{tabular}
     \end{tabular}
@@ -2353,12 +2353,113 @@ Value errors can be prevented with static analysis; this is a much more complex 
 \end{property}
 
 \subsubsection{Expression of denotational semantics with explicit errors}
+TODO.
 
 \subsubsection{Statement of operational semantics with explicit errors}
+TODO.
+
+\begin{definition}[Operational semantics]
+    We consider maximal execution traces:
+    \begin{equation*}
+        \begin{aligned}
+            t\sem{s} := &\set{(\sigma_0, \dots, \sigma_n)}{\sigma_0\in\I, \sigma_n\in B, \forall i<n, \sigma_i\to \sigma_{i+1}} \\& \cup \set{(\sigma_0, \dots)}{\sigma_0\in\I, \forall i\in\N, \sigma_i\to\sigma_{i+1}}
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+
+\begin{theorem}[Type soundness]
+    Typing is sound, i.e. well-typed programs cannot produce errors. Formally:
+    \begin{center}
+        $s$ is well-typed $\implies\forall (\sigma_0, \dots, \sigma_n)\in t\sem{s}, \sigma_n\neq\Omega_t$
+    \end{center}
+\end{theorem}
 
 \subsection{Typing checking}
+\subsubsection{Type declarations}
+\begin{center}
+    How do we prove that a program is well-typed?
+\end{center}
+
+An approach is bottom-up reasoning: we construct a proof tree ending in $\emptyset\vdash s$ by applying rules \say{in reverse}. Given a conclusion, there is generally only one rule to apply. The only rule that requires imagination is
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\Gamma\cup\{(X:t)\}\vdash s}
+        \infer1{\Gamma\vdash\textbf{local } X \textbf{ in } s}
+    \end{prooftree}
+\end{figure}
+\noindent where $t$ is assumed to be a free variable. We need to guess a good $t$, i.e. a type for $X$, that makes the proof work. Similarly, to type $\Gamma\vdash e_1=e_2 : \textbf{bool}$, we also have to choose between $\Gamma\vdash e_1:\textbf{bool}$ and $\Gamma\vdash e_1:\textbf{int}$. In other words, we would need to know the types of the variables, which we will use to deduce the types of the expressions.
+
+A common solution in programming languages is to ask the programmer to add type information to all variables declarations: we change the syntax of declaration statements into:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{stat}{\textbf{local} $X:\textnormal{type}$ \textbf{in} stat}{}
+        \grule{\dots}{}
+    \end{grammar}
+\end{figure}
+Under these assumptions, the typing rule for local variable declarations becomes deterministic:
+\begin{figure}[H]
+    \centering
+    \begin{prooftree}
+        \hypo{\Gamma\cup\{(X:t)\}\vdash s}
+        \infer1{\Gamma\vdash\textbf{local } X:t \textbf{ in } s}
+    \end{prooftree}
+\end{figure}
+
+\subsubsection{Type propagation in expressions}
+
+\subsubsection{Type propagation in statements}
+
 
 \subsection{Type inference}
+\begin{center}
+    Can we avoid specifying types in the progam?
+\end{center}
+Specifying types is a handy solution from the semantics point of view, but it is unpleasant in practice -- hopefully, automatic type inference allow us to guess the type of a variable.
+
+\subsubsection{Automatic type inference}
+To do so, each variable $X\in\V$ is assigned a \emph{type variable} $t_X$, and we generate a set of \emph{type constraints} ensuring that the program is well typed. Thus, we simply need to solve the constraint system to infer a type value for each type variable. 
+
+To express type constraints, we need equalities on types and type variables:
+\begin{figure}[H]
+    \centering
+    \begin{grammar}
+        \firstrule{type constr}{type expr = type expr}{type equality}
+        \gskip
+        \firstrule{type expr}{\bf int}{integers}
+        \grule{\bf bool}{booleans}
+        \grule{$t_X$}{type variable for $X\in\V$}
+    \end{grammar}
+\end{figure}
+
+\subsubsection{Generating type constraints}
+\paragraph*{Expressions}
+In a method similar to type propagation, we will inductively define a function
+\begin{equation*}
+    \tau_e : \textnormal{expr} \to (\textnormal{type expr} \times \Pc(\textnormal{type constr}))
+\end{equation*}
+which maps to an expression the type of the expression (possibly a type variable) and a set of constraints to satisfy to ensure it is well typed. No type environment is need: a variable $X$ has a symbolic type $t_X$. In what follows, $(t_i, C_i) := \tau_e(e_i)$.
+\begin{equation*}
+    \begin{aligned}
+        \tau_e(c\in\Z) &:= (\textbf{int}, \emptyset)\\
+        \tau_e(c\in\B) &:= (\textbf{bool}, \emptyset)\\
+        \tau_e(X) &:= (t_X, \emptyset)\\
+        \tau_e(-e_1) &:= (\textbf{int}, C_1\cup\{t_1=\textbf{int}\})\\
+        \tau_e(\lnot e_1) &:= (\textbf{bool}, C_1\cup\{t_1=\textbf{bool}\})\\
+        \forall \diamond\in\{+, -, \times, /\}, \quad \tau_e(e_1\diamond e_2) &:= (\textbf{int}, C_1\cup C_2\cup\{t_1=\textbf{int}, t_2=\textbf{int}\})\\
+        \forall \diamond\in\{<, \leq\}, \quad \tau_e(e_1\diamond e_2) &:= (\textbf{bool}, C_1\cup C_2\cup\{t_1=\textbf{int}, t_2=\textbf{int}\})\\
+        \forall \diamond\in\{\land, \lor\}, \quad \tau_e(e_1\diamond e_2) &:= (\textbf{bool}, C_1\cup C_2\cup\{t_1=\textbf{bool}, t_2=\textbf{bool}\})\\
+        \forall \diamond\in\{=, \neq\}, \quad \tau_e(e_1\diamond e_2) &:= (\textbf{bool}, C_1\cup C_2\cup\{t_1=t_2\})
+    \end{aligned}
+\end{equation*}
+\noindent Typing $e_1=e_2$ and $e_1\neq e_2$ reduces to ensuring an equal type for $e_1$ and $e_2$.
+
+\paragraph*{Statements}
+Similarly, we inductively define $\tau_s$ of the form:
+\begin{equation*}
+    \tau_s=\textnormal{stat}\to\Pc(\textnormal{type constr})
+\end{equation*}
 
 \subsection{Object-oriented languages}
 
