@@ -2460,6 +2460,18 @@ Similarly, we inductively define $\tau_s$ of the form:
 \begin{equation*}
     \tau_s=\textnormal{stat}\to\Pc(\textnormal{type constr})
 \end{equation*}
+We return a set of constraints to satisfy to ensure it is well typed. For simplicity, scoping in $\textbf{local } X\in s$ is not handled: we assign a single type for all the local variables with the same name. 
+
+\begin{equation*}
+    \begin{aligned}
+        \tau_s(\textbf{skip}) &:= \emptyset\\
+        \tau_s(s_1;s_2) &:= \tau_s(s_1) \cup \tau_s(s_2)\\
+        \tau_s(X\leftarrow e) &:= C\cup\{t_X:t\}\\
+        \tau_s(\textbf{while } e \textbf{ do } s) &:= \tau_s(s) \cup C \cup \{t=\textbf{bool}\}\\
+        \tau_s(\textbf{local } X \textbf{ in } s) &:= \tau_s(s)
+    \end{aligned}
+\end{equation*}
+where $(t, C) := \tau_e(e)$.
 
 \subsection{Object-oriented languages}
 
