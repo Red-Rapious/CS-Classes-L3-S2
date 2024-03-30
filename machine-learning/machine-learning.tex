@@ -83,7 +83,51 @@ where $R(\theta)$ is the \emph{population risk}.
 \end{example}
 
 \section{Linear Least Squares Regression}
-Consider an input space $X$ and an output space $Y$. We consider a function $f:X\to Y$ unknown to us, that we want to recover. We are given samples $D_N = [(x_1, y_1), \dots, (x_N, y_N)]$. Our goal is to produce $\hat{f}_D$ such that $\hat{f}_D$ "converges" to $f$ when $|D|\to+\infty$.
+%Consider an input space $X$ and an output space $Y$. We consider a function $f:X\to Y$ unknown to us, that we want to recover. We are given samples $D_N = [(x_1, y_1), \dots, (x_N, y_N)]$. Our goal is to produce $\hat{f}_D$ such that $\hat{f}_D$ "converges" to $f$ when $|D|\to+\infty$.
+\subsection{Introduction}
+In this chapter, we will study the simple but still widely used problem of Linear Least Square Regression. We are given a set of points, which we assume to be sampled from some distribution: there exists some function which generated these points, and we want to retrieve or at least approximate this unknown function. To do so, we will naturally look for the function which best fits the points; nevertheless, assuming that it is unlikely that the function is overly-complicated, we will only approximate it using \emph{linear function}. Finally, to choose which linear function \say{fits best} the data, we will introduce the mean square error, which we will minimize to find our linear approximation function.
+
+Formally, our objective is to find a function $f$ such that it explains well the distribution $(y_i)_{1\leq i\leq n}$ as a function of $(x_i)_{1\leq i\leq n}$, that is $y_i\sim f(x_i)$. To do this, we can choose a \emph{function space} $\mathcal{F}$ and solve the empirical risk minimization problem:
+\begin{equation*}
+    \hat{f}_n \in \argmin_{f\in\mathcal{F}} \hat{R}_n(f) := \argmin_{f\in\mathcal{F}} \frac{1}{n}\sum_{i=1}^n (y_i-f(x_i))^2
+\end{equation*}
+Care must be taken when selecting the function space to avoid overfitting\footnote{We say that the function \emph{overfits} the data when it corresponds too closely to the specific set of data (i.e. on the training data), such that it fails to fit additional data (i.e. test data).}: for example, if we were to choose $\mathcal{F}:=\R_d[X]$ for some $d\in\N$, it is in our best interest to keep $d$ small to avoid getting a function $f$ which fits perfectly the points but diverges between them. Although the empirical mean square error $\hat{R}_n$ decreases when the function space $\mathcal{F}$ becomes larger (i.e. larger polynomial degrees), the $\hat{f}_n$ estimator loses its predictive power. $\hat{f}_n$ will not necessarily perform well on new data. In what follows, we will consider the linear function space, containing functions of the form $f:x\mapsto ax+b$, which is the simplest.
+
+\subsection{General setup and notations for supervised learning}
+\begin{definition}[Training data set]
+    The \emph{training data set}, often denoted $D_n:=\set{(x_i, y_i)}{i\in\llbracket 1, n \rrbracket}$, is the set of some observations $(x_i, y_i)\in\X\times\Y$. We will often make the assumption that the observations $(x_i, y_i)$ are realizations of i.i.d. random variables from a distribution $\nu$.
+\end{definition}
+
+The distribution $\nu$ is unknown to the statistician; it's a matter of learning it from the data.
+
+\begin{definition}[Learning rule]
+    A \emph{learning rule} $\A$ is a function that associates to training data $D-n$ a prediction function $\hat{f}_n$:
+    \begin{equation*}
+        \begin{aligned}
+            \A: \bigcup_{n\in\N} (\X\times\Y)^n &\longrightarrow \Y^\X\\
+            D_n &\longmapsto \hat{f}_n
+        \end{aligned}
+    \end{equation*}
+    The estimated function $\hat{f}_n$ is constructed to predict a new output $y$ from a new input $x$, where $(x, y)$ is a pair of \emph{test data}, i.e. not necessarily observed in the training data. The function $\hat{f}_n$ is an estimator because it depends on the data $D_n$ and not on unobserved parameter, such as the distribution $\nu$. If $D_n$ is random, it is also a random function.
+\end{definition}
+
+\begin{definition}[Risk]
+    
+\end{definition}
+
+\begin{definition}[Empirical risk]
+    
+\end{definition}
+
+\begin{definition}[Linear model]
+    
+\end{definition}
+
+\subsection{Ordinary Least Squares Estimator (OLS)}
+
+\subsection{Statistical analysis}
+
+\subsection{Ridge regression}
 
 \section{Logic regression and convex analysis}
 \subsection*{Recap of important notions and notations}
