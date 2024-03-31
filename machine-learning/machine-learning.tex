@@ -126,6 +126,7 @@ The distribution $\nu$ is unknown to the statistician; it's a matter of learning
 In practice, the statistician cannot compute the risk, since one cannot acces the distribution $\nu$. Therefore, a common method in supervised machine learning is to replace the risk (defined using the distribution $\nu$ through the expectation $\E$) by the empirical risk (defined using the training data set).
 
 \begin{definition}[Squared Loss Empirical risk]
+    \label{eq:sq-empirical-risk}
     Given an estimator $\hatf_n$ and a data set $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}$, we define its \emph{empirical risk}:
     \begin{equation}
         \emrisk_n(f) := \frac{1}{n}\sum_{i=1}^n (y_i-f(x_i))^2
@@ -142,7 +143,7 @@ However, one must be careful about overfitting, the case where $\emrisk_n(f)$ is
 \begin{definition}[Linear model]
     When $\X=\R^d$ and $\Y=\R$, the simplest interesting function space is the set of affine functions. To ease the notation, we assume that the frist components of the inputs is 1 so that it is sufficient to consider linear functions. Therefore, the function space is:
     \begin{equation}
-        \mathcal{F}:=\set{x\mapsto \theta^\top x}{\theta\in\R^d}
+        \mathcal{F}:=\set{x\mapsto \theta^\tp x}{\theta\in\R^d}
     \end{equation}
     i.e. linear functions parametrized by $\theta\in\R^d$.
 \end{definition}
@@ -150,15 +151,70 @@ However, one must be careful about overfitting, the case where $\emrisk_n(f)$ is
 \begin{remark}
     Choosing a linear model, the empirical risk minimization corresponds to the problem of minimizing the following quantity over $\theta\in\R^d$:
     \begin{equation*}
-        \emrisk_{\theta}:=\frac{1}{n}\sum_{i=1}^n(y_i-\theta^\top x_i)^2
+        \emrisk_n(\theta):=\frac{1}{n}\sum_{i=1}^n(y_i-\theta^\tp x_i)^2
     \end{equation*}
-    This expression can be rewritten using matrix notation. We let $Y=(Y_1, \dots, Y_n)^\top\in\R^n$ be the vector of outputs and $X\in\R^{n\times d}$ the matrix of inputs, whose rows are $x_i^\top$. $X$ is called the \emph{design matrix}. The empirical risk is therefore given by:
+    This expression can be rewritten using matrix notation. We let $Y=(Y_1, \dots, Y_n)^\tp\in\R^n$ be the vector of outputs and $X\in\R^{n\times d}$ the matrix of inputs, whose rows are $x_i^\tp$. $X$ is called the \emph{design matrix}. The empirical risk is therefore given by:
     \begin{equation*}
         \emrisk_n(\theta)=\frac{1}{n}\norm{Y-X\theta}^2_2
     \end{equation*}
 \end{remark}
 
 \subsection{Ordinary Least Squares Estimator (OLS)}
+\subsubsection{Definition and closed form}
+In the following, we assume that the design matrix is injective.\footnote{Said otherwise, the rank of $X$ is $d$.} In particular, $d\leq n$, otherwise this is not possible.
+
+\begin{definition}[Ordinary Least Squares]
+    If $X$ is injective, the minimizer of the empirical risk \eqref{eq:sq-empirical-risk} is called the \emph{Ordinary Least Squares (OLS) estimator}. Said otherwise, it is the vector $\htheta\in\R^d$ minimizing $\emrisk_n$:
+    \begin{equation*}
+        \htheta := \argmin_{\theta\in\R^d} \emrisk_n(\theta)=\argmin_{\theta\in\R^d}\frac{1}{n}\sum_{i=1}^n(y_i-\theta^\tp x_i)^2
+    \end{equation*}
+\end{definition}
+
+\begin{property}[Closed form soluion of the OLS estimator]
+    \label{prop:closed-form-OLS}
+    If $X$ is injective, the OLS estimator exists and is unique. Moreover, it is given by:
+    \begin{equation}
+        \label{eq:closed-form-OLS}
+        \htheta = (X^\tp X)^{-1}X^\tp Y
+    \end{equation}
+\end{property}
+
+\begin{proof}
+    Since $\emrisk_n$ is coercive\footnote{$\norm{\emrisk_n(\theta)} \xrightarrow[\norm{\theta}\to+\infty]{} +\infty$} and continuous, it admits at least a minimizer. Furthermore, we have:
+    \begin{equation*}
+        \emrisk_n(\theta) := \frac{1}{n}\norm{Y-X\theta}^2_2 = \frac{1}{n}\left(\theta^\tp(X^\tp X)\theta - 2\theta^\tp X^\theta Y+\norm{Y}^2\right)
+    \end{equation*}
+    Since $\emrisk$ is differentialble any mimizer cancels its gradient:
+    \begin{equation*}
+        \nabla\emrisk_n(\htheta) = \frac{1}{n}\left(\htheta^\tp(X^\tp X) + (X^\tp X)\htheta - 2X^\tp Y\right) = \frac{2}{n}\left((X^\tp X)\htheta - Y^\tp X\right)
+    \end{equation*}
+    where the last equality holds because $X^\tp X\in\R^{d\times d}$ is symmetric. Since $X$ is injective, $X^\tp X$ is invertible\footnote{It is even positive definite.}. Therefore, a solution of $\nabla\emrisk_n(\htheta)=0$ satisfies:
+    \begin{equation*}
+        \htheta = (X^\tp X)^{-1}XY
+    \end{equation*}
+    Finally, this unique solution is indeed a minimum since its Hessian is definite positive:
+    \begin{equation*}
+        \nabla^2\emrisk_n(\htheta) = \frac{2}{n}(X^\tp X)
+    \end{equation*}
+\end{proof}
+
+\subsubsection{Geometric interpretation}
+The linear model aims modeling the ouput vector $Y\in\R^n$ by a linear combination of the form $X\theta\in\R^n$. The image of $X$ is the solution space, denoted:
+\begin{equation*}
+    \im(X)=\set{X\theta\in\R^n}{\theta\in\R^d}
+\end{equation*}
+This is the vector subspace of $\R^n$ generated by the $d\leq n$ columns of the design matrix. As $\rg(X)=d$, it is of dimension $d$.
+
+By minimizing $\norm{Y-X\theta}$, we thus look for the element of $\im(X)$ closest to $Y$. This is the orthogonal projection of $Y$ on $\im(X)$, denoted $\hat{Y}$. By definition of the OLS and by Property \ref{prop:closed-form-OLS}, we have:
+\begin{equation*}
+    \hat{Y} := X\htheta = X(X^\tp X)^{-1}X^\tp Y
+\end{equation*}
+In particular, $P_X:=X(X^\tp X)^{-1}X^\tp$ is the projection matrix on $\im(X)$.
+
+\subsubsection{Numerical resolution}
+The closed form formula \eqref{eq:closed-form-OLS} of the OLS is useful in analyzing it; however, calculating it naively can be prohibitively expensive. For example, when $d$ is large, one prefers to avoid inverting the design matrix $X^\tp X$ which costs $O(d^3)$\footnote{Using the Gauss-Jordan method}, and can be very unstable when the matrix is badly conditioned. The following methods are usually preferred.
+
+\subsubsection{Nonlinear problem: polynomial, spline, and kernel regression}
 
 \subsection{Statistical analysis}
 
@@ -191,16 +247,16 @@ The function $\hatf_{D_N}$ can be chosen such that it minimizes the empirical er
 \subsection{}
 We consider the case where $X=\R^d$ and $Y=\R$. We define the loss $l$ to be the least squares, $l(y, y') = (y-y')^2$, and we choose our functions to be of the form of $f_\star = \theta_\star^T X$. In this case, ERM is OLS:
 \begin{equation*}
-    \hat{\theta}_N = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2
+    \htheta_N = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2
 \end{equation*}
 
-We can also define $\hat{\theta}_{N, \lambda}$ to be:
+We can also define $\htheta_{N, \lambda}$ to be:
 \begin{equation*}
-    \hat{\theta}_{N, \lambda} = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2 + \lambda\norm{\theta}^2
+    \htheta_{N, \lambda} = \argmin_{\theta\in\R^d} \frac{1}{N} \sum_{i=1}^N (\theta^Tx_i-y_i)^2 + \lambda\norm{\theta}^2
 \end{equation*}
 This allows to regulate the "complexity" of the function to avoid overfitting. This is called Tikhonov regularization. In this case, we have
 \begin{equation*}
-    \E_{\hat{Y}}[\mathcal{\hat{\theta}_N} - \mathcal{E}(\theta_\star)] = \frac{\sigma^2 d}{N}
+    \E_{\hat{Y}}[\mathcal{\htheta_N} - \mathcal{E}(\theta_\star)] = \frac{\sigma^2 d}{N}
 \end{equation*}
 and therefore the optimal function is 
 \begin{equation*}
@@ -209,7 +265,7 @@ and therefore the optimal function is
 
 We define $X\in\R^{N\times d} := (x_1^T, \dots, x_N^T)$, and $\hat{Y}=(\hat{y}_1, \dots, \hat{y}_n)$. We this notation, we have
 \begin{equation*}
-    \hat{\theta}_{N, \lambda} = \frac{1}{N}||X\theta-\hat{Y}||^2 + \lambda||\theta||^2
+    \htheta_{N, \lambda} = \frac{1}{N}||X\theta-\hat{Y}||^2 + \lambda||\theta||^2
 \end{equation*}
 Thus, we have
 \begin{equation*}
@@ -220,7 +276,7 @@ Thus, we have
 \end{equation*}
 therefore,
 \begin{equation*}
-    \hat{\theta}_{N, \lambda} = \left(\frac{X^TX}{N}+\lambda I\right)^{-1}\frac{X^T\hat{Y}}{N} = \left(X^TX+\lambda N I\right)^{-1}X^T\hat{Y}
+    \htheta_{N, \lambda} = \left(\frac{X^TX}{N}+\lambda I\right)^{-1}\frac{X^T\hat{Y}}{N} = \left(X^TX+\lambda N I\right)^{-1}X^T\hat{Y}
 \end{equation*}
 We introduce the singular value decomposition of $X$:
 \begin{equation*}
@@ -245,19 +301,19 @@ In this case,
 
 \section{Kernels}
 \subsection{Introduction to kernels}
-In this course, we often focused on prediction methods which are \emph{linear}, that is, the input data are vectors and the prediction function is linear (e.g. $f(x)=w^\top x$ for $w\in\R^d$). In this situation with given data $(x_i, y_i)$, the vector $w$ can be obtained by minimizing
+In this course, we often focused on prediction methods which are \emph{linear}, that is, the input data are vectors and the prediction function is linear (e.g. $f(x)=w^\tp x$ for $w\in\R^d$). In this situation with given data $(x_i, y_i)$, the vector $w$ can be obtained by minimizing
 \begin{equation*}
-    \hat{L}(w)=\frac{1}{n}\sum_{i=1}^n l(y_i, w^\top x_i) + \lambda \Omega(w)
+    \hat{L}(w)=\frac{1}{n}\sum_{i=1}^n l(y_i, w^\tp x_i) + \lambda \Omega(w)
 \end{equation*}
 
 Classical examples are logistic regression or least-squares regression. These methods look at first sight of limited practical significance, because input data may not be vectors, and relevant prediction functions may not be linear.
 
-The goal of kernel methods is therefore to go beyond these limitations while keeping the good aspects. The underlying principle is to replace $x$ by a function $\phi(x)\in\R^d$, \emph{explicitly} or \emph{implicitly}, and consider linear predictions in $\Phi(x)$, i.e. $f(x)=w^\top \phi(x)$. We call $\phi(x)$ the \emph{feature} associated to $x$.
+The goal of kernel methods is therefore to go beyond these limitations while keeping the good aspects. The underlying principle is to replace $x$ by a function $\phi(x)\in\R^d$, \emph{explicitly} or \emph{implicitly}, and consider linear predictions in $\Phi(x)$, i.e. $f(x)=w^\tp \phi(x)$. We call $\phi(x)$ the \emph{feature} associated to $x$.
 
 \begin{example}[Linear regression]
     In the case of linear regression, $\phi(x)=x$ for $x\in\R^d$. As expected, this gives us linear models:
     \begin{equation*}
-        f(x)=w^\top x = \sum_{j=1}^d w_jx_j
+        f(x)=w^\tp x = \sum_{j=1}^d w_jx_j
     \end{equation*}
 \end{example}
 
@@ -268,7 +324,7 @@ The goal of kernel methods is therefore to go beyond these limitations while kee
     \end{equation*}
     Therefore, the prediction functions will be general polynomials of degree at most $r$:
     \begin{equation*}
-        f(x)=w^\top\phi(x)=\sum_{j=0}^r (\phi(x))_j = \sum_{j=1}^r w_jx^j
+        f(x)=w^\tp\phi(x)=\sum_{j=0}^r (\phi(x))_j = \sum_{j=1}^r w_jx^j
     \end{equation*}
 \end{example}
 
@@ -283,7 +339,7 @@ The goal of kernel methods is therefore to go beyond these limitations while kee
 \begin{example}[Generic set of functions]
     Let $\varphi_1, \varphi_r : \R^d \to \R$ be a set of functions of interest (e.g. a subset of the Fourier basis); we define $\phi(x) = (\varphi_1(x), \dots, \varphi_r(x))$ to have:
     \begin{equation*}
-        f(x)=w^\top \phi(x) = \sum_{j=1}^rw_j\varphi_j(x)
+        f(x)=w^\tp \phi(x) = \sum_{j=1}^rw_j\varphi_j(x)
     \end{equation*}
 \end{example}
 
@@ -291,14 +347,14 @@ The goal of kernel methods is therefore to go beyond these limitations while kee
 \subsubsection{Theorem statement}
 Given a dataset $x_1, \dots, x_n$, we are able to compute the observed feature maps $\phi_(x_1), \dots, \phi(x_n)$. We can ask ourselves if there exists an easier representation for $w$ in terms of these observed feature maps, i.e. we want to know if it is possible to characterize the minimum $\hat{w}$ of:
 \begin{equation*}
-    \hat{L}(w) = \frac{1}{n}\sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \lambda w^\top w
+    \hat{L}(w) = \frac{1}{n}\sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \lambda w^\tp w
 \end{equation*}
 in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$. The following theorem guarantees such characterization under basic properties of $\hat{L}$.
 
 \begin{theorem}[Representer theorem]
     Let $\phi:\X\to\R^d$. Let $(x_1, \dots, x_n)\in\X^n$ and assume that $\Psi:\R^{n+1}\to\R$ is strictly increasing with respect to the last variable. Then, the minimum of
     \begin{equation*}
-        \hat{L}(w) := \Psi(w^\top\phi(x_1), \dots, w^\top\phi(x_n), w^\top w)
+        \hat{L}(w) := \Psi(w^\tp\phi(x_1), \dots, w^\tp\phi(x_n), w^\tp w)
     \end{equation*}
     is obtained for
     \begin{equation*}
@@ -313,7 +369,7 @@ in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$.
 \begin{corollary}
     For $\lambda>0$, 
     \begin{equation*}
-        \min_{w\in\R^d} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \frac{\lambda}{2} w^\top w
+        \min_{w\in\R^d} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w
     \end{equation*}
     is obtained for
     \begin{equation*}
@@ -326,25 +382,25 @@ Note that there is no assumption on $l$, and in particular, no convexity assumpt
 \subsubsection{Finite dimensional representation of the learning problem}
 Using the representer theorem, we know that the minimum of $\hat{L}$ is of the form $w=\sum_{i=1}^n \alpha_i\phi(x_i)$; we can therefore directly optimize this characterization, i.e. we can then write:
 \begin{equation*}
-    \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\top\phi(x_i)) + \frac{\lambda}{2} w^\top w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n l(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\top K\alpha
+    \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n l(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\tp K\alpha
 \end{equation*}
 where $K$ is an $n\times n$ matrix with values
 \begin{equation*}
-    K_{i, j} = \phi(x_i)^\top \phi(x_j).
+    K_{i, j} = \phi(x_i)^\tp \phi(x_j).
 \end{equation*}
 
 Indeed,
 \begin{equation*}
-    \phi(x_i)^\top w = \sum_{j=1}^n \alpha_j\phi(x_i)^\top\phi(x_j) = (K\alpha)_i
+    \phi(x_i)^\tp w = \sum_{j=1}^n \alpha_j\phi(x_i)^\tp\phi(x_j) = (K\alpha)_i
 \end{equation*}
 moreover,
 \begin{equation*}
-    ||w||^2 = w^\top w = \sum_{i=1}^n\sum_{j=1}^n \alpha_i\alpha_j\phi(x_i)^\top\phi(x_j) = \alpha^\top K\alpha
+    ||w||^2 = w^\tp w = \sum_{i=1}^n\sum_{j=1}^n \alpha_i\alpha_j\phi(x_i)^\tp\phi(x_j) = \alpha^\tp K\alpha
 \end{equation*}
 
-We finally have a closed form representation for the function evaluation. Defining the \emph{kernel function} $k(x, x'):=\phi(x)^\top \phi(x')$, we have:
+We finally have a closed form representation for the function evaluation. Defining the \emph{kernel function} $k(x, x'):=\phi(x)^\tp \phi(x')$, we have:
 \begin{equation*}
-    f(x) = w^\top\phi(x) = \sum_{i=1}^n \alpha_i\phi(x_i)^\top\phi(x) = \sum_{i=1}^n \alpha_i k(x_i, x).
+    f(x) = w^\tp\phi(x) = \sum_{i=1}^n \alpha_i\phi(x_i)^\tp\phi(x) = \sum_{i=1}^n \alpha_i k(x_i, x).
 \end{equation*}
 
 \begin{remark}[Kernel trick]
@@ -365,7 +421,7 @@ We finally have a closed form representation for the function evaluation. Defini
     \end{equation*}
     with $\sum_{j=1}^{+\infty}w_j^2 < +\infty$. This model space is the set of analytic function on $\X$, which is a very rich space. In particular, it is dense in the space of continuous functions. However, it is not possible to compute $\phi(x)$ explicitly since it is infinite dimensional. The kernel trick provides an elegant way to compute the solution of the learning problem in closed form; indeed, the inner product can be computed in closed form in $O(1)$:
     \begin{equation*}
-        k(x, x') = \phi(x)^\top\phi(x')=\sum_{j=0}^{+\infty}x^jx^{'j} = \frac{1}{1-xx'}
+        k(x, x') = \phi(x)^\tp\phi(x')=\sum_{j=0}^{+\infty}x^jx^{'j} = \frac{1}{1-xx'}
     \end{equation*}
 
     Therefore, the kernel trick allow to replace $\R^d$ by $\R^n$, which is interesting when $d$ is very large. Furthermore, it allows to separate the representation problem (design a kernel on a set $\X$), algorithms, and analysis (which only use the kernel matrix $K$).
@@ -374,7 +430,7 @@ We finally have a closed form representation for the function evaluation. Defini
 \subsection{Properties of kernels}
 Since the learning problem is completely defined in terms of the kernel function, the explicit knowledge of the feature map is not required anymore. In particular, given a function $k:X\times X \to \R$, tu use it in a learning problem, we need to be sure that it is a \emph{positive definite kernel}, i.e. that there exists a feature map $\phi$ such that
 \begin{equation*}
-    \forall x, x'\in\X, \quad k(x, x") = \phi(x)^\top \phi(x')
+    \forall x, x'\in\X, \quad k(x, x") = \phi(x)^\tp \phi(x')
 \end{equation*}
 Kernel functions admits many characterizations, which we will now present.
 
@@ -397,12 +453,12 @@ Kernel functions admits many characterizations, which we will now present.
 \begin{example}[Linear kernel]
     The linear kernel corresponds to $\phi = x \mapsto x$:
     \begin{equation*}
-        k(x, y) = x^\top y
+        k(x, y) = x^\tp y
     \end{equation*}
 \end{example}
 
 \begin{example}[Polynomial kernel]
-    The kernel $k(x, y) = (x^\top y)^r$ can be expanded as:
+    The kernel $k(x, y) = (x^\tp y)^r$ can be expanded as:
     \begin{equation*}
         k(x, y) = \left(\sum_{i=1}^d x_iy_i\right)^r = \sum_{\alpha_1 + \dots + \alpha_p=r} \binom{r}{\alpha_1, \dots, \alpha_p} \underbrace{(x_1y_1)^{\alpha_1} \dots (x_py_p)^{\alpha_p}}_{(x_1^{\alpha_1}\dots x_p^{\alpha_p})(y_1^{\alpha_1}\dots y_p^{\alpha_p})}
     \end{equation*}
