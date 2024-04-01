@@ -1,11 +1,14 @@
-\documentclass[toc]{../cs-classes/cs-classes}
+\documentclass{../cs-classes/cs-classes}
 
 \title{Introduction to Machine Learning}
-\author{Alessandro Rudi, Umut Simsekli\\ Notes by Antoine Groudiev}
+\author{Alessandro Rudi, Umut \c{S}im\c{s}ekli\\ Notes by Antoine Groudiev}
 
 \begin{document}
-\section*{Introduction}
-This document is Antoine Groudiev's class notes while following the class \emph{Introduction to Machine Learning} (Apprentissage Statistique) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes of Pierre Gaillard Alessandro Rudi, and Umut \c{S}im\c{s}ekli. 
+\begin{abstract}
+    This document is Antoine Groudiev's class notes while following the class \emph{Introduction to Machine Learning} (Apprentissage Statistique) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes written by Pierre Gaillard, Alessandro Rudi, and Umut \c{S}im\c{s}ekli. 
+\end{abstract}
+\tableofcontents
+\newpage
 
 \section{An overview of Machine Learning}
 %\subsection{What is ML?}
@@ -250,13 +253,13 @@ All that remains is to solve a linear system with a triangular upper matrix, whi
 We can completely bypass the need of matrix inversion or factorization using gradient descent. It consists in solving the minimization problem step by step by approching the minimum throught gradient steps. For example, we initialize $\theta_0:=0$\footnote{In practice, $\theta_0$ is often initialized to some random vector to avoid singularities.}, then update it using the following recurrence formula:
 \begin{equation*}
     \begin{aligned}
-        \theta_{i=1} :=&\, \theta_i -\eta\cdot\nabla\emrisk_n(\theta_i)\\
+        \theta_{i+1} :=&\, \theta_i -\eta\cdot\nabla\emrisk_n(\theta_i)\\
         =&\, \theta_i - \eta\cdot\frac{2}{n}\left((X^\tp X)\theta_i - Y^\tp X\right)
     \end{aligned}
 \end{equation*}
 where $\eta>0$ is a learning parameter called \emph{learning rate}. We see that if the algorithm converges, then it converges to a point cancelling the gradient, thus to the (unique) OLS solution. For the algorithm to converge, the learning rate $\eta$ must be well calibrated. This will be seen in more details in the following chapter about gradient descent.
 
-If the data set is too big, i.e.~when $n\gg1$, loading all the data to make the gradient calculation $\nabla\emrisk(\theta_i)$ can be prohibitively expensive too. The common solution to this is to use Stochastic Gradient Descent, where gradient steps are made only on estimates of $\nabla\emrisk(\theta_i)$, calculated on a random subset of the data.
+If the data set is too big, i.e.~when $n\gg1$, loading all the data to make the gradient calculation $\nabla\emrisk(\theta_i)$ can be prohibitively expensive too. The common solution to this is to use \emph{Stochastic Gradient Descent}, where gradient calculations for one step are made only on estimates of $\nabla\emrisk(\theta_i)$, calculated on a random subset of the data.
 
 \subsubsection{Nonlinear problem: polynomial, spline, and kernel regression}
 The assumption tha the observations $y_i$ can be explained as a linear combination of the explanatory variables $x_{i, j}$ may seem strong. However, the previous linear framework can be applied to transformations of the variables $x_{i, j}$. For example, by adding the powers of the variables $x^k_{i, j}$ or their products $x_{i, j}\cdot x_{i', j'}$, this allows comparison to polynomial spaces. Doing a linear regression on polynomial transformations of variables is equivalent to doing a polynomial regression.
