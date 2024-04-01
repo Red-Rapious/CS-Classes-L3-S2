@@ -366,6 +366,62 @@ A special case that is often considered is Gaussian noise, i.e. $Z_i\sim\mathcal
 \end{property}
 
 \subsection{Ridge regression}
+\subsubsection{Handling non-injective design matrices}
+If $X$ is not injective, the matrix $X^\tp X$ is no longer invertible and the OLS optimization problem admits several solutions. The problem is said to be \emph{poorly posed} or \emph{unindentifiable}. Since the variance of $\htheta$ depends on the conditioning of the matrix $(X^\tp X)^{-1}$, the more columns of it are likely to be dependent, the less stable $\htheta$ will be. Several solutions allow dealing with the case where $\rg(X)<D$.
+
+\emph{Explicit complexity control} reduces the $\im(X)$ solution space: this can be done by removing columns from the $X$ matrix until it becomes injective (for example, by reducing the degree of polynomials). One can also set identifiability constraints of the form $\theta\in V$, a vector subspace of $\R^d$ such that any element $y\in\im(X)$ has a unique antecedent $\theta\in V$ with $y=X\theta$. For example, we could choose $V=\ker(X)^\bot$.
+
+\emph{Implicit complexity control} regularizes the empirical risk minimization problem. The most common approach is to regularize by adding $\norm{\theta}^2_2$ (Ridge regression) or $\norm{\theta}_1$ (Lasso regression).
+
+\subsubsection{Ridge regression}
+\begin{definition}
+    For a regularization parameter $\lambda$, the Ridge regression estimator is defined as
+    \begin{equation}
+        \htheta_\lambda \in \argmin\set{\frac{1}{n}\norm{Y-X\theta}^2_2+\lambda\norm{\theta}^2_2}{\theta\in\R^d}
+    \end{equation}
+    The regularization parameter $\lambda>0$ regulates the trade-off between the variance of $\htheta$ and its bias.
+\end{definition}
+
+\begin{property}
+    The Ridge regression estimator is unique and satisfies:
+    \begin{equation*}
+        \htheta_\lambda = (X^\tp X+n\lambda I_n)^{-1}X^\tp Y
+    \end{equation*}
+\end{property}
+\begin{proof}
+    Similar to the one of the OLS and left as an exercise. We can see that there is no longer the problem of inverting $X\tp X$ since the Ridge regression replaces $(X^\tp X)^{-1}$ by $(X^\tp X+n\lambda I_n)^{-1}$ in the OLS solution.
+\end{proof}
+
+\begin{property}[Risk of Ridge regression]
+    Under the linear model assumption, the Ridge regression estimator satisfies:
+    \begin{equation*}
+        \E[\risk_X(\htheta_\lambda)]-\risk_X(\theta^*) = \sum_{j=1}^d(\theta_j^*)^2\frac{\lambda_j}{(1+\lambda_j/\lambda)^2} + \frac{\sigma^2}{n}\sum_{j=1}^d\frac{\lambda_j^2}{(\lambda_j+\lambda)^2}
+    \end{equation*}
+    where $\lambda_j$ is the $j$-th eigenvalue of $\Sigma=\frac{1}{n}X^\tp X$. In particular, the choice of:
+    \begin{equation*}
+        \lambda^* = \frac{\sigma\sqrt{\Tr(\Sigma)}}{\norm{\theta^*}_2\sqrt{n}}
+    \end{equation*}
+    yiels the following excess risk:
+    \begin{equation*}
+        \E[\risk_X(\htheta_{\lambda^*})]-\risk_X(\theta^*) \leq \frac{\sigma\sqrt{2\Tr(\Sigma)\norm{\theta^*}_2}}{\sqrt{n}}
+    \end{equation*}
+\end{property}
+\begin{proof}
+    Follows from the bias-variance decomposition, and is left as an exercise.
+\end{proof}
+
+\begin{remark}
+    As $\lambda\to0$, its excess risk converges to the one of OLS. The first term corresponds to the bias of the Ridge estimator. Thus, on the downside, the Ridge estimator is biased in constrast to the OLS. But on the positive side, its variance does not involve the inverse of $\Sigma$ but of $\Sigma+\lambda I_d$ instead, which is better conditioned. It has therefore a lower variance. The parameter $\lambda$ controls the trade-off.
+\end{remark}
+
+\subsubsection{Comparaison to the OLS}
+We can compare the excess risk bound obtained by $\htheta_{\lambda^*}$ with the one of the OLS, which was $\sigma^2d/n$.
+\begin{itemize}
+    \item The OLS convergence is in $O(n^{-1})$ while the convergence of $O(n^{-1/2})$, which is slower
+    \item The OLS dependency on the noise is in $\sigma^2$ while Ridge's is in $\sigma$, which is better
+    \item Since $\Tr(\Sigma)\leq\max_{1\leq i\leq n}\norm{x_i}^2$, if the input norms are bounded by $R$, the excess risk of Ridge does not depend on the dimension $d$, which can even be infinite. It is called a \emph{dimension free} bound.
+\end{itemize}
+The calibration of the regularization parameter is therefore essential in practice. It can for example be done analytically as in the proposition -- but often, some quantities such as $\sigma^2$ and $\norm{\theta^*}$ are unknown. In practice, one resorts to train/validation set or \emph{cross-validation}.
 
 \section{Logic regression and convex analysis}
 \subsection*{Recap of important notions and notations}
