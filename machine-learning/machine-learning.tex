@@ -116,11 +116,13 @@ The distribution $\nu$ is unknown to the statistician; it's a matter of learning
     The estimated function $\hatf_n$ is constructed to predict a new output $y$ from a new input $x$, where $(x, y)$ is a pair of \emph{test data}, i.e.~not necessarily observed in the training data. The function $\hatf_n$ is an estimator because it depends on the data $D_n$ and not on unobserved parameter, such as the distribution $\nu$. If $D_n$ is random, it is also a random function.
 \end{definition}
 
-\begin{definition}[Sqaured Loss Risk]
+\begin{definition}[Squared Loss Risk]
     Given an estimator $\hatf_n$, we define its risk:
     \begin{equation}
+        \label{eq:sq-risk}
         \risk(\hatf_n) := \E\left[(Y-\hatf_n(X))^2\,\big| \, D_n\right] \quad \textnormal{where} \quad (X, Y)\sim\nu
     \end{equation}
+    This is also called the \emph{generalization error}, as it measures how well the estimator performs on other inputs and outputs of the dataset.
 \end{definition}
 
 In practice, the statistician cannot compute the risk, since one cannot acces the distribution $\nu$. Therefore, a common method in supervised machine learning is to replace the risk (defined using the distribution $\nu$ through the expectation $\E$) by the empirical risk (defined using the training data set).
@@ -175,9 +177,10 @@ In the following, we assume that the design matrix is injective.\footnote{Said o
 
 \begin{definition}[Ordinary Least Squares]
     If $X$ is injective, the minimizer of the empirical risk \eqref{eq:sq-empirical-risk} is called the \emph{Ordinary Least Squares (OLS) estimator}. Said otherwise, it is the vector $\htheta\in\R^d$ minimizing $\emrisk_n$:
-    \begin{equation*}
+    \begin{equation}
+        \label{eq:ols-estimator}
         \htheta := \argmin_{\theta\in\R^d} \emrisk_n(\theta)=\argmin_{\theta\in\R^d}\frac{1}{n}\sum_{i=1}^n(y_i-\theta^\tp x_i)^2
-    \end{equation*}
+    \end{equation}
 \end{definition}
 
 \begin{property}[Closed form soluion of the OLS estimator]
@@ -262,9 +265,94 @@ Of course, other bases and transformations exist: for instance, \emph{spline bas
 In general, we can consider transformations $\varphi:\X\to\R^d$ and try to explain the outputs $y_i$ with functions of the form $\theta\to\varphi(x_i)^\tp \theta$. Another form of regression that we will discuss in the following is therefore \emph{kernel regression}, which allows computing efficiently the estimator even when $\varphi$ maps to an infinite dimensional space.
 
 \subsection{Statistical analysis}
+In this section, we try to show some guarantees for the OLS estimator, such as a bound the excess risk of the OLS, which we will define later on.
 \subsubsection{Stochastic assumptions and bias/variance decomposition}
+To provide guarantees on the performance of OLS, we require assumptions about how the data is generated. In this section, we consider a stochastic framework that will allow us to statistically analyze OLS.
+
+\paragraph*{Assumption: linear model}
+We assume that there exists a vector $\theta^*\in\R^d$ such that for all $1\leq i\leq n$, 
+\begin{equation}
+    \label{eq:assumption-linear-model}
+    Y_i = x_i^\tp \theta^* + Z_i
+\end{equation}
+where $Z=(Z_1, \dots, Z_n)^\tp\in\R^n$ is a vector of \emph{errors}, also called \emph{noise}. The $Z_i$ are assumed to be centered independent variables of variance $\sigma^2$, i.e. $\E[Z_i]=0$ and $\V[Z_i]=\sigma^2$. The assumption \eqref{eq:assumption-linear-model} can be rewritten in matrix form:
+\begin{equation}
+    Y=X\theta^*+Z
+\end{equation}
+where $Y=(Y_1, \dots, Y_n)^\tp\in\R^n$, $X=(x_1, \dots, x_n)^\tp\in\R^{n\times d}$, and $Z=(Z_1, \dots, Z_n)^\tp\in\R^n$.
+
+\begin{remark}
+    We write $Y_i$ and $Z_i$ using capital letters to remind ourselves that they are random variables. The noise $Z$ comes from the fact that in practice, the observations $Y_i$ never completely fit the linear forecast. They are due to noise or unobserved explanatory variables. As before, we assume that the first vector of the explanatory variable is the constant vector, i.e. $\forall i, x_{i, 1}=1$
+\end{remark}
+
+\paragraph*{Analysis settings}
+Two settings of analysis can be chosen:
+\begin{itemize}
+    \item In the \emph{fixed desing} setting, the design matrix $X$ is not random but deterministic and the features $x_1, \dots, x_n$ are fixed. The expectations are thus only with respect to the $Z_i$ and the $Y_i$, and the goal is to minimize:
+    \begin{equation*}
+        \risk_X(\theta) = \E\left[\frac{1}{n}\sum_{i=1}^n (Y_i-x_i^\tp\theta)^2\right]
+    \end{equation*}
+    for new random observations $Y_i$, but on the same inputs.
+    \item In the \emph{random design} setting, both the inputs and the ouputs are random. This is the most standard setting in supervised machine learning. The goal is therefore to minimize the risk \eqref{eq:sq-risk} -- also called the generalization error.
+\end{itemize}
+In this chapter, we will consider the fixed design setting, because it eases both the notation and the calculations -- we will only need some simple linear algebra.
+
+Before analyzing the statistical properties of OLS, we state a general result under the linear model assumption, which illustrates the tradeoff between estimation and approximation -- or bias and variance.
+
+\begin{property}[Risk decomposition]
+    Under the linear model assumption with fixed design, the following hols:
+    \begin{equation*}
+        \forall \theta\in\R^d, \quad \E[\risk_X(\theta)-\risk_X(\theta^*)] = \norm{\theta-\theta^*}^2_\Sigma
+    \end{equation*}
+    where $\Sigma:=\frac{1}{n}X^\tp X\in\R^{d\times d}$ and $\norm{\alpha}^2_\Sigma:=\alpha^\tp\Sigma\alpha$. Furthermore, if $\theta$ is a random variable -- when it depends on a random dataset -- we have:
+    \begin{equation*}
+        \E[\risk_X(\theta)]-\risk(\theta^*) = \underbrace{\norm{\E[\theta]-\theta^*}^2_\Sigma}_{\textnormal{Bias}} + \underbrace{\E\left[\norm{\theta-\E[\theta]}^2_\Sigma\right]}_{\textnormal{Variance}}
+    \end{equation*}
+\end{property}
+\begin{proof}
+    %TODO
+\end{proof}
+
+\begin{remark}
+    It is worth to note that the optimal risk satisfies:
+    \begin{equation*}
+        \risk_X(\theta^*) = \E\left[\frac{1}{n}\sum_{i=1}^n(Y_i-x_i^\top\theta^*)^2\right] = \E\left[\frac{1}{n}\sum_{i=1}^nZ_i^2\right] = \frac{1}{n}\sum_{i=1}^n\E[Z_i^2]=\sigma^2
+    \end{equation*}
+\end{remark}
 
 \subsubsection{Statistical properties of OLS}
+We can now show some guarantees for the OLS estimator.
+
+\begin{property}
+    Under the linear model assumption with fixed design, the OLS estimator $\htheta$ defined by \eqref{eq:ols-estimator} satisfies:
+    \begin{equation*}
+        \E[\htheta] = \theta^* \quad \textnormal{and} \quad \V[\htheta] = \frac{\sigma^2}{n}\Sigma^{-1}
+    \end{equation*}
+    i.e. it is unbiased, and its variance is some $O(n^{-1})$. Furthermore, we can even show that it satisfies the Gauss-Markov property: it is optimal among all unbiased estimators of $\theta$, in the sense that is has a minimal variance-covariance matrix.
+\end{property}
+
+\begin{proof}
+    %TODO
+\end{proof}
+
+\begin{definition}[Excess risk]
+    The excess risk of an estimator $\htheta$ is defined by:
+    \begin{equation}
+        \E[R_X(\htheta)]-\risk(\theta^*)
+    \end{equation}
+    It allows to measure the risk induced by the use of an estimator instead of the optimal vector, without taking into account the inherent risk generated by the noise, which cannot be reduced.
+\end{definition}
+
+\begin{corollary}[Excess risk of OLS]
+    Under the linear model assumption with fixed design, the excess risk of the OLS satisfies:
+    \begin{equation*}
+        \E[\risk_X(\htheta)]-\risk(\theta^*)=\frac{\sigma^2d}{n}
+    \end{equation*}
+\end{corollary}
+
+\begin{proof}
+    % TODO
+\end{proof}
 
 \subsection{Ridge regression}
 
