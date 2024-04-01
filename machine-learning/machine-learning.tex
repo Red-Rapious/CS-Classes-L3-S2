@@ -354,6 +354,17 @@ We can now show some guarantees for the OLS estimator.
     % TODO
 \end{proof}
 
+\subsubsection{Gaussian noise model}
+A special case that is often considered is Gaussian noise, i.e. $Z_i\sim\mathcal{N}(0, \sigma^2)$, the normal distribution of expectation 0 and variance $\sigma^2$. This choice comes not only from the fact that it allows to compute many additional statistical properties on $\htheta$ and to perform tests, such as confidence intervals or significance of variables. In practice, it is also motivated by the central limit theorem, and the fact that noise is often an addition of many phonomena not explained by the linear combination of the explanatory variables.
+
+\begin{property}
+    In the linear model with Gaussian noise, the maximum likelihood estimators of $\theta$ and $\sigma$ satisfy respectively:
+    \begin{equation*}
+        \htheta_{MV}=(X^\tp X)^{-1}XY \quad \textnormal{and} \quad \hat{\sigma}^2_{MV}=\frac{\norm{Y-X\htheta}^2}{n}
+    \end{equation*}
+    We therefore find the least squares estimator obtained by minimizing the empirical risk. The variance estimator is biased. We will see more about maximum likelihood estimators in next chapters.
+\end{property}
+
 \subsection{Ridge regression}
 
 \section{Logic regression and convex analysis}
