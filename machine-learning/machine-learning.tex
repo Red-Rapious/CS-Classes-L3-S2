@@ -131,10 +131,10 @@ The distribution $\nu$ is unknown to the statistician; it's a matter of learning
 In practice, the statistician cannot compute the risk, since one cannot acces the distribution $\nu$. Therefore, a common method in supervised machine learning is to replace the risk (defined using the distribution $\nu$ through the expectation $\E$) by the empirical risk (defined using the training data set).
 
 \begin{definition}[Squared Loss Empirical risk]
-    \label{eq:sq-empirical-risk}
     Given an estimator $\hatf_n$ and a data set $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}$, we define its \emph{empirical risk}:
     \begin{equation}
-        \emrisk_n(f) := \frac{1}{n}\sum_{i=1}^n (y_i-f(x_i))^2
+        \label{eq:sq-empirical-risk}
+        \emrisk_n(\hatf_n) := \frac{1}{n}\sum_{i=1}^n (y_i-\hatf_n(x_i))^2
     \end{equation}
 \end{definition}
 
@@ -496,6 +496,87 @@ The calibration of the regularization parameter is therefore essential in practi
 %    &= V(\underbrace{\Sigma^2 + \lambda N I}_{\textnormal{invertible}}) V^T
 %\end{aligned}
 %\end{equation*}
+
+This chapter will introduce logistic regression, a widely used classification algorithm. Conversly to linear regression, there is no closed-form solution and one needs to solve it using iterative convex optimization algorithms.
+
+\subsection{Logistic regression}
+We consider the binary classification problem: given inputs in $\R^d$, we want to predict outputs in $\{0, 1\}$. We are given a training set $D_n=\set{(X_i, Y_i)}{i\in\iset{1}{n}}$, where the data points $(X_i, Y_i)$ are i.i.d. random variables following a distribution $\nu$ in $\X\times\Y=\R^d\times\{0, 1\}$
+
+\subsubsection{Motivation}
+We would like to use an algorithm similar to linear regression introduced in the previous chapter. However, since the outputs $Y_i$ are binary and belong to $\{0, 1\}$, a discrete set, we cannot predict them using a linear transformation of the inputs $X_i$. We will thus classify the data based on a classification rule of the form
+\begin{equation*}
+    f : \R^d \longrightarrow \R
+\end{equation*}
+which will then be passed through a function with specification $\R\to\{0, 1\}$. The final estimator will therefore be:
+\begin{equation*}
+    \ind_{\R_+}\circ f
+\end{equation*}
+meaning that the estimator will predict $Y_i=+1$ exactly when $f(X_i)\geq0$.
+
+More precisely, we will consider linear functions $f$ of the form:
+\begin{equation*}
+    f_\beta = x \longmapsto x^\tp\beta
+\end{equation*}
+This assumes that the data is \emph{linearly separable}, meaning that it can be well-explained by a linear separation.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/linearly-separable.png}
+    \caption{Data that can or cannot be well-explained by a linear separation}
+\end{figure}
+If the data does not seem to be linearly separable, we can use similar tricks as the one introduced for linear regression (polynomial regression, kernel regression, splines, \dots). We will dive into more details in an upcoming chapter about kernels.
+
+\subsubsection{Loss function}
+To minimize the empirical risk, it remains to choose a loss function to assess the performance of a prediction. 
+
+\begin{definition}[Loss function]
+    A \emph{loss function} $\ell$ is a function of the form
+    \begin{equation*}
+        \ell : \Y\times\Y' \longrightarrow \R_+
+    \end{equation*}
+    such that for $(y, y')\in\Y\times\Y'$, $\ell(y, y')$ intuitively quantifies the mistake when predicting $y'$ instead of $y$. 
+\end{definition}
+
+\begin{definition}[Empirical Risk associated to a Loss function]
+    Given an estimator $\hatf_n$, a data set $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}$ and a loss function $\ell$, we define the \emph{empirical risk associated to $\ell$} by:
+    \begin{equation}
+        \label{eq:em-risk-loss-function}
+        \emrisk_n(\hatf_n) := \frac{1}{n}\sum_{i=1}^n \ell(y_i, \hatf_n(x_i))
+    \end{equation}
+\end{definition}
+
+\begin{definition}[Squared loss]
+    We define the \emph{squared loss} $\ell_2:\R\times\R\to\R_+$ used previously in linear regression by:
+    \begin{equation}
+        \ell_2(y, y') := (y-y')^2
+    \end{equation}
+    Using the squared loss $\ell_2$ in \eqref{eq:em-risk-loss-function}, we obtain the same result as the original definition \eqref{eq:sq-empirical-risk}. 
+\end{definition}
+
+\begin{definition}[Binary loss]
+    A natural loss is the \emph{binary loss}, also known as the \emph{0-1 loss}. It takes 1 as a value if there is a mistake (i.e. $f(X_i)\neq Y_i$) and 0 otherwise:
+    \begin{equation}
+        \ell_{1}(X_i, Y_i) = \delta_{Y_i\neq\ind_{\R_+}(f(X_i))}
+    \end{equation}
+    Using $\ell_1$, the empirical risk becomes:
+    \begin{equation*}
+        \emrisk_n(\beta) = \frac{1}{n}\sum_{i=1}^n \delta_{Y_i\neq\ind_{\R_+}(X_i^\tp\beta)}
+    \end{equation*}
+\end{definition}
+
+This loss function is however not convex in $\beta$; therefore, the problem of minimizing $\emrisk_n$ is extremely hard to solve. The idea of logistic regression consists in replacing the binary loss with another similar loss function, which is convex in $\beta$. This is the case of both the \emph{Hinge loss} and the \emph{logistic loss} which we will now introduce.
+
+\begin{definition}[Hinge loss]
+    
+\end{definition}
+
+\begin{definition}[Logistic loss]
+    
+\end{definition}
+
+
+\subsubsection{Computation of the estimator}
+
+\subsubsection{Regularization}
 
 \section{Convex analysis and convex optimization}
 \subsection{Constrained optimization problems}
