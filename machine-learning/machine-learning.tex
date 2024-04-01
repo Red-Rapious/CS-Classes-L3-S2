@@ -133,10 +133,20 @@ In practice, the statistician cannot compute the risk, since one cannot acces th
     \end{equation}
 \end{definition}
 
-\begin{wrapfigure}{r}{0.45\textwidth}
+\begin{wrapfigure}[15]{r}{0.45\textwidth}
     \centering
-    \includegraphics[width=0.4\textwidth]{images/learning-curves.png}
-    \caption{Overfitting and underfitting according to the complexity of $\mathcal{F}$}
+    \captionsetup{justification=centering}
+    \begin{tikzpicture}[scale=0.8]
+        \draw[domain=0.55:6.8, samples=50, color=teal, thick] plot (\x, 2.5/\x + 0.2*\x^0.5) node[above] {Training error};
+        \draw[domain=0.6:6.8, samples=50, color=cyan, thick] plot (\x, 2.5/\x + 1*\x^0.5) node[above] {Expected error};
+        \draw[dotted, very thick] (2.3, 2.6) -- (2.3, 0) node[below] {Best choice};
+        \draw[->, thick] (0,0) -- (7,0) node[below] {Complexity of $\mathcal{F}$};
+        \draw[->, thick] (0,0) -- (0,6) node[above] {Error};
+
+        \draw[->, color=orange, thick] (5, 5) -- (7, 5) node[above, pos=0.5] {Overfitting};
+        \draw[->, color=orange, thick] (3, 5) -- (1, 5) node[above, pos=0.5] {Underfitting};
+      \end{tikzpicture}
+    \caption{Overfitting and underfitting}
 \end{wrapfigure}
 However, one must be careful about overfitting, the case where $\emrisk_n(f)$ is much lower than $\risk(f)$, as discussed previously. In this chapter, we will study the performance of the least square estimator in the case of the linear model.
 
@@ -246,8 +256,15 @@ where $\eta>0$ is a learning parameter called \emph{learning rate}. We see that 
 If the data set is too big, i.e.~when $n\gg1$, loading all the data to make the gradient calculation $\nabla\emrisk(\theta_i)$ can be prohibitively expensive too. The common solution to this is to use Stochastic Gradient Descent, where gradient steps are made only on estimates of $\nabla\emrisk(\theta_i)$, calculated on a random subset of the data.
 
 \subsubsection{Nonlinear problem: polynomial, spline, and kernel regression}
+The assumption tha the observations $y_i$ can be explained as a linear combination of the explanatory variables $x_{i, j}$ may seem strong. However, the previous linear framework can be applied to transformations of the variables $x_{i, j}$. For example, by adding the powers of the variables $x^k_{i, j}$ or their products $x_{i, j}\cdot x_{i', j'}$, this allows comparison to polynomial spaces. Doing a linear regression on polynomial transformations of variables is equivalent to doing a polynomial regression.
+
+Of course, other bases and transformations exist: for instance, \emph{spline bases} are piecewise polynomials with constraints on the edgets. This is the model used for example by EDF to predict electricity consumption as a function of variables such as the time of the day, the day of the week, temperature or cloud cover.
+In general, we can consider transformations $\varphi:\X\to\R^d$ and try to explain the outputs $y_i$ with functions of the form $\theta\to\varphi(x_i)^\tp \theta$. Another form of regression that we will discuss in the following is therefore \emph{kernel regression}, which allows computing efficiently the estimator even when $\varphi$ maps to an infinite dimensional space.
 
 \subsection{Statistical analysis}
+\subsubsection{Stochastic assumptions and bias/variance decomposition}
+
+\subsubsection{Statistical properties of OLS}
 
 \subsection{Ridge regression}
 
