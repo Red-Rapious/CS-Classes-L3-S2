@@ -563,20 +563,59 @@ To minimize the empirical risk, it remains to choose a loss function to assess t
     \end{equation*}
 \end{definition}
 
-This loss function is however not convex in $\beta$; therefore, the problem of minimizing $\emrisk_n$ is extremely hard to solve. The idea of logistic regression consists in replacing the binary loss with another similar loss function, which is convex in $\beta$. This is the case of both the \emph{Hinge loss} and the \emph{logistic loss} which we will now introduce.
+\begin{wrapfigure}{r}{0.45\textwidth}
+\centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.4\textwidth]{images/losses-graph.png}
+    \caption{Binary, Hinge, and logistic loss for $y'=1$}
+\end{wrapfigure}
+This loss function is however not convex in $\beta$; therefore, the problem of minimizing $\emrisk_n$ is extremely hard to solve. 
+The idea of logistic regression consists in replacing the binary loss with another similar loss function, which is convex in $\beta$. This is the case of both the \emph{Hinge loss} and the \emph{logistic loss} which we will now introduce.
 
 \begin{definition}[Hinge loss]
-    
+    The \emph{Hinge loss} $\ell_H:\R\times\{-1, 1\}\to\R_+$ is such that it values to $0$ when both arguments have the same sign and that $|y|\geq1$ (confident prediction), and increases linearly when their signs differ or when $|y|<1$ (prediction not confident enough):
+    \begin{equation}
+        \ell_H(y, y') := \max(0, 1-yy')
+    \end{equation}
 \end{definition}
 
 \begin{definition}[Logistic loss]
-    
+    The \emph{logistic loss} $\ell_l:\R\times\{0, 1\}\to\R_+$ is defined by:
+    \begin{equation}
+        \ell_l(y, y') := y'\log(1-e^{-y}) + (1-y')\log(1+e^y)
+    \end{equation}
 \end{definition}
 
+The advantage of the logistic loss with respect to the Hinge loss is that it has a probabilistic interpretation, by modeling $\P(Y=1|X)$, where $(X, Y)$ is a couple of random variables following the law $(X_i, Y_i)$. We will see more on this in the lecture on Maximum Likelihood.
+
+\begin{definition}[Logistic regression estimator]
+    The logistic regression estimator is the solution of the following minimization problem:
+    \begin{equation}
+        \hat{\beta}_{\textnormal{(logi.)}} := \argmin_{\beta\in\R^d}\frac{1}{n}\sum_{i=1}^n \ell_l(X^\tp_i\beta, Y_i)
+    \end{equation}    
+\end{definition}
 
 \subsubsection{Computation of the estimator}
+Similarly to OLS, we may try to analyticall solve the minimization problem to find $\hat{\beta}_{(\textnormal{logi.})}$. This could be done by cancelling the gradient of the empirical risk. Note that:
+\begin{equation*}
+    \frac{\partial\ell_l(y, y')}{\partial y} = \sigma(y)-y'
+\end{equation*}
+where $\sigma$ is the logistic function
+\begin{equation*}
+    \sigma = z \longmapsto \frac{1}{1+e^{-z}}.
+\end{equation*}
+Therefore,
+\begin{equation*}
+    \nabla\emrisk_n(\beta) = \frac{1}{n}\sum_{i=1}^nX_i(\sigma(X_i^\tp\beta)-Y_i)=\frac{1}{n}X(Y-\sigma(X\beta))
+\end{equation*}
+where $\sigma(X\beta)_i:=\sigma(X_i^\tp\beta)$. The problem is that the equation $\nabla\emrisk_n(\beta)=0$ had no closed-form solution. Therefore, it needs to be solved through iterative algorithms (gradient descent, Newton's method, \dots). Fortunately, this is possible, since the logistic loss is convex in its first argument. Indeed:
+\begin{equation*}
+    \frac{\partial^2\ell_l(y, y')}{\partial y^2} = \sigma(y)\sigma(-y)>0
+\end{equation*}
+Furthermore, the loss being strictly convex, the solution is even unique. In this chapter and in the next one, we will see tools and methods to solve convex optimization problems.
 
 \subsubsection{Regularization}
+Similarly to linear regression, logistic regression may over-fit the data (especially when $p>n$). In this case, one needs to add a regularization term, such as $\lambda\norm{\beta}^2_2$ to the logistic loss.
 
 \section{Convex analysis and convex optimization}
 \subsection{Constrained optimization problems}
