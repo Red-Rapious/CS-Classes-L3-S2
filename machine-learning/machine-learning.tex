@@ -617,6 +617,110 @@ Furthermore, the loss being strictly convex, the solution is even unique. In thi
 \subsubsection{Regularization}
 Similarly to linear regression, logistic regression may over-fit the data (especially when $p>n$). In this case, one needs to add a regularization term, such as $\lambda\norm{\beta}^2_2$ to the logistic loss.
 
+\subsection{Convex analysis}
+\subsubsection{Convexity and minimization problems}
+\begin{wrapfigure}{l}{0.4\textwidth}
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.4\textwidth]{images/hyperplane.png}
+    \caption{Hyperplane}
+\end{wrapfigure}
+We will now see notions of convex analysis to solve convex optimization problems, such as logistic regression. This chapter will introduce convex analysis -- the properties of convex functions and convex optimization problems, and the next chapter will approach convex optimization algorithms (gradient descent, Newton's method, stochastic gradient descent, \dots).
+
+
+Convexity is a crucial notion in many fields of mathematics and computer science. In machine learning, convexity creates well-defined problems with efficient solutions. A typical example is the problem of \emph{empirical risk minimization}:
+\begin{equation*}
+    \hatf_n\in\argmin_{f\in\mathcal{F}}\frac{1}{n}\sum_{i=1}^n\ell(f(X_i), Y_i)+\lambda\Omega(f)
+\end{equation*}
+where $D_n=\set{(X_i, Y_i)}{i\in\iset{1}{n}}$ is the data set, $\mathcal{F}$ is a \emph{convex} set of predictors $f:\X\to\R$, for all $y'\in\Y$, $y\mapsto\ell(y, y')$ is a convex loss function, and $\Omega$ is a convex penaly (such as $\norm{\cdot}_2$, $\norm{\cdot}_1$, \dots).
+
+Convexity will be useful to analyze bot statistical properties of the solution $\hatf_n$ and its generalization error:
+\begin{equation*}
+    \risk(\hatf_n):=\E[\ell(f(X), Y)|D_n]
+\end{equation*}
+but also to derive efficient algorithms to solve the forementionned minimization problem and find $\hatf_n$.
+
+\subsubsection{Convex sets}
+In what follows, we will only consider finite dimensional Euclidean spaces (typically $\R^d$).
+\begin{wrapfigure}{r}{0.4\textwidth}
+    \centering
+        \captionsetup{justification=centering}
+        \includegraphics[width=0.3\textwidth]{images/half-space.png}
+        \caption{Half-space}
+\end{wrapfigure}
+
+
+\begin{definition}[Convex set]
+    A set $K\subseteq\R^d$ is convex if and only if:
+    \begin{equation*}
+        \forall x, y\in K, \forall \alpha\in[0, 1], \quad \alpha x+(1-\alpha)y \in K
+    \end{equation*}
+    Said otherwise, $K$ is stable by barycentration, or, for all points $x, y\in K$, $[x, y]\subseteq K$.
+\end{definition}
+
+\begin{example}
+    The following sets are convex:
+    \begin{itemize}
+        \item Hyperplans: $K=\set{x\in\R^d}{a^\tp x = b, a\neq 0, b\in\R}$
+        \item Half spaces: $K=\set{x\in\R^d}{a^\tp x\geq b, a\neq0, b\in\R}$
+        \item Affine subspaces: $K=\set{x\in\R^d}{Ax=b, A\in\mathscr{M}_d(\R), b\in\R}$
+        \item Balls: $\set{x\in\R^d}{\norm{x}\leq R}$
+        \item Cones: $K=\set{(x, r)\in\R^{d+1}}{\norm{x}\leq r}$
+        \item Convex polytopes: intersections of half spaces
+    \end{itemize}
+\end{example}
+
+\begin{wrapfigure}{l}{0.4\textwidth}
+    \centering
+        \captionsetup{justification=centering}
+        \includegraphics[width=0.35\textwidth]{images/affine-space.png}
+        \caption{Half-space}
+\end{wrapfigure}
+We know ennounce useful properties of convex sets.
+\begin{property}[Stability by intersection]
+    Convexity is stable by intersection. If $(K_i)_{i\in I}$ is a collection -- non-necessarily countable -- of convex sets, then:
+    \begin{equation*}
+        \bigcap_{i\in I}K_i \quad\textnormal{is convex}
+    \end{equation*}
+\end{property}
+
+\begin{property}[Stability by affine transformation]
+    Convexity is stable by affine transformation. If $K\subseteq\R^d$ is a convex set, then for all $\lambda\in\R$ and $\beta\in \R^d$,
+    \begin{equation*}
+        \lambda\cdot K+\beta := \set{\lambda\cdot x+\beta}{x\in K} \quad \textnormal{is convex}
+    \end{equation*}
+\end{property}
+
+\begin{property}[Convex serparation]
+    If $C$, $D$ are disjoints convex sets (i.e. $C\cap D=\emptyset$), then there exists a hyperplane which separates $C$ and $D$:
+    \begin{equation*}
+        \exists a\neq0, b\in\R, \quad C\subseteq\set{x\in\R^d}{a^\tp x\geq b}, D\subseteq\set{x\in\R^d}{a^\tp x\leq b}
+    \end{equation*}
+    Moreover, the inequalities are strict if $C$ and $D$ are compact.
+\end{property}
+
+\begin{wrapfigure}{r}{0.3\textwidth}
+    \centering
+        \captionsetup{justification=centering}
+        \includegraphics[width=0.2\textwidth]{images/polytope.png}
+        \caption{Polytope}
+\end{wrapfigure}
+When a set is not convex, a trick is to use its convex hull to show some properties on it.
+\begin{definition}[Convex Hull]
+    Let $A\in\R^d$. The \emph{Convex Hull} of $A$, denoted $\Conv(A)$, is the smallest convex set that contains $A$. In other words,
+    \begin{equation}
+        \begin{aligned}
+            \Conv(A):=&\,\bigcap\set{B\in\R^d}{A\subseteq B, B \textnormal{ convex}}\\
+            =&\,\set{\sum_{i=1}^p\alpha_iz_i}{p\geq 1, \alpha\in\R_+^p, (z_1, \dots, z_p)\in A^p, \; \sum_{i=1}^p \alpha_i=1}
+        \end{aligned}
+    \end{equation}
+\end{definition}
+
+
+\subsubsection{Convex functions}
+
+\subsubsection{Unconstrained optimization problems}
+
 \section{Convex analysis and convex optimization}
 \subsection{Constrained optimization problems}
 
