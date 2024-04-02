@@ -814,10 +814,60 @@ In practice, the functions which we will consider will be $\mathcal{C}^1$ and ev
 \end{property}
 
 \begin{property}[Jensen's inequality]
-    
+    For $f$ convex, $x_1, \dots, x_n\in D$ and $\alpha_1,\dots, \alpha_n\in\R_+$ such that $\sum_{i=1}^n\alpha_i=1$. Then:
+    \begin{equation*}
+        f\left(\sum_{i=1}^n\alpha_ix_i\right) \leq \sum_{i=1}^n\alpha_if(x_i)
+    \end{equation*}
+\end{property}
+
+\begin{property}[Jensen's integral inequality]
+    For $f$ convex, $p(x)\geq0$ over $S\subseteq D$ such that $\int_s p(x)\,\textnormal{d}x=1$, then:
+    \begin{equation*}
+        f\left(\int_Sp(x)\,\textnormal{d}x\right) \leq \int_Sp(x)f(x)\,\textnormal{d}x
+    \end{equation*}
+\end{property}
+
+\begin{property}[Jensen's expectation inequality]
+    For $f$ convex, and $X$ a random variable such that $X\in D$ almost surely and with $\E[X]<+\infty$, then:
+    \begin{equation*}
+        f(\E[X])\leq\E[f(X)]
+    \end{equation*}
 \end{property}
 
 \subsubsection{Unconstrained optimization problems}
+Let $f:\R^d\to\R$ be a convex function. We consider the following minimization problem:
+\begin{equation*}
+    \inf_{x\in\R^d}f(x)
+\end{equation*}
+Note that the notation $\min_x f(x)$ is only used when the minimum is reached. If no point achieves the minimum, we use the notation $\inf_xf(x)$.
+
+Three cases are possible, depending on $\inf_xf(x)$:
+\begin{itemize}
+    \item $\inf_{x\in\R^d}f(x)=-\infty$ -- there is no minimum.
+    \item $\inf_{x\in\R^d}f(x)>-\infty$ and the minimum is not reached.
+    \item $\inf_{x\in\R^d}f(x)>-\infty$ and the minimum is reached and equals $\min{x\in\R^d}f(x)$.
+\end{itemize}
+
+\begin{definition}[Local minimum]
+    Let $f:D\to\R$ and $x\in D$. $x$ is a local minimum if and only if there exists an open set $V\subseteq D$ such that $x\in V$ and $f(x)=\min_{x'\in V}f(x')$.
+\end{definition}
+
+\begin{property}
+    \label{prop:local-global-min}
+    If $f$ is convex, any local minimum of $f$ is a global minimum.
+\end{property}
+
+\begin{property}
+    If $f$ is stricly convex, it has at most one minimum.
+\end{property}
+
+\begin{property}
+    If $f$ is convex and $\mathcal{C}^1$, then $x$ is a minimum of $f$ on $\R^d$ if and only if $f'(x)=0$.
+\end{property}
+
+These three properties justify the apprach of canceling the gradient to efficiently find a solution to a minimization problem. Property \ref{prop:local-global-min} guarantees that the result of some gradient descent is a global minimum, and not just some dead-end for the descent path. Strict convexity guarantees that every converging gradient descent will end up at the same minimum.
+
+In the next chapter, we will continue the analysis of this frequent minimization problem and develop formal tools and algorithm to solve it efficiently.
 
 \section{Convex analysis and convex optimization}
 \subsection{Constrained optimization problems}
