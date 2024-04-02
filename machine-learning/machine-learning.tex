@@ -619,14 +619,13 @@ Similarly to linear regression, logistic regression may over-fit the data (espec
 
 \subsection{Convex analysis}
 \subsubsection{Convexity and minimization problems}
-\begin{wrapfigure}{l}{0.4\textwidth}
+We will now see notions of convex analysis to solve convex optimization problems, such as logistic regression. This chapter will introduce convex analysis -- the properties of convex functions and convex optimization problems, and the next chapter will approach convex optimization algorithms (gradient descent, Newton's method, stochastic gradient descent, \dots).
+\begin{wrapfigure}[10]{l}{0.4\textwidth}
     \centering
     \captionsetup{justification=centering}
-    \includegraphics[width=0.4\textwidth]{images/hyperplane.png}
+    \includegraphics[width=0.3\textwidth]{images/hyperplane.png}
     \caption{Hyperplane}
 \end{wrapfigure}
-We will now see notions of convex analysis to solve convex optimization problems, such as logistic regression. This chapter will introduce convex analysis -- the properties of convex functions and convex optimization problems, and the next chapter will approach convex optimization algorithms (gradient descent, Newton's method, stochastic gradient descent, \dots).
-
 
 Convexity is a crucial notion in many fields of mathematics and computer science. In machine learning, convexity creates well-defined problems with efficient solutions. A typical example is the problem of \emph{empirical risk minimization}:
 \begin{equation*}
@@ -645,8 +644,8 @@ In what follows, we will only consider finite dimensional Euclidean spaces (typi
 \begin{wrapfigure}{r}{0.4\textwidth}
     \centering
         \captionsetup{justification=centering}
-        \includegraphics[width=0.3\textwidth]{images/half-space.png}
-        \caption{Half-space}
+        \includegraphics[width=0.35\textwidth]{images/affine-space.png}
+        \caption{Affine space}
 \end{wrapfigure}
 
 
@@ -670,10 +669,10 @@ In what follows, we will only consider finite dimensional Euclidean spaces (typi
     \end{itemize}
 \end{example}
 
-\begin{wrapfigure}{l}{0.4\textwidth}
+\begin{wrapfigure}{l}{0.3\textwidth}
     \centering
         \captionsetup{justification=centering}
-        \includegraphics[width=0.35\textwidth]{images/affine-space.png}
+        \includegraphics[width=0.3\textwidth]{images/half-space.png}
         \caption{Half-space}
 \end{wrapfigure}
 We know ennounce useful properties of convex sets.
@@ -708,16 +707,115 @@ We know ennounce useful properties of convex sets.
 When a set is not convex, a trick is to use its convex hull to show some properties on it.
 \begin{definition}[Convex Hull]
     Let $A\in\R^d$. The \emph{Convex Hull} of $A$, denoted $\Conv(A)$, is the smallest convex set that contains $A$. In other words,
-    \begin{equation}
+    \begin{equation*}
         \begin{aligned}
             \Conv(A):=&\,\bigcap\set{B\in\R^d}{A\subseteq B, B \textnormal{ convex}}\\
             =&\,\set{\sum_{i=1}^p\alpha_iz_i}{p\geq 1, \alpha\in\R_+^p, (z_1, \dots, z_p)\in A^p, \; \sum_{i=1}^p \alpha_i=1}
         \end{aligned}
+    \end{equation*}
+\end{definition}
+
+\subsubsection{Convex functions}
+\begin{definition}[Convex function]
+    A function $f:D\subseteq\R^d\to\R$ where $D$ is convex is a \emph{convex function} when:
+    \begin{equation}
+        \forall x, y \in D, \forall \alpha\in[0, 1], \quad f(\alpha x+(1-\alpha)y)\leq\alpha f(x) + (1-\alpha)f(y)
     \end{equation}
 \end{definition}
 
+\begin{definition}[Stricly convex function]
+    A function $f:D\subseteq\R^d\to\R$ where $D$ is convex is a \emph{strictly convex function} when:
+    \begin{equation}
+        \forall x, y \in D, \forall \alpha\in[0, 1], \quad f(\alpha x+(1-\alpha)y)<\alpha f(x) + (1-\alpha)f(y)
+    \end{equation}
+\end{definition}
 
-\subsubsection{Convex functions}
+\begin{definition}
+    A function $f:D\subseteq\R^d\to\R$ where $D$ is convex is \emph{$\mu$-stricly convex} when 
+    \begin{equation*}
+        x\longmapsto f(x)-\frac{\mu}{2}\norm{x}^2 \quad\textnormal{is convex}
+    \end{equation*}
+\end{definition}
+
+\begin{example}[Convex functions]
+    \leavevmode
+    All the following functions are convex:
+    \begin{figure}[H]
+        \centering
+        \begin{tabular}{c c}
+            \begin{minipage}{0.45\textwidth}
+                \vspace*{-0.4cm}
+                In dimension $d=1$:
+                \begin{itemize}
+                    \item $x\longmapsto x$
+                    \item $x\longmapsto x^2$
+                    \item $x\longmapsto -\log(x)$
+                    \item $x\longmapsto \log(1+e^{-x})$
+                    \item $x\longmapsto |x|^p$ for $p\geq1$
+                    \item $x\longmapsto -x^p$ for $p<1$
+                \end{itemize}
+            \end{minipage}
+            \begin{minipage}{0.5\textwidth}
+                Higher dimensions $d\geq1$:
+                \begin{itemize}
+                    \item Linear functions $x\longmapsto aa^\tp x$
+                    \item Quadratic functions $x\longmapsto x^\tp Qx$ for $Q$ semidefinite symmetric positive matrix
+                    \item Norms
+                    \item $x\longmapsto\max\set{x_i}{i\in\iset{1}{d}}$
+                    \item $x\longmapsto\log\left(\sum_{i=1}^de_i^x\right)$
+                \end{itemize}
+            \end{minipage}
+        \end{tabular}
+    \end{figure}
+\end{example}
+
+\vspace*{-1cm}
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.7\textwidth]{images/convexity.jpg}
+    \caption{Geometric interpretation of convexity}
+\end{figure}
+
+In practice, the functions which we will consider will be $\mathcal{C}^1$ and even $\mathcal{C}^2$. In this case, much simpler characterization are given for convex functions.
+
+\begin{property}[Differentiable convex functions]
+    If $f$ is $\mathcal{C}^1$,
+    \begin{equation*}
+        f \textnormal{ convex} \iff \forall x, y\in D, f(x)\geq f(y) + f'(y)(x-y)
+    \end{equation*}
+\end{property}
+\begin{property}[Twice differentiable convex functions]
+    If $f$ is twice differentiable,
+    \begin{center}
+        $f$ convex $\iff$ $\forall x\in D$, its Hessian is semi-definite positive ($f''(x)\geq0$)
+    \end{center}
+\end{property}
+
+\begin{property}[Operations which preserve convexity]
+    If $(f_i)_{i\in I}$ is a family of convex functions, then,
+    \begin{equation*}
+        x \longmapsto \sup_{i\in I} f_i(x) \quad\textnormal{is convex}
+    \end{equation*}
+    \begin{equation*}
+        \forall \alpha_i\in\R_+, x \longmapsto \sum_{i\in I} \alpha_i f_i(x) \quad\textnormal{is convex}
+    \end{equation*}
+    Furthermore, if $f$ is convex on $C\times D$, then
+    \begin{equation*}
+        y \longmapsto \inf_{x\in C} f(x, y) \quad \textnormal{is convex on $D$}
+    \end{equation*}
+\end{property}
+
+\begin{property}[Convexity and continuity]
+    If $f$ is convex on $D$, then $f$ is continuous on $\mathring{D}$. Furthermore, the epigraph of $f$,
+    \begin{equation*}
+        \set{(x, t)\in D\times\R}{f(x)\leq t} \quad \textnormal{is convex.}
+    \end{equation*}
+\end{property}
+
+\begin{property}[Jensen's inequality]
+    
+\end{property}
 
 \subsubsection{Unconstrained optimization problems}
 
