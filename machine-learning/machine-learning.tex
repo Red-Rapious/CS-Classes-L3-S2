@@ -730,6 +730,14 @@ When a set is not convex, a trick is to use its convex hull to show some propert
     \end{equation}
 \end{definition}
 
+\vspace*{-0.5cm}
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.7\textwidth]{images/convexity.jpg}
+    \caption{Geometric interpretation of convexity}
+\end{figure}
+
 \begin{definition}
     A function $f:D\subseteq\R^d\to\R$ where $D$ is convex is \emph{$\mu$-stricly convex} when 
     \begin{equation*}
@@ -768,14 +776,6 @@ When a set is not convex, a trick is to use its convex hull to show some propert
         \end{tabular}
     \end{figure}
 \end{example}
-
-\vspace*{-1cm}
-\begin{figure}[H]
-    \centering
-    \captionsetup{justification=centering}
-    \includegraphics[width=0.7\textwidth]{images/convexity.jpg}
-    \caption{Geometric interpretation of convexity}
-\end{figure}
 
 In practice, the functions which we will consider will be $\mathcal{C}^1$ and even $\mathcal{C}^2$. In this case, much simpler characterization are given for convex functions.
 
@@ -865,6 +865,12 @@ Three cases are possible, depending on $\inf_xf(x)$:
     If $f$ is convex and $\mathcal{C}^1$, then $x$ is a minimum of $f$ on $\R^d$ if and only if $f'(x)=0$.
 \end{property}
 
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.7\textwidth]{images/local-minimum.png}
+    \caption{Local and global minima of a non-convex function}
+\end{figure}
 These three properties justify the apprach of canceling the gradient to efficiently find a solution to a minimization problem. Property \ref{prop:local-global-min} guarantees that the result of some gradient descent is a global minimum, and not just some dead-end for the descent path. Strict convexity guarantees that every converging gradient descent will end up at the same minimum.
 
 In the next chapter, we will continue the analysis of this frequent minimization problem and develop formal tools and algorithm to solve it efficiently.
