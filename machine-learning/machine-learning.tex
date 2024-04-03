@@ -497,7 +497,7 @@ The calibration of the regularization parameter is therefore essential in practi
 %\end{aligned}
 %\end{equation*}
 
-This chapter will introduce logistic regression, a widely used classification algorithm. Conversly to linear regression, there is no closed-form solution and one needs to solve it using iterative convex optimization algorithms.
+This chapter will introduce logistic regression, a widely used classification algorithm. Unlike linear regression, there is no closed-form solution and one needs to solve it using iterative convex optimization algorithms.
 
 \subsection{Logistic regression}
 We consider the binary classification problem: given inputs in $\R^d$, we want to predict outputs in $\{0, 1\}$. We are given a training set $D_n=\set{(X_i, Y_i)}{i\in\iset{1}{n}}$, where the data points $(X_i, Y_i)$ are i.i.d. random variables following a distribution $\nu$ in $\X\times\Y=\R^d\times\{0, 1\}$
@@ -877,6 +877,91 @@ In the next chapter, we will continue the analysis of this frequent minimization
 
 \section{Convex analysis and convex optimization}
 \subsection{Constrained optimization problems}
+Let $f:D\mapsto\R^d$ convex and $C\subseteq D$ convex. We consider the constrained minimization problem
+\begin{equation*}
+    \inf_{x\in C}f(x)
+\end{equation*}
+where $C$ is the constraint set. It is often  defined as the intersection of sets of the form $\set{h_i(x)=0}{i\in I}$ (hyperplanes) and $\set{g_j(x)\leq0}{j\in J}$ (half-spaces).
+
+\begin{example}[Minimization of a linear function over a compact]
+    Let $A\subseteq\R^d$ be a compact, non-necessarily convex set, and $a\in\R^d\setminus\{0\}$. We can reformulate the non-convex minimization problem on $A$ as a constrained convex optimization problem on $\Conv(A)$:
+    \begin{equation*}
+        \min\set{a^\tp x}{x\in A} = \min\set{a^\tp x}{x\in\Conv(A)}
+    \end{equation*}    
+\end{example}
+
+\subsubsection{Lagrangian duality}
+A useful notion to solve constrained problems is Lagrangian duality. Assume that we are interested in the following constrained optimization problem:
+\begin{equation}
+    \label{eq:optimization-problem}
+    \min_{x\in D}f(x) \quad \textnormal{such that}\quad 
+    \begin{cases*}
+        h_i(x) = 0 & for $i\in\iset{1}{m}$\\
+        g_j(x)\leq0 & for $j\in\iset{1}{r}$
+    \end{cases*}
+\end{equation}
+We denote by $D^*\subseteq D$ the set of points that satisfy the constraints:
+\begin{equation*}
+    D^* := \set{x\in D}{\forall i\in\iset{1}{m}, h_i(x)=0 \land \forall j\in\iset{1}{r}, g_j(x)\leq 0}
+\end{equation*}
+Note that the equality constraints $h_i(x)=0$ can be rewritten as inequalities:
+\begin{equation*}
+    h_i(x)\leq0 \land -h_i(x)\leq0
+\end{equation*}
+Unlike unconstrained optimization problems, canceling the gradient does not necessarily provide a solution for constrained optimization problems. The basic idea of Lagrangian duality is therefore to take the constraint $D^*$ into account in the minimization problem by augmenting the objective function with a weighted sum of the constraint functions.
+
+\begin{definition}[Lagrangian]
+    The \emph{Lagrangian} associated to the optimization problem \eqref{eq:optimization-problem} is the function
+    \begin{equation*}
+        \L:D\times\R^m\times\R_+^r \longrightarrow \R
+    \end{equation*}
+    defines by:
+    \begin{equation*}
+        \L(x, \lambda, \mu) = f(x) + \lambda^\tp h(x) + \mu^\tp g(x)
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Primal function]
+    We define the \emph{primal function} associated to \eqref{eq:optimization-problem}
+    \begin{equation*}
+        \bar{f}:D\longrightarrow\R\cup\{+\infty\}
+    \end{equation*}
+    by:
+    \begin{equation*}
+        \bar{f} : x \longmapsto \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} \L(x, \lambda, \mu) = \begin{cases*}
+            f(x) & if $x\in D^*$\\
+            +\infty & otherwise
+        \end{cases*}
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Primal problem]
+    With these definitions, we observe that the optimization problem \eqref{eq:optimization-problem} can be re-written as a constraints-free problem of minimization of the primal function.
+    \begin{equation*}
+        \begin{aligned}
+            \inf_{x\in D^*} &= \inf_{x\in D}\bar{f}(x)\\
+            &= \inf_{x\in D} \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} \L(x, \lambda, \mu)
+        \end{aligned}
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Dual problem]
+    The \emph{Dual problem} is obtained by exchanging inf and sup in the primal problem:
+    \begin{equation*}
+        \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} f^*(\lambda, \mu) := \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} \inf_{x\in D}\L(x, \lambda, \mu)
+    \end{equation*}
+    where
+    \begin{equation*}
+        f^* : (\lambda, \mu) \longmapsto \inf_{x\in D}\L(x, \lambda, \mu)
+    \end{equation*}
+    is the \emph{dual function}. If $f$ is convex, this function is concave. Note that the dual of the dual is the primal.
+\end{definition}
+
+The admissibility domain of the primal is $D^* := \set{x\in D}{\bar{f}(x)<+\infty}$, and the admissibility domain of the dual is $C^* := \set{(\lambda, \mu)\in\R^m\times\R_r^r}{f^*(\lambda, \mu)>-\infty}$. There is no solution to the optimization problem when $D^*=\emptyset$. The problem is unbounded when $C^*=\emptyset$.
+
+\subsubsection{Link between primal and dual problems}
+The primal and dual problems are not necessarily identical, but have a strong relationship. For any $(\lambda, \mu)$, $f^*(\lambda, \mu)$ provides a lower bound on the solution of \eqref{eq:optimization-problem}. The dual problem finds the best lower bound.
+
 
 \subsection{Optimization algorithms for unconstrained convex optimization}
 \subsubsection{Gradient Descent}
