@@ -1130,9 +1130,10 @@ We will prove in the next theorem that there exists a step-size that guarantees 
 
 \begin{remark}
     Using a different argument, it is possible to prove the tighter result:
-    \begin{equation*}
+    \begin{equation}
+        \label{eq:tighter-ineq}
         f(y)\leq f(x)+\nabla f(x)^\tp(y-x)+\frac{L}{2}\norm{y-x}^2
-    \end{equation*}
+    \end{equation}
 \end{remark}
 
 \begin{lemma}[Gradient descent is a descent algorithm with $\gamma_n\in\rbrack 0, 1/L\lbrack$]
@@ -1149,6 +1150,43 @@ We will prove in the next theorem that there exists a step-size that guarantees 
 \begin{proof}
     
 \end{proof}
+
+Recall that when $f$ is $\mu$-stricly convex, we have:
+\begin{equation*}
+    f(y)\geq f(x)+\nabla f(x)^\tp(y-x)+\frac{\mu}{2}\norm{y-x}^2
+\end{equation*}
+This will be used in the next theorem.
+
+\begin{theorem}
+    Let $f:\R^d\to\R$ be a $\mu$-stricly convex function with $L$-Lipschitz continuous gradients. Let $\gamma\in\rbrack 0, 1/2L\lbrack$, and choose a constant step-size $\gamma_n=\gamma$ for $n\in\N$. Denote by $x^*$ the global optimum of $f$. Finally, let $x_0\in\R^d$ and $N\in\N$. Then:
+    \begin{equation*}
+        \norm{x_N-x^*}^2\leq(1-\gamma\mu)^\tp\norm{x_0-x^*}^2
+    \end{equation*}
+\end{theorem}
+\begin{proof}
+    
+\end{proof}
+
+\begin{remark}
+    Using the tighter inequality \eqref{eq:tighter-ineq}, the previous result can be extended to $\gamma\in\rbrack 0, 1/L\lbrack$.
+\end{remark}
+
+Note that since:
+\begin{equation*}
+    (1-\gamma\mu)^N\leq e^{-\gamma\mu N}
+\end{equation*}
+the choice of $N=\frac{\gamma\mu}\log(\norm{x_0-x^*}^2/\epsilon)$ gives:
+\begin{equation*}
+    \norm{x_N-x^*}^2\leq\epsilon
+\end{equation*}
+
+\begin{corollary}
+    Under the same hypothesis on $f$, $\gamma$, we have:
+    \begin{equation*}
+        \norm{x_N-x^*} \xrightarrow[N\to+\infty]{} 0
+    \end{equation*}
+    Therefore, in this case, the Gradient Descent algorithm converges.
+\end{corollary}
 
 \subsubsection{Stochastic Gradient Descent}
 
