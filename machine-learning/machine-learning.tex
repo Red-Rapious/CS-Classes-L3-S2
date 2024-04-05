@@ -911,6 +911,12 @@ Note that the equality constraints $h_i(x)=0$ can be rewritten as inequalities:
 \end{equation*}
 Unlike unconstrained optimization problems, canceling the gradient does not necessarily provide a solution for constrained optimization problems. The basic idea of Lagrangian duality is therefore to take the constraint $D^*$ into account in the minimization problem by augmenting the objective function with a weighted sum of the constraint functions.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/constrained-optimization.png}
+    \caption{Constrained optimization: $D^*$ is the red and orange part below the $g$ plane}
+\end{figure}
+
 \begin{definition}[Lagrangian]
     The \emph{Lagrangian} associated to the optimization problem \eqref{eq:optimization-problem} is the function
     \begin{equation*}
@@ -1075,7 +1081,74 @@ These conditions are called the Karush-Kuhn-Tucker (KKT) conditions. When the pr
 The KKT conditions play an important role in optimization. In some cases, it is possible to solve them analytically. Many optimization methods are conceived for solving the KKT conditions.
 
 \subsection{Optimization algorithms for unconstrained convex optimization}
+In this section we will see two widely used optimization algorithms for the problem of unconstrained optimization, \emph{Gradient descent} and \emph{Stochastic Gradient descent}.
+
+Since the goal of minimizing a function $f:\R^d\to\R$ for $d\in\N$ is to find the point $x$ for which the function has minimum value, the fundamental idea behind gradient descent consists in strating from a given $x_0\in\R^d$ and finding the next point following a descet direction iteratively. In particular, we will consider $f$ to be a convex function.
+
 \subsubsection{Gradient Descent}
+\begin{wrapfigure}[15]{l}{0.45\textwidth}
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.4\textwidth]{images/gradient-descent-2.png}
+    \caption{Convex gradient descent}
+\end{wrapfigure}
+When $f$ is diffenrentiable, the gradient of $f$ in $x$, denoted $\nabla f(x)$, determines the direction of maximum increase of the function in a suitable neighborhood of $x$ -- and so $-\nabla f(x)$ determines the direction of maximum decrease of the function. The gradient descent algorithm then reads as follows:
+\begin{equation*}
+    \begin{cases*}
+        x_0 & given\\
+        x_{n+1} := x_n -\gamma_n\nabla f(x_n) & $\forall n\in\iset{1}{N}$
+    \end{cases*}
+\end{equation*}
+where $\gamma_n$ is denoted as \emph{step-size} and is small enough such that $-\gamma_n\nabla f(x_n)$ is still a decrease direction in the neighborhood of $x_n$.
+
+The choice of $\gamma_n$ is crucial for the optimization algorithm. If $\gamma_n$ is too big, it makes the algorithm unstable and possibly divergince, since it follows the direction $-\nabla f(x_n)$ out of the region where it is a descent direction. On the other hand, if $\gamma_n$ is too small, the chosen direction is a descent direction, but each step is very short, leading to a larger number of steps required to arrive to the minimum solution -- with a big impact on the total computational complexity.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/gd-step-size.png}
+    \caption{Choice of step size}
+\end{figure}
+
+We will prove in the next theorem that there exists a step-size that guarantees the convergence of the solution of the gradient descent algorithm to the minimizer of $f$, and we characterize how fast gradient descent achieves it.
+
+\subsubsection{Gradient Descent for strongly convex functions}
+\begin{definition}[$L$-Lipschitz continuous gradients]
+    For $L>0$, $f$ has $L$-Lipschitz continuous gradients when:
+    \begin{equation*}
+        \forall x, y, \in\R^d, \quad \norm{\nabla f(x) - \nabla f(y)}\leq L\norm{y-x}
+    \end{equation*}
+\end{definition}
+
+\begin{lemma}
+    Let $L>0$ and $f:\R^d\to\R$ be a convex function with $L$-Lipschitz continuous gradients, then:
+    \begin{equation}
+        f(y)\leq f(x)+\nabla f(x)^\tp(y-x)+L\norm{y-x}^2
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    %TODO
+\end{proof}
+
+\begin{remark}
+    Using a different argument, it is possible to prove the tighter result:
+    \begin{equation*}
+        f(y)\leq f(x)+\nabla f(x)^\tp(y-x)+\frac{L}{2}\norm{y-x}^2
+    \end{equation*}
+\end{remark}
+
+\begin{lemma}[Gradient descent is a descent algorithm with $\gamma_n\in\rbrack 0, 1/L\lbrack$]
+    Let $f$ be convex with $L$-Lipschitz gradient, let $x_0\in\R^d$ and $\gamma_n>0$, then:
+    \begin{equation*}
+        \forall n\in\N^*, \quad f(x_n)\leq f(x_{n-1}) - \gamma_n(1-L\cdot\gamma_n) \cdot \norm{\nabla f(x_{n-1})}^2
+    \end{equation*}
+    In particular, if $\gamma_n\in\rbrack 0, 1/L\lbrack$, we have that $\gamma_n(1-L\cdot\gamma_n)>0$. Therefore, for all $n\in\N^*$:
+    \begin{equation*}
+        f(x_n)<f(x_{n-1})
+    \end{equation*}
+    whenever $x_{n-1}$ is not a global optimum, otherwise $x_n=x_{n-1}$ and $f(x_n)=f(x_{n-1})$ (a fixpoint is reached).
+\end{lemma}
+\begin{proof}
+    
+\end{proof}
 
 \subsubsection{Stochastic Gradient Descent}
 
