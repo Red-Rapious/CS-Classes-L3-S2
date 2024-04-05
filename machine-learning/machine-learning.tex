@@ -896,6 +896,7 @@ A useful notion to solve constrained problems is Lagrangian duality. Assume that
     \label{eq:optimization-problem}
     \min_{x\in D}f(x) \quad \textnormal{such that}\quad 
     \begin{cases*}
+        \tag{P}
         h_i(x) = 0 & for $i\in\iset{1}{m}$\\
         g_j(x)\leq0 & for $j\in\iset{1}{r}$
     \end{cases*}
@@ -957,11 +958,121 @@ Unlike unconstrained optimization problems, canceling the gradient does not nece
     is the \emph{dual function}. If $f$ is convex, this function is concave. Note that the dual of the dual is the primal.
 \end{definition}
 
-The admissibility domain of the primal is $D^* := \set{x\in D}{\bar{f}(x)<+\infty}$, and the admissibility domain of the dual is $C^* := \set{(\lambda, \mu)\in\R^m\times\R_r^r}{f^*(\lambda, \mu)>-\infty}$. There is no solution to the optimization problem when $D^*=\emptyset$. The problem is unbounded when $C^*=\emptyset$.
+The admissibility domain of the primal is $D^* := \set{x\in D}{\bar{f}(x)<+\infty}$, and the admissibility domain of the dual is $C^* := \set{(\lambda, \mu)\in\R^m\times\R_+^r}{f^*(\lambda, \mu)>-\infty}$. There is no solution to the optimization problem when $D^*=\emptyset$. The problem is unbounded when $C^*=\emptyset$.
 
 \subsubsection{Link between primal and dual problems}
 The primal and dual problems are not necessarily identical, but have a strong relationship. For any $(\lambda, \mu)$, $f^*(\lambda, \mu)$ provides a lower bound on the solution of \eqref{eq:optimization-problem}. The dual problem finds the best lower bound.
 
+\begin{property}[Weak duality principle]
+    \begin{equation*}
+        d^* := \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} \inf_{x\in D}\L(x, \lambda, \mu) \leq \inf_{x\in D} \sup_{\lambda\in\R^m, \;\mu\in\R^r_+} \L(x, \lambda, \mu)
+    \end{equation*}    
+\end{property}
+The solution of the dual problem is therefore always smaller than the solution of the primal. A good mnemonic is to remember this inequality as \say{the largest dwarf is always smaller than the smallest giant}.
+
+\begin{definition}[Dual gap]
+    The \emph{dual gap} of the optimization problem is the difference between the primal and dual solutions:
+    \begin{equation*}
+        p^*-d^* \geq 0
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Strong duality]
+    There is \emph{strong duality} when $p^*=d^*$. In this case, the two problems are equivalent -- they share the same solutions. The existence of the solultions are related with the existence of saddle point of the Lagrangian. Note that strong duality does not always hold.
+\end{definition}
+
+\subsubsection{Strong duality}
+Sometimes, the dual problem is easier to solve than the primal problem. It is then useful to know if there is strong duality.
+
+\begin{definition}[Strictly feasible point]
+    A point $x_0\in D$ is \emph{strictly feasible} when:
+    \begin{equation*}
+        \exists x_0\in D, \quad \begin{cases*}
+            h_i(x_0)=0 & $\forall i\in\iset{1}{m}$\\
+            g_j(x_0)<0 & $\forall j\in\iset{1}{r}$
+        \end{cases*}
+    \end{equation*}
+\end{definition}
+
+\begin{theorem}[Slater's condition]
+    If $f$ and $D$ are convex, $h_i$ are affine and $g_j$ are convex, then the existence of a strictly feasible point implies strong duality.
+\end{theorem}
+
+\begin{example}
+    Let $D=\R^d_+$ and consider the following linear programming minimization problem:
+    \begin{equation*}
+        \min_{x\in D, \; Ax=b}c^\tp x
+    \end{equation*}
+    where $A\in\mathscr{M}_{m, d}(\R)$ and $b\in\R^m$. The constraints can be written as $Ax-b=0$. Therefore, the Lagrangian is:
+    \begin{equation*}
+        \L : (x, \lambda) \in \R_+^d \times \R^m \longrightarrow c^\tp x + \lambda^\tp(b-Ax)
+    \end{equation*}
+    The primal problem can be rewritten using the Lagrangian:
+    \begin{equation*}
+        \begin{aligned}
+            \min_{x\in D, \; Ax=b}c^\tp x &= \min_{x\in D}\sup_{\lambda\in\R^m} c^\tp x+\lambda^\tp(b-Ax)\\
+            &= \min_{x\in D}\sup_{\lambda\in\R^m} b^\tp\lambda+x^\tp(c-A^\tp\lambda)
+        \end{aligned}
+    \end{equation*}
+    The problem is convex since the objective function is convex, and the equality constraints are affine. By Slater's condition, we can swap the $\min$ and the $\sup$, giving:
+    \begin{equation*}
+        \begin{aligned}
+            \min_{x\in D, \; Ax=b}c^\tp x &= \sup_{\lambda\in\R^m} \min_{x\in D} c^\tp x+\lambda^\tp(b-Ax)\\
+            &= \sup_{\lambda\in\R^m, \; A^\tp\lambda\leq c} b^\tp\lambda
+        \end{aligned}
+    \end{equation*}
+    This is the dual formulation of the problem.
+\end{example}
+
+\subsubsection{Karush-Kuhn-Tucker optimality conditions}
+We will now see conditions playing the same role as gradient cancelling for unconstrained optimization problems. These conditions will be useful to find equations to compute analytically the solutions of the minimization problem.
+
+Assume that the function $f$, $h_i$, and $g_i$ are all differentiable. Let $x^*$, and $(\lambda^*, \mu^*)$ be any primal and dual solutions, and assume that there is strong duality.
+
+\begin{property}[KKT1]
+    Since $x^*$ minimizes $\L(x, \lambda^*, \mu^*)$ over $x$, its gradient must be canceled at $x^*$:
+    \begin{equation}
+        \tag{KKT1}
+        \nabla f(x^*) + \sum_{i=1}^m \lambda_i^*\nabla h(x^*) + \sum_{j=1}^r\mu_j\nabla g_j(x^*)=0
+    \end{equation}
+\end{property}
+
+\begin{property}[KKT2]
+    Since $x^*\in D^*$ and $(\lambda^*, \mu^*)\in C^*$ are feasible we have:
+    \begin{equation}
+        \tag{KKT2}
+        \begin{aligned}
+            \forall i\in\iset{1}{m},& \quad h_i(x^*)=0\\
+            \forall i\in\iset{1}{r},& \quad g_j(x^*)\leq0\\
+            \forall j\in\iset{1}{r},& \quad \mu_j^*\geq0
+        \end{aligned}
+    \end{equation}
+\end{property}
+
+\begin{property}[KKT3]
+    The \emph{complementary condition} holds, i.e.:
+    \begin{equation}
+        \tag{KKT3}
+        \forall j\in\iset{1}{r}, \quad \mu^*_jg_j(x^*)=0
+    \end{equation}
+\end{property}
+\begin{proof}
+    By contradiction, if the complementary condition does not hold, we could improve $\mu^*$ by setting $\mu_j^*=0$, since $g_j(x^*)\leq0$ and $(\lambda^*, \mu^*)$ maximizes $\L(x^*, \lambda, \mu)$.
+\end{proof}
+
+These conditions are called the Karush-Kuhn-Tucker (KKT) conditions. When the primal problem is convex, these conditions are also sufficient.
+
+\begin{theorem}[Karush–Kuhn–Tucker theorem]
+    If there is strong duality, then:
+    \begin{center}
+        (KKT) conditions are satisfied $\iff$ $\begin{cases*}
+            x^* &is a solution to the primal problem\\
+            (\lambda^*, \mu^*) & is a solution of the dual problem
+        \end{cases*}$
+    \end{center}
+\end{theorem}
+
+The KKT conditions play an important role in optimization. In some cases, it is possible to solve them analytically. Many optimization methods are conceived for solving the KKT conditions.
 
 \subsection{Optimization algorithms for unconstrained convex optimization}
 \subsubsection{Gradient Descent}
