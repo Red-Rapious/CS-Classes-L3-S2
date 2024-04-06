@@ -821,9 +821,9 @@ In practice, the functions which we will consider will be $\mathcal{C}^1$ and ev
 \end{property}
 
 \begin{property}[Jensen's integral inequality]
-    For $f$ convex, $p(x)\geq0$ over $S\subseteq D$ such that $\int_s p(x)\,\textnormal{d}x=1$, then:
+    For $f$ convex, $p(x)\geq0$ over $S\subseteq D$ such that $\int_s p(x)\dd x=1$, then:
     \begin{equation*}
-        f\left(\int_Sp(x)\,\textnormal{d}x\right) \leq \int_Sp(x)f(x)\,\textnormal{d}x
+        f\left(\int_Sp(x)\,\dd x\right) \leq \int_Sp(x)f(x)\dd x
     \end{equation*}
 \end{property}
 
@@ -1095,12 +1095,12 @@ When $f$ is diffenrentiable, the gradient of $f$ in $x$, denoted $\nabla f(x)$, 
 \begin{equation*}
     \begin{cases*}
         x_0 & given\\
-        x_{n+1} := x_n -\gamma_n\nabla f(x_n) & $\forall n\in\iset{1}{N}$
+        x_{t+1} := x_n -\gamma_t\nabla f(x_t) & $\forall t\in\iset{1}{T}$
     \end{cases*}
 \end{equation*}
-where $\gamma_n$ is denoted as \emph{step-size} and is small enough such that $-\gamma_n\nabla f(x_n)$ is still a decrease direction in the neighborhood of $x_n$.
+where $\gamma_n$ is denoted as \emph{step-size} and is small enough such that $-\gamma_t\nabla f(x_t)$ is still a decrease direction in the neighborhood of $x_t$.
 
-The choice of $\gamma_n$ is crucial for the optimization algorithm. If $\gamma_n$ is too big, it makes the algorithm unstable and possibly divergince, since it follows the direction $-\nabla f(x_n)$ out of the region where it is a descent direction. On the other hand, if $\gamma_n$ is too small, the chosen direction is a descent direction, but each step is very short, leading to a larger number of steps required to arrive to the minimum solution -- with a big impact on the total computational complexity.
+The choice of $\gamma_t$ is crucial for the optimization algorithm. If $\gamma_t$ is too big, it makes the algorithm unstable and possibly divergince, since it follows the direction $-\nabla f(x_t)$ out of the region where it is a descent direction. On the other hand, if $\gamma_t$ is too small, the chosen direction is a descent direction, but each step is very short, leading to a larger number of steps required to arrive to the minimum solution -- with a big impact on the total computational complexity.
 
 \begin{figure}[H]
     \centering
@@ -1136,19 +1136,19 @@ We will prove in the next theorem that there exists a step-size that guarantees 
     \end{equation}
 \end{remark}
 
-\begin{lemma}[Gradient descent is a descent algorithm with $\gamma_n\in\rbrack 0, 1/L\lbrack$]
-    Let $f$ be convex with $L$-Lipschitz gradient, let $x_0\in\R^d$ and $\gamma_n>0$, then:
+\begin{lemma}[Gradient descent is a descent algorithm with $\gamma_t\in\openseg{0, 1/L}$]
+    Let $f$ be convex with $L$-Lipschitz gradient, let $x_0\in\R^d$ and $\gamma_t>0$, then:
     \begin{equation*}
-        \forall n\in\N^*, \quad f(x_n)\leq f(x_{n-1}) - \gamma_n(1-L\cdot\gamma_n) \cdot \norm{\nabla f(x_{n-1})}^2
+        \forall t\in\N^*, \quad f(x_t)\leq f(x_{t-1}) - \gamma_t(1-L\cdot\gamma_t) \cdot \norm{\nabla f(x_{t-1})}^2
     \end{equation*}
-    In particular, if $\gamma_n\in\rbrack 0, 1/L\lbrack$, we have that $\gamma_n(1-L\cdot\gamma_n)>0$. Therefore, for all $n\in\N^*$:
+    In particular, if $\gamma_t\in\openseg{0, 1/L}$, we have that $\gamma_t(1-L\cdot\gamma_n)>0$. Therefore, for all $t\in\N^*$:
     \begin{equation*}
-        f(x_n)<f(x_{n-1})
+        f(x_t)<f(x_{t-1})
     \end{equation*}
-    whenever $x_{n-1}$ is not a global optimum, otherwise $x_n=x_{n-1}$ and $f(x_n)=f(x_{n-1})$ (a fixpoint is reached).
+    whenever $x_{t-1}$ is not a global optimum, otherwise $x_t=x_{t-1}$ and $f(x_t)=f(x_{t-1})$ (a fixpoint is reached).
 \end{lemma}
 \begin{proof}
-    
+    %TODO
 \end{proof}
 
 Recall that when $f$ is $\mu$-stricly convex, we have:
@@ -1158,13 +1158,13 @@ Recall that when $f$ is $\mu$-stricly convex, we have:
 This will be used in the next theorem.
 
 \begin{theorem}
-    Let $f:\R^d\to\R$ be a $\mu$-stricly convex function with $L$-Lipschitz continuous gradients. Let $\gamma\in\rbrack 0, 1/2L\lbrack$, and choose a constant step-size $\gamma_n=\gamma$ for $n\in\N$. Denote by $x^*$ the global optimum of $f$. Finally, let $x_0\in\R^d$ and $N\in\N$. Then:
+    Let $f:\R^d\to\R$ be a $\mu$-stricly convex function with $L$-Lipschitz continuous gradients. Let $\gamma\in\openseg{0, 1/2L}$, and choose a constant step-size $\gamma_t=\gamma$ for $t\in\N$. Denote by $x^*$ the global optimum of $f$. Finally, let $x_0\in\R^d$ and $T\in\N$. Then:
     \begin{equation*}
-        \norm{x_N-x^*}^2\leq(1-\gamma\mu)^\tp\norm{x_0-x^*}^2
+        \norm{x_T-x^*}^2\leq(1-\gamma\mu)^T\norm{x_0-x^*}^2
     \end{equation*}
 \end{theorem}
 \begin{proof}
-    
+    %TODO
 \end{proof}
 
 \begin{remark}
@@ -1173,22 +1173,84 @@ This will be used in the next theorem.
 
 Note that since:
 \begin{equation*}
-    (1-\gamma\mu)^N\leq e^{-\gamma\mu N}
+    (1-\gamma\mu)^T\leq e^{-\gamma\mu T}
 \end{equation*}
-the choice of $N=\frac{\gamma\mu}\log(\norm{x_0-x^*}^2/\epsilon)$ gives:
+the choice of $T=\frac{\gamma\mu}\log(\norm{x_0-x^*}^2/\epsilon)$ gives:
 \begin{equation*}
-    \norm{x_N-x^*}^2\leq\epsilon
+    \norm{x_T-x^*}^2\leq\epsilon
 \end{equation*}
 
 \begin{corollary}
     Under the same hypothesis on $f$, $\gamma$, we have:
     \begin{equation*}
-        \norm{x_N-x^*} \xrightarrow[N\to+\infty]{} 0
+        \norm{x_T-x^*} \xrightarrow[T\to+\infty]{} 0
     \end{equation*}
     Therefore, in this case, the Gradient Descent algorithm converges.
 \end{corollary}
 
 \subsubsection{Stochastic Gradient Descent}
+In this section, we will introduce Stochastic Gradient Descent. In some cases, especially when $n$ is big, computing the actual gradient of the empirical risk function $\emrisk_n$ is extremely costly. The approach of SGD is therefore to replace the exact gradient by a stochastic approximation of it, in practice calculating it from a random subset of the training data. This enables faster iterations, at the cost of a slower convergence rate.
+
+The algorithm is useful to find the global minimum of conex functions of the form
+\begin{equation*}
+    f(x)=\E_\theta\;g(x, \theta), \quad\textnormal{where}\quad \E_\theta g(x, \theta)=\int_\Omega\;g(x,\theta)\dd p(\theta)
+\end{equation*}
+where $p$ is a probability distribution over $\Omega$ and $g:\R^d\times\Omega\to\R$.
+
+\begin{example}[Empirical Risk Minimization]
+    We consider $f$ of the form:
+    \begin{equation*}
+        f(x) = \frac{1}{n}\sum_{i=1}^n L(x, \theta_i), \quad\textnormal{where}\quad \begin{cases}
+            L(x, \theta_i)=\ell(x^\tp z_i, y_i)\\
+            \theta_i=(z_i, y_i)
+        \end{cases}
+    \end{equation*}
+\end{example}
+In this context, we can assume that due to the size of $\Omega$ (in the previous example, $n$), we are not able to evaluate the integral above, but we assume that we are able to sample some $\theta_t$ from $p$ and to compute the gradient $\nabla_x g(x, \theta_t)$.
+
+The algorithm is similar to classical gradient descent, but the iteration step is changed to:
+\begin{equation*}
+    x_t=x_{t-1}-\gamma_t\nabla_x g(x, \theta_t) \quad\textnormal{where}\quad \theta_t\sim p
+\end{equation*}
+As previously, $\gamma_t$ is a sequence of step sizes and $x_0$ is given; moreover, specifically for stochastic GD, $\theta_t$ is independently and identically distributed according to $p$. 
+
+Note that, by linearity of the integral $\nabla f(x)=\E_\theta \nabla_x g(x,\theta)$, so:
+\begin{equation*}
+    \begin{aligned}
+        \E_\theta x_t &= x_{t-1}-\gamma_t\nabla_xg(x_{t-1},\theta_t)\\
+        &=x_{t-1} - \gamma_t\nabla f(x_{t-1})
+    \end{aligned}
+\end{equation*}
+Intuitively, the SGD seems to behave in expectation like gradient descent. Let's analyze this property in more details with the following theorem.
+
+\begin{definition}[Variance of the estimator of the gradient]
+    We define the \emph{variance of the estimator of the gradient} as:
+    \begin{equation*}
+        \sigma^2(x):=\E_\theta\norm{\nabla f(x)-\nabla_x g(x,\theta)}^2
+    \end{equation*}
+\end{definition}
+
+\begin{theorem}[Expectation bound for SGD]
+    Assuming that $f:\R^d\to\R$ is $\mu$-stricly convex and with $L$-Lipschitz continuous gradients, let $\gamma_t=\gamma$ for $t\in\N$, with $\gamma\in\openseg{0, 1/2L}$. Assume that there exists $\sigma^2_*$ such that
+    \begin{equation*}
+        \forall x\in\R^d, \quad \sigma^2(x)\leq\sigma^2_*
+    \end{equation*}
+    Under such assumptions, we have that:
+    \begin{equation*}
+        \E_{\theta_1,\dots,\theta_T}\norm{x_T-x^*}^2 \leq (1-\mu\gamma)^T\norm{x_0-x^*}^2+\frac{\gamma}{\mu}\sigma^2
+    \end{equation*}
+\end{theorem}
+\begin{proof}
+    %TODO
+\end{proof}
+
+\begin{corollary}[Convergence of SGD]
+    Under the same assumptions:
+    \begin{equation*}
+        \E_{\theta_1,\dots,\theta_T}\norm{x_T-x^*}^2 \xrightarrow[T\to+\infty]{} 0
+    \end{equation*}
+    Hence, stochastic gradient descent converges in expectation towards the global minimum.
+\end{corollary}
 
 \section{Kernels}
 \subsection{Introduction to kernels}
