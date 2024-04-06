@@ -1298,7 +1298,7 @@ The goal of kernel methods is therefore to go beyond these limitations while kee
 
 \subsection{Representer theorem}
 \subsubsection{Theorem statement}
-Given a dataset $x_1, \dots, x_n$, we are able to compute the observed feature maps $\phi_(x_1), \dots, \phi(x_n)$. We can ask ourselves if there exists an easier representation for $w$ in terms of these observed feature maps, i.e.~we want to know if it is possible to characterize the minimum $\hat{w}$ of:
+Given a dataset $x_1, \dots, x_n$, let $\phi$ be a feature map, such that we are able to compute the observed feature maps $\phi(x_1), \dots, \phi(x_n)$. We can ask ourselves if there exists an easier representation for $w$ in terms of these observed feature maps, i.e.~we want to know if it is possible to characterize the minimum $\hat{w}$ of:
 \begin{equation*}
     \hat{L}(w) = \frac{1}{n}\sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \lambda w^\tp w
 \end{equation*}
@@ -1322,7 +1322,7 @@ in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$.
 \begin{corollary}
     For $\lambda>0$, 
     \begin{equation*}
-        \min_{w\in\R^d} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w
+        \min_{w\in\R^d} \frac{1}{n} \sum_{i=1}^n \ell(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w
     \end{equation*}
     is obtained for
     \begin{equation*}
@@ -1330,12 +1330,12 @@ in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$.
     \end{equation*}
 \end{corollary}
 
-Note that there is no assumption on $l$, and in particular, no convexity assumption. This result is extendable to Hilbert spaces (RKHS), as we will see in the next section.
+Note that there is no assumption on $\ell$, and in particular, no convexity assumption. This result is extendable to Hilbert spaces (RKHS), as we will see in the next section.
 
 \subsubsection{Finite dimensional representation of the learning problem}
 Using the representer theorem, we know that the minimum of $\hat{L}$ is of the form $w=\sum_{i=1}^n \alpha_i\phi(x_i)$; we can therefore directly optimize this characterization, i.e.~we can then write:
 \begin{equation*}
-    \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n l(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n l(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\tp K\alpha
+    \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n \ell(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n \ell(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\tp K\alpha
 \end{equation*}
 where $K$ is an $n\times n$ matrix with values
 \begin{equation*}
@@ -1355,6 +1355,12 @@ We finally have a closed form representation for the function evaluation. Defini
 \begin{equation*}
     f(x) = w^\tp\phi(x) = \sum_{i=1}^n \alpha_i\phi(x_i)^\tp\phi(x) = \sum_{i=1}^n \alpha_i k(x_i, x).
 \end{equation*}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/kernel-trick.png}
+    \caption{Use of a kernel to linearly separate data}
+\end{figure}
 
 \begin{remark}[Kernel trick]
     The whole learning problem can be written in terms of the kernel $k$; indeed, $f$ depends only on $k$, $\hat{L}$ depends on $K$ with $K_{i, j} = k(x_i, x_j)$. Therefore, we have the so-called \emph{kernel trick}, i.e.~we do not need to compute explicitly the features $\phi$ to be able to represent and solve the learning problem, we just need to be able to compute their inner product.
@@ -1376,7 +1382,6 @@ We finally have a closed form representation for the function evaluation. Defini
     \begin{equation*}
         k(x, x') = \phi(x)^\tp\phi(x')=\sum_{j=0}^{+\infty}x^jx^{'j} = \frac{1}{1-xx'}
     \end{equation*}
-
     Therefore, the kernel trick allow to replace $\R^d$ by $\R^n$, which is interesting when $d$ is very large. Furthermore, it allows to separate the representation problem (design a kernel on a set $\X$), algorithms, and analysis (which only use the kernel matrix $K$).
 \end{example}
 
@@ -1434,5 +1439,23 @@ Kernel functions admits many characterizations, which we will now present.
 \section{MCMC Sampling}
 
 \section{Neural Networks}
+
+\section{Appendix}
+\subsection{Complexity of linear algebra computations}
+In the following, we consider $K, L\in\mathscr{M}_n(\R)$ to be two square matrices, and $y\in\R^n$ to be a vector. We give asymptotic computation time for different operations of linear algebra for simple algorithms.
+
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \bf Operation & \bf Notation & \bf Complexity\\
+        \hline\hline
+        Matrix multiplication & $KL$ & $O(n^3)$\\\hline
+        Inversion & $K^{-1}$ & $O(n^3)$\\\hline
+        Vector multiplication & $Ky$ & $O(n^2)$\\\hline
+        Eigenvalues/vectors decomposition & $\textnormal{Sp}(K)$ & $O(n^3)$\\\hline
+        Largest eigenvector & & $O(n^2)$\\\hline
+    \end{tabular}
+\end{figure}
 
 \end{document}
