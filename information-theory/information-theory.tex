@@ -1904,4 +1904,32 @@ In what follows we consider \emph{binary coding automata} with the input alphabe
     TODO.
 \end{proof}
 
+\subsection{Lempel-Ziv algorithm}
+
+\subsection{Entropy equivalence}
+
+
+\section{Mutual information and communication channel}
+We shall introduce a basic model of \emph{noisy communication channel} and define its mathematical \emph{capacity} as the maximum of the \emph{mutual information} -- a measure of dependence derived from the notion of entropy -- between the input and the output of the channel. Two illustrative examples are studied: binary symmetric channel and binary erasure channel.
+
+\subsection{Conditional entropy}
+In what follows, $\X, \Y, \Zc$ denote finite sets.
+
+\begin{definition}[Conditional entropy]
+    For a random vector $(X, Y)$ on $\X\times\Y$, we define the \emph{conditional entropy of $X$ given $Y$} by:
+    \begin{equation*}
+        H(X|Y) := H(X, Y)-H(Y)
+    \end{equation*}
+    where $H(X, Y)$ is the joint entropy of the vector $(X, Y)$ and $H(Y)$ is the marginal entropy of $Y$.
+\end{definition}
+
+The conditional entropy $H(X|Y)$ is supposed to express the amount of additional information carried on average by one realization of the random variable with respect to the information carried by $Y$.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{images/conditional-entropy.png}
+    \caption{Venn diagram illustrating the conditional entropy}
+\end{figure}
+
+
+
 \end{document}
