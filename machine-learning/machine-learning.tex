@@ -1495,14 +1495,59 @@ As before, $\emrisk_n$ is the empirical risk, which measures the average error p
 \subsection{Preliminary results}
 We will first recall some results that will be useful for the proof.
 \subsubsection{Results on random variables}
+\begin{lemma}[Union bound]
+    Let $\mathcal{F}$ be a finite set indexing a family of sets $(A_f)_{f\in\mathcal{F}}$, then:
+    \begin{equation*}
+        \P\left(\bigcup_{f\in\mathcal{F}}A_f\right)\leq\sum_{f\in\mathcal{F}}\P(A_f)
+    \end{equation*}
+\end{lemma}
+
+\begin{lemma}[Supremum of random variables]
+    Let $t>0$ and $\mathcal{F}$ be a finite set indexing real random variables $(u_f)_{f\in\mathcal{F}}$, we have:
+    \begin{equation*}
+        \P(\sup_{f\in\mathcal{F}}|u_f|>t) \leq \sum_{f\in\mathcal{F}} \P(|u_f|>t)
+    \end{equation*}
+\end{lemma}
+
+\begin{property}
+    Let $X$ be a random variable and let $f, g$ be real functions, with $t\in\R$ such that $f(X)\geq g(X)>t$ almost surely, then:
+    \begin{equation*}
+        \P(g(X)>t)\leq\P(f(X)>t)
+    \end{equation*}
+\end{property}
 
 \subsubsection{Bernstein's inequality}
+\begin{lemma}[Exponential moments of bounded random variables]
+    Let $u$ be a random variable such that $|u|\leq B$, for $B>0$ almost surely and $\E[u]=0$. Define $\sigma^2:=\E[u^2]$. Let $0\leq\theta<B^{-1}$, then:
+    \begin{equation*}
+        \E[e^{\theta u}]\leq \exp\left(\frac{\theta^2\sigma^2}{2(1-\theta B)}\right)
+    \end{equation*}
+\end{lemma}
+
+\begin{lemma}[Bernstein inequality for random variables]
+    Let $U_1, \dots, U_n$ be independently and identically distributed random variables, such that $\E[u]=0$ and $|u|\leq B$ almost surely, for $B>0$. Define $\sigma^2:=\E[u^2]$. Let $t>0$. The following holds:
+    \begin{equation}
+        \P\left(\frac{1}{n}\sum_{i=1}^nU_i > t\right) \leq \exp\left(-\frac{t^2n}{2(\sigma^2+Bt)}\right)
+    \end{equation}
+\end{lemma}
+
+\begin{corollary}
+    Under the same assumption as the previous lemmas,
+    \begin{equation*}
+        \P\left(\left|\frac{1}{n}\sum_{i=1}^nU_i\right|>t\right) \leq 2\exp\left(-\frac{t^2n}{2(\sigma^2+Bt)}\right)
+    \end{equation*}
+\end{corollary}
 
 \subsection{Consistency and Learning rates for Empirical Risk Minimization}
+\subsubsection{Introduction}
+
+\subsubsection{Bounding the variance term: PAC bounds}
+
+\subsubsection{Bounds in probability}
 
 \subsection{Bounding the Bias}
 
-\subsection{Optional exercises}
+%\subsection{Optional exercises}
 
 
 \section{Model-Based Machine Learning}
