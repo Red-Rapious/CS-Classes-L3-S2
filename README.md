@@ -9,5 +9,8 @@ The main classes are:
 - [Operating systems](operating-systems/operating-systems.pdf)
 - [Semantics and application to formal verification](semantics-and-verification/semantics-and-verification.pdf)
 
+## Contribution
+Contributing to this repository is encouraged: please let me know about typos and suggestions, using the GitHub issue feature or through a PR. Small additions are also welcomed.
+
 ## Disclaimer
 Despite being written and organised by me, these documents contain material heavily inspired by my teacher's own classes.
