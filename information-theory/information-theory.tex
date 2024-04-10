@@ -1237,9 +1237,9 @@ We shall perform parsing of a random sequence $X_1, X_2, \dots \in \A$, i.i.d., 
     \begin{equation*}
         \begin{aligned}
             H(W) = -\E\left[\sum_{i=1}^{L_1}\log p(X_i)\right] &= -\E\left[\sum_{i=1}^\infty \ind_{i\leq L_1}\log p(X_i)\right]\\
-            &= - \sum_{i=1}^\infty \E[ind_{i\leq L_1} \log p(X_i)]\\
-            &= - \sum_{i=1}^\infty \P(i\leq L_1) \E[\log p(X_i)]\\
-            &= -\E[\log p(X) \sum_{i=1}^\infty \P(i\leq L_1)]\\
+            &= - \sum_{i=1}^\infty \E[\ind_{i\leq L_1} \log p(X_i)]\\
+            &= - \sum_{i=1}^\infty \P(i\leq L_1) \cdot \E[\log p(X_i)]\\
+            &= -\E\left[\log p(X) \sum_{i=1}^\infty \P(i\leq L_1)\right]\\
             &= H(X) \E[L_1] = H(X)\E[L]
         \end{aligned}
     \end{equation*}
