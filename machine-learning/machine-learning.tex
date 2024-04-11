@@ -123,7 +123,7 @@ The distribution $\nu$ is unknown to the statistician; it's a matter of learning
     Given an estimator $\hatf_n$, we define its risk:
     \begin{equation}
         \label{eq:sq-risk}
-        \risk(\hatf_n) := \E\left[(Y-\hatf_n(X))^2\,\big| \, D_n\right] \quad \textnormal{where} \quad (X, Y)\sim\nu
+        \risk(\hatf_n) := \E\left[(Y-\hatf_n(X))^2\,\big| \, D_n\right] \where (X, Y)\sim\nu
     \end{equation}
     This is also called the \emph{generalization error}, as it measures how well the estimator performs on other inputs and outputs of the dataset.
 \end{definition}
@@ -1194,14 +1194,14 @@ In this section, we will introduce Stochastic Gradient Descent. In some cases, e
 
 The algorithm is useful to find the global minimum of conex functions of the form
 \begin{equation*}
-    f(x)=\E_\theta\;g(x, \theta), \quad\textnormal{where}\quad \E_\theta g(x, \theta)=\int_\Omega\;g(x,\theta)\dd p(\theta)
+    f(x)=\E_\theta\;g(x, \theta), \where \E_\theta g(x, \theta)=\int_\Omega\;g(x,\theta)\dd p(\theta)
 \end{equation*}
 where $p$ is a probability distribution over $\Omega$ and $g:\R^d\times\Omega\to\R$.
 
 \begin{example}[Empirical Risk Minimization]
     We consider $f$ of the form:
     \begin{equation*}
-        f(x) = \frac{1}{n}\sum_{i=1}^n L(x, \theta_i), \quad\textnormal{where}\quad \begin{cases}
+        f(x) = \frac{1}{n}\sum_{i=1}^n L(x, \theta_i), \where \begin{cases}
             L(x, \theta_i)=\ell(x^\tp z_i, y_i)\\
             \theta_i=(z_i, y_i)
         \end{cases}
@@ -1211,7 +1211,7 @@ In this context, we can assume that due to the size of $\Omega$ (in the previous
 
 The algorithm is similar to classical gradient descent, but the iteration step is changed to:
 \begin{equation*}
-    x_t=x_{t-1}-\gamma_t\nabla_x g(x, \theta_t) \quad\textnormal{where}\quad \theta_t\sim p
+    x_t=x_{t-1}-\gamma_t\nabla_x g(x, \theta_t) \where \theta_t\sim p
 \end{equation*}
 As previously, $\gamma_t$ is a sequence of step sizes and $x_0$ is given; moreover, specifically for stochastic GD, $\theta_t$ is independently and identically distributed according to $p$. 
 
@@ -1488,7 +1488,7 @@ A classical way to estimate $f^*$ is via \emph{empirical risk minimization}. Thi
 
 Let $\mathcal{F}$ be a set of functions called \emph{function space} containing some candidate estimators of choice. The estimator is defined as:
 \begin{equation*}
-    \hatf_n := \argmin_{f\in\mathcal{F}} \emrisk_n(f) \quad \textnormal{where}\quad \emrisk_n(f) = \frac{1}{n}\sum_{i=1}^n\ell(y_i, f(x_i))
+    \hatf_n := \argmin_{f\in\mathcal{F}} \emrisk_n(f) \where \emrisk_n(f) = \frac{1}{n}\sum_{i=1}^n\ell(y_i, f(x_i))
 \end{equation*}
 As before, $\emrisk_n$ is the empirical risk, which measures the average error performed by $f$ on the training set. The intuition is that $\emrisk_n(f)$ approximates $\risk(f)$ -- the expected error -- increasingly better when $n$ goes to infinity. A crucial question we need to address is to understand under which conditions \emph{empirical risk minimization} is a learning algorithm and has learning rates.
 
@@ -1549,7 +1549,7 @@ We will first recall some results that will be useful for the proof.
 
 %\subsection{Optional exercises}
 
-\section{\mathpdf{K}-Nearest Neighbors}
+\section{\mathpdf{k}-Nearest Neighbors}
 
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
@@ -1638,38 +1638,98 @@ The intuition behind this approach is that spreading the $K$ initial cluster cen
 \begin{enumerate}
     \item Choose the first center uniformly among the data points.
     \item For each data point $x_i$ of the data set, compute the distance between $x_i$ and the nearest center that has already been chosen. We denote this distance $D_{\mu_t}(x_i)$ where $\mu_t$ is specified to recall that we are minimizing over the current chosen centers.
+    \item Choose a new data point at random as a new center, but now using a weighted probability distribution where a point $x_i$ is chosen with probability proportional to $D_{\mu_t}(x_i)^2$.
+    \item Come back to step 2 until $K$ centers have been chosen.
 \end{enumerate}
 
-\subsection{Dimensionality reduction: principal component analysis}
-\begin{center}
-    This section is in progress.
-\end{center}
+We see that we have now built $K$ vectors with respect to our first intuition which was to well spread the centers -- because we used a well-chosen weighted probability. We can now use those vectors as the initialization of our standard $K$-means algorithm.
 
-
-Imagine that we want to process some video data $(x_i)_{i\in\iset{1}{n}}$ where $x_i\in\R^p$. In the case of video data, $p$ can be prohibitively huge to manipulate, e.g. $p\simeq10^{11}$.
-
-Can we find a new representation for each of the $x_i$:
+\subsubsection{Choice of \mathpdf{K}}
+It is important to point out that the choice of $K$ is not universal. Indeed, we see that if we increase $K$, the distortion $J$ decreases, until reaches $0$ when $K=n$ --  when each data point is the center of its own cluster. To address this issue, one solution could be to add to $J$ a penalty over $K$. Usually, it takes the following form:
 \begin{equation*}
-    x_i\in\R^p \longmapsto \hat{x}_i\in\R^{p'} \quad \textnormal{where} \quad p' \ll p
+    J(\mu, z, K) := \sum_{i=1}^n\sum_{k=1}^K z_i^k\norm{x_i-\mu_k}^2+\lambda K
 \end{equation*}
-without loosing too much information?
+Once again, the choice of the penalty coefficient $\lambda$ is arbritrary. There is no general way to choose $K$.
 
-$X\in\R^p\sim\nu$ (data distribution), with $\E[X]=0$, $\Sigma:=\Cov(X)=\E[(X-\E[X])(X-\E[X])^\tp]=\E[XX^\tp]$.
+\subsubsection{Other problems}
+We can also point out that $K$-means will work properly when the width of the different clusters are similar -- for example when dealing with spheres. But clustering by $K$-means could also be disappointing in some cases such as the following example:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/k-means-limitations.png}
+    \caption{Example where $K$-means does not provide a satisfactory clustering result}
+\end{figure}
+For instance, the use of Gaussian mixtures provides a way to avoid this problem.
 
-$\V(\omega^\tp X)=\E[\omega^\tp X]^2-(\E[\omega^\tp X])^2 = \E[(\omega^tp X)(\omega^\tp X)] = \E[\omega^\tp XX^\tp\omega]=\omega^\tp\E[XX^\tp]\omega = \omega^\tp\Sigma\omega$.
+\subsection{Dimensionality reduction: principal component analysis}
+Imagine that we want to process some video data $(x_i)_{i\in\iset{1}{n}}$ where $x_i\in\R^p$. In the case of video data, $p$ can be prohibitively huge to manipulate, e.g. $p\simeq10^{11}$. We would like to reduce the dimensionality of the origin space, i.e. finding a new representation for each of the $x_i$:
+\begin{equation*}
+    x_i\in\R^p \longmapsto \hat{x}_i\in\R^{p'} \where p' \ll p
+\end{equation*}
+without loosing too much information.
 
-In what follows, we only consider reduction to 1 dimension.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/dimensionality-reduction.png}
+    \caption{Dimensionality reduction from $\R^3$ to $\R^2$, i.e. using two principal components}
+\end{figure}
 
-Therefore, finding $\sup_{\norm{\omega}=1}\V(\omega^\tp X)$ is the same as finding $\sup_{\norm{\omega}=1}\omega^\tp\Sigma\omega$. Therefore, $\omega$ is exactly the eigenvector of $\Sigma$ corresponding to the largest eigenvalue. We can write $\Sigma=UDU^\tp$ with $U\in\R^{p\times p}$, and $UU^\tp=I_p$., with $D=\diag(\lambda_1, \dots, \lambda_p)$. If we assume $\lambda_1\geq\dots\geq\lambda_p$, we have that $\omega$ is the first column of $U$. %(cf. photo)
+\subsubsection{Analysis view}
+We will start by introducing formally the problem. Assume that there is some data distribution $\nu$ over $\R^p$. A random variable $X\in\R^p\sim\nu$ samples this data distribution over this high-dimensional space. Assume that $\E[X]=0$, and let
+\begin{equation*}
+    \Sigma:=\Cov(X)=\E\left[(X-\E[X])(X-\E[X])^\tp\right]=\E[XX^\tp]
+\end{equation*}
+$\Sigma$ is the covariance matrix of $X$; note that it is definite non-negative.
 
-To generalize this procedure to $p'$ dimensions, we take the $p'$ eigenvectors associated to the $p'$ largest eigenvalues.
+The intuition is that we want to preserve as much \say{diversity} in the output after the dimension reduction. This leads to the following definition of the problem in the case where $p'=1$.
+\begin{definition}[PCA problem]
+    Find $w\in\R^{p}$ such that:
+    \begin{equation}
+        \label{eq:pca-problem}
+        w\in\argmax_{\norm{w}=1}\V(w^\tp X)
+    \end{equation}
+\end{definition}
+
+\begin{theorem}
+    $w$ verifies \eqref{eq:pca-problem} exactly when $w$ is the eigenvector of $\Sigma$ corresponding to the largest eigenvalue.
+\end{theorem}
+\begin{proof}
+    Note that:
+    \begin{equation*}
+        \begin{aligned}
+            \V(\omega^\tp X)&=\E[\omega^\tp X]^2-(\E[\omega^\tp X])^2\\
+            &= \E[(\omega^\tp X)(\omega^\tp X)] \\
+            &= \E[\omega^\tp XX^\tp\omega]\\
+            &=\omega^\tp\E[XX^\tp]\,\omega \\
+            &= \omega^\tp\Sigma\,\omega
+        \end{aligned}
+    \end{equation*}
+    Therefore,
+    \begin{equation*}
+        \sup_{\norm{\omega}=1}\V(\omega^\tp X) = \sup_{\norm{\omega}=1}\omega^\tp\Sigma\,\omega
+    \end{equation*}
+    Thus, by property, $\omega$ is exactly the eigenvector of $\Sigma$ corresponding to the largest eigenvalue. We can write $\Sigma=UDU^\tp$ with $U\in\R^{p\times p}$, and $UU^\tp=I_p$, with $D=\diag(\lambda_1, \dots, \lambda_p)$. If we assume $\lambda_1\geq\dots\geq\lambda_p$, we have that $\omega$ is the first column of $U$. %(cf. photo)
+\end{proof}
+
+\begin{remark}
+    To generalize this procedure to $p'$ dimensions, we take the $p'$ eigenvectors associated to the $p'$ largest eigenvalues. Another approach would be to use \emph{deflation}, defined by the following algorithm:
+    \begin{enumerate}
+        \item Find $w$ using the largest eigenvalue.
+        \item Project the data onto $\Span(w)$.
+        \item Start at Step 1.
+    \end{enumerate}
+\end{remark}
 
 \subsubsection{In practice}
-In practice, we do not know $\Sigma$, but we are given a dataset to work with.
+In practice, we do not know $\Sigma$ -- since it depends on the unknown distribution $\nu$ -- but we are given a dataset to work with. Given $(x_i)_{i\in\iset{1}{n}}$, we want to find a vector $w\in\R^p$ -- or a matrix $W\in\mathscr{M}_{p, p'}(\R)$ -- such that the associated projection maximizes the variance of the projected dataset. In the theoretical analysis, we assumed that $\E[X]=0$; to verify the assumptions, we need the dataset to be centered, or \emph{center} it if necessary. Thus, we introduce the mean of the dataset (a vector) and substract it to the initial dataset:
+\begin{equation*}
+    x_i\leftarrow x_i-\mu \where \mu=\frac{1}{n}\sum_{i=1}^n x_i
+\end{equation*}
 
-Given $(x_i)_{i\in\iset{1}{n}}$, we want to find a good matrix $W\in\R^{p\times p'}$. To verify the assumptions, we \emph{center} the dataset: we introduce the mean of the dataset $\mu=\frac{1}{n}\sum_{i=1}^n x_i$, and do $x_i\leftarrow x_i-\mu I_{p, 1}$.
-
-$\hat{Sigma} := \frac{1}{n} \sum_{i=1}^n  x_ix_i^\tp$
+This being done, we can define the \emph{empirical covariance matrix}, which is the approximation of the covariance matrix $X$ with respect to the dataset available:
+\begin{equation*}
+    \hat{\Sigma} := \frac{1}{n} \sum_{i=1}^n  x_ix_i^\tp
+\end{equation*}
+Similarly to the theoretical setting, we can use the normlized eigenvectors associated to the largest eigenvalues to construct a matrix maximizing the variance.
 
 \section{Model-Based Machine Learning}
 
