@@ -1549,12 +1549,129 @@ We will first recall some results that will be useful for the proof.
 
 %\subsection{Optional exercises}
 
+\section{Unsupervised Learning}
+As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
+
+\subsection{\texorpdfstring{$K$}{K}-means}
+$K$-means clustering is a method of vector quantization. $K$-means clustering is an algorithm of alternate minimization that aims at partitioning $n$ observations into $K$ clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype to the cluster.
+
+
+\subsubsection{Distortion}
+\begin{definition}[Observations]
+    In the clustering problem, we are given $x_i\in\R^p$ for $i\in\iset{1}{n}$, the \emph{observations} we want to partition.
+\end{definition}
+
+\begin{definition}[Means]
+    For some given $K$, we denote $\mu_k\in\R^p$ for $k\in\iset{1}{K}$ the means. $\mu_k$ is the center of the cluster $k$. We will denote $\mu$ the associated matrix.
+\end{definition}
+
+\begin{definition}[Hard membership variables]
+    $z_i^k\in\{0, 1\}$ are indicator variables associated to $x_i$, such that:
+    \begin{equation*}
+        z_i^k := \begin{cases*}
+            1 & if $x_i$ belongs to the cluster $k$\\
+            0 & otherwise
+        \end{cases*}
+    \end{equation*}
+    We denote by $z$ the matrix which components are equal to $z_i^k$.
+\end{definition}
+
+\begin{definition}[Distortion]
+    We define the distortion $J(\mu, z)$ by:
+    \begin{equation}
+        J(\mu, z) := \sum_{i=1}^n \sum_{k=1}^K z_i^k \norm{x_i-\mu_k}^2
+    \end{equation}
+    Distortion measures the overall distance of the centers $\mu_k$ to the points of the cluster.
+\end{definition}
+
+\begin{definition}[$K$-means optimization problem]
+    The \emph{$K$-means optimization problem} consists in finding matrices $\mu$ and $z$ which minimize the distortion:
+    \begin{equation}
+        \min_{\substack{\mu\in\mathscr{M}_{n, k}(\R)\\z\in\mathscr{M}_{n, k}(\R)}} J(\mu, z) = \min_{\substack{\mu\in\mathscr{M}_{n, k}(\R)\\z\in\mathscr{M}_{n, k}(\R)}} \sum_{i=1}^n \sum_{k=1}^K z_i^k \norm{x_i-\mu_k}^2
+    \end{equation}
+\end{definition}
+
+\subsubsection{Algorithm}
+To minimize $J(\mu, z)$, we proceed using an alternating minimization: we will minimize $J$ alternatively with respect to $z$ and $\mu$.
+
+\begin{enumerate}
+    \item Randomly choose a vector $\mu$.
+    \item Minimize $J$ with respect to $z$:
+    \begin{equation}
+        z_i^k = \begin{cases*}
+            1 & if $\norm{x_i-\mu_k}^2 = \min_s \norm{x_i-\mu_s}^2$\\
+            0 & otherwise
+        \end{cases*}
+    \end{equation}
+    This is equivalent to associating to $x_i$ the nearest center $\mu_k$.
+    \item Minmize $J$ with respect to $\mu$:
+    \begin{equation}
+        \label{eq:minimize-mu}
+        \mu_k = \frac{\sum_{i=1}^n z_i^k x_i}{\sum_{i=1}^n z_i^k}
+    \end{equation}
+    \item Come back to step 2 until convergence.
+\end{enumerate}
+
+\begin{proof}
+    The formula \eqref{eq:minimize-mu} can be obtained by minmizing the gradient of $J$ with respect to $\mu_k$:
+    \begin{equation*}
+        \nabla_{\mu_k} J = -2 \sum_{i=1}^n z_i^k (x_i-\mu_k)
+    \end{equation*}
+    Therefore:
+    \begin{equation*}
+        \nabla_{\mu_k} J = 0 \iff \mu_k = \frac{\sum_{i=1}^n z_i^k x_i}{\sum_{i=1}^n z_i^k}
+    \end{equation*}
+\end{proof}
+
+\subsubsection{Convergence and initialization: \texorpdfstring{$K$}{K}-means++}
+We can show that this algorithm converges in a finite number of iterations. Nevertheless, the convergence could be towards to local minimum, introducing the problem of initialization.
+
+A classic method is to use random restarts. It consists in choosing serveral random vectors $\mu$, computing the algorithm for each case and finally keeping the partition wihch minimizes the distortion. Thus, we hope that at least one of the local minima is close enought to a global minimum.
+
+Another well known method is the $K$-means++ algorithm, which aims at correcting a major theoretical shortcoming of the $K$-means algorithm: the approximation found can be arbitrarily bad with respect to the objective function compared to the optimal clustering.
+
+The $K$-means++ algorithm addresses this obstacles by specifying a procedure to initialize the cluster centers before proceeding with the standard $K$-means optimization iterations. With the $K$-means++ initialization, the algorithm is guaranteed to find a solution that is $O(\log K)$ competitive to the optimal $K$-means solution.
+
+The intuition behind this approach is that spreading the $K$ initial cluster centers will improve the quality of the clusters found by the algorithm. At each iteration of the algorithm we will build a new center, and repeat this step until we have $K$ centers. Here are the steps of the algorithm:
+\begin{enumerate}
+    \item Choose the first center uniformly among the data points.
+    \item For each data point $x_i$ of the data set, compute the distance between $x_i$ and the nearest center that has already been chosen. We denote this distance $D_{\mu_t}(x_i)$ where $\mu_t$ is specified to recall that we are minimizing over the current chosen centers.
+\end{enumerate}
+
+\subsection{Dimensionality reduction: principal component analysis}
+\begin{center}
+    This section is in progress.
+\end{center}
+
+
+Imagine that we want to process some video data $(x_i)_{i\in\iset{1}{n}}$ where $x_i\in\R^p$. In the case of video data, $p$ can be prohibitively huge to manipulate, e.g. $p\simeq10^{11}$.
+
+Can we find a new representation for each of the $x_i$:
+\begin{equation*}
+    x_i\in\R^p \longmapsto \hat{x}_i\in\R^{p'} \quad \textnormal{where} \quad p' \ll p
+\end{equation*}
+without loosing too much information?
+
+$X\in\R^p\sim\nu$ (data distribution), with $\E[X]=0$, $\Sigma:=\Cov(X)=\E[(X-\E[X])(X-\E[X])^\tp]=\E[XX^\tp]$.
+
+$\V(\omega^\tp X)=\E[\omega^\tp X]^2-(\E[\omega^\tp X])^2 = \E[(\omega^tp X)(\omega^\tp X)] = \E[\omega^\tp XX^\tp\omega]=\omega^\tp\E[XX^\tp]\omega = \omega^\tp\Sigma\omega$.
+
+In what follows, we only consider reduction to 1 dimension.
+
+Therefore, finding $\sup_{\norm{\omega}=1}\V(\omega^\tp X)$ is the same as finding $\sup_{\norm{\omega}=1}\omega^\tp\Sigma\omega$. Therefore, $\omega$ is exactly the eigenvector of $\Sigma$ corresponding to the largest eigenvalue. We can write $\Sigma=UDU^\tp$ with $U\in\R^{p\times p}$, and $UU^\tp=I_p$., with $D=\diag(\lambda_1, \dots, \lambda_p)$. If we assume $\lambda_1\geq\dots\geq\lambda_p$, we have that $\omega$ is the first column of $U$. %(cf. photo)
+
+To generalize this procedure to $p'$ dimensions, we take the $p'$ eigenvectors associated to the $p'$ largest eigenvalues.
+
+\subsubsection{In practice}
+In practice, we do not know $\Sigma$, but we are given a dataset to work with.
+
+Given $(x_i)_{i\in\iset{1}{n}}$, we want to find a good matrix $W\in\R^{p\times p'}$. To verify the assumptions, we \emph{center} the dataset: we introduce the mean of the dataset $\mu=\frac{1}{n}\sum_{i=1}^n x_i$, and do $x_i\leftarrow x_i-\mu I_{p, 1}$.
+
+$\hat{Sigma} := \frac{1}{n} \sum_{i=1}^n  x_ix_i^\tp$
 
 \section{Model-Based Machine Learning}
 
 \section{Maximum Likelihood}
-
-\section{Unsupervised Learning}
 
 \section{MCMC Sampling}
 
