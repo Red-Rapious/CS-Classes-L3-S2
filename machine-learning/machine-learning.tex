@@ -1549,10 +1549,12 @@ We will first recall some results that will be useful for the proof.
 
 %\subsection{Optional exercises}
 
+\section{\mathpdf{K}-Nearest Neighbors}
+
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
 
-\subsection{\texorpdfstring{$K$}{K}-means}
+\subsection{\mathpdf{K}-means}
 $K$-means clustering is a method of vector quantization. $K$-means clustering is an algorithm of alternate minimization that aims at partitioning $n$ observations into $K$ clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype to the cluster.
 
 
@@ -1623,7 +1625,7 @@ To minimize $J(\mu, z)$, we proceed using an alternating minimization: we will m
     \end{equation*}
 \end{proof}
 
-\subsubsection{Convergence and initialization: \texorpdfstring{$K$}{K}-means++}
+\subsubsection{Convergence and initialization: \mathpdf{K}-means++}
 We can show that this algorithm converges in a finite number of iterations. Nevertheless, the convergence could be towards to local minimum, introducing the problem of initialization.
 
 A classic method is to use random restarts. It consists in choosing serveral random vectors $\mu$, computing the algorithm for each case and finally keeping the partition wihch minimizes the distortion. Thus, we hope that at least one of the local minima is close enought to a global minimum.
