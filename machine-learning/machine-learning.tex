@@ -1549,7 +1549,31 @@ We will first recall some results that will be useful for the proof.
 
 %\subsection{Optional exercises}
 
-\section{\mathpdf{k}-Nearest Neighbors}
+\section{\mathpdf{k}-Nearest Neighbours}
+\subsection{Introduction}
+\subsubsection{Goal}
+We would like to classify objects, described with vectors $x\in\R^d$, among $L+1$ classes $\Y:=\{0, \dots, L\}$, automatically. To do so, we have at hand a labelled data set of $n$ data points $(x_i, y_i)\in\R^d\times\Y$ for $i\in\iset{1}{n}$, which we assume to be the realizations of i.i.d. random variables $(X_i, Y_i)$ following a distribution $\nu$. The goal of this lesson is to build a classifier, i.e. a function
+\begin{equation*}
+    g:\R^d\longrightarrow\Y
+\end{equation*}
+which minimizes the probability of mistakes:
+\begin{equation*}
+    \P_{(X, Y)\sim\nu}(g(X)\neq Y) = \risk(g) := \E_{(X, Y)\sim\nu}[\ind_{g(x)\neq Y}]
+\end{equation*}
+
+\subsubsection{Intuition of the base algorithm}
+The $k$-nearest neighbours classifier works as follows. Given a new input $x\in\R^d$, the classifier analyzes the $k$ nearest points $x_i$ in the data set $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}$ and predicts a majority vote among them.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/knn.jpeg}
+    \caption{$k$-NN for different values of $k$}
+\end{figure}
+
+The $k$-nearest neighbor classifier is quite popular because it is simple to code and to understand; it has nice theoretical guarantess as soon as $k$ is appropriately chosen and performs reasonably well in low dimensional spaces. 
+
+\subsubsection{Assumptions and notations}
+
 
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
