@@ -1105,38 +1105,40 @@ The choice of $\gamma_t$ is crucial for the optimization algorithm. If $\gamma_t
 
 \begin{figure}[H]
     \centering
-    %\includegraphics[width=0.7\textwidth]{images/gd-step-size.png}
     \begin{minipage}{0.45\textwidth}
         \begin{tikzpicture}[scale=0.8]
-            \draw[->, thick] (0,0) -- (7,0) node[below] {$w$};
-            \draw[->, thick] (0,0) -- (0,6) node[left] {$f(w)$};
+            \draw[->, thick] (0,0) -- (7,0) node[below] {$x$};
+            \draw[->, thick] (0,0) -- (0,6) node[left] {$f(x)$};
 
             \draw[domain=1.25:5.75, samples=50, thick] plot (\x, \x*\x-7*\x+13);
 
-            \draw[dotted, thick] (3.5, 0.75) -- (3.5, 0) node[below] {$w''$};
+            \draw[dotted, thick] (3.5, 0.75) -- (3.5, 0) node[below] {$x^*$};
             \node at (3.5, 0.75)[circle,fill,inner sep=1.5pt]{};
 
             \foreach \n in {1.6,1.7,1.8,1.9,2,2.1,2.2,2.3,2.4,2.5,2.6,2.7}
                 {
-                    %\tkzDefPoint(\n, \n*\n-7*\n+13){A};
-                    %\tkzDefPoint(\n+0.05,\n*\n+\n*0.2-7*\n-0.7+13.4){B};
-                    %\tkzDefPoint(\n+0.1,\n*\n+\n*0.2-7*\n-0.7+13){C};
-
-                    \draw[-, color=red] (\n, \n*\n-7*\n+13)  -- (\n+0.05,\n*\n+\n*0.2-7*\n-0.05*\n-0.7+13.6);
-                    \draw[-, color=red] (\n+0.05,\n*\n+\n*0.2-7*\n-0.05*\n-0.7+13.6) -- (\n+0.1,\n*\n+\n*0.2-7*\n-0.7+13);
+                    \draw[-, thick, color=red] (\n, \n*\n-7*\n+13)  -- (\n+0.1,\n*\n+\n*0.2-7*\n-0.7+13);
+                    \node at (\n, \n*\n-7*\n+13)[circle,fill,inner sep=1.2pt, color=red]{};
                 }
         \end{tikzpicture}
         \caption*{Too small: converges very slowly}
     \end{minipage}
     \begin{minipage}{0.45\textwidth}
         \begin{tikzpicture}[scale=0.8]
-            \draw[->, thick] (0,0) -- (7,0) node[below] {$w$};
-            \draw[->, thick] (0,0) -- (0,6) node[left] {$f(w)$};
+            \draw[->, thick] (0,0) -- (7,0) node[below] {$x$};
+            \draw[->, thick] (0,0) -- (0,6) node[left] {$f(x)$};
 
             \draw[domain=1.25:5.75, samples=50, thick] plot (\x, \x*\x-7*\x+13);
 
-            \draw[dotted, thick] (3.5, 0.75) -- (3.5, 0) node[below] {$w''$};
+            \draw[dotted, thick] (3.5, 0.75) -- (3.5, 0) node[below] {$x^*$};
             \node at (3.5, 0.75)[circle,fill,inner sep=1.5pt]{};
+
+            \foreach \i\j in {1.6/5.2,5.2/1.9,1.9/4.95,4.95/2.1,2.1/4.7}
+            {
+                \draw[-, thick, color=red] (\i, \i*\i-7*\i+13)  -- (\j, \j*\j-7*\j+13);
+                \node at (\i, \i*\i-7*\i+13)[circle,fill,inner sep=1.2pt, color=red]{};
+            }
+            \draw[->, thick, color=red] (2.1, 2.1*2.1-7*2.1+13)  -- (4.7, 4.7*4.7-7*4.7+13);
         \end{tikzpicture}
         \caption*{Too big: overshoots and diverges}
     \end{minipage}
