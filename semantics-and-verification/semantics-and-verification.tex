@@ -118,7 +118,7 @@ void P0(P) {
     \end{minted}
     \end{minipage}
     \end{figure}
-    \noindent and we consider the return value of $Pa(P0, P0)$. If $Pa(P0, P0) == 1$, then $P0$ loops forever, and if $Pa(P0, P0) == 0$, then $P0$ terminates. This is a contradiction, and the termination problem is not computable.
+    and we consider the return value of $Pa(P0, P0)$. If $Pa(P0, P0) == 1$, then $P0$ loops forever, and if $Pa(P0, P0) == 0$, then $P0$ terminates. This is a contradiction, and the termination problem is not computable.
 \end{proof}
 
 \begin{property}
@@ -899,7 +899,7 @@ We will consider the following example of a simple specification language.
     \end{equation*}
 \end{definition}
 
-\noindent This specification language allows to formally express state properties. 
+This specification language allows to formally express state properties. 
 \begin{example}[Unreachability of control state $l_0$]
     \begin{equation*}
         \sem{\lnot@l_0}_s = \S_\Omega \setminus \set{(l_0, m)}{m\in\mathbb{M}}
@@ -1419,7 +1419,7 @@ Intuitively, any property true before \textbf{skip} is true afterwards. We forma
     \end{prooftree}
 \end{figure}
 
-\noindent Similarly, any property is true after fail:
+Similarly, any property is true after fail:
 \begin{figure}[H]
     \centering
     \begin{prooftree}
@@ -1428,7 +1428,7 @@ Intuitively, any property true before \textbf{skip} is true afterwards. We forma
     \end{prooftree}
 \end{figure}
 
-\noindent Finally, we can introduce the \emph{assignment axiom}: for $P$ over $X$ to be true after $X \leftarrow e$, $P$ must be true over $e$ before the assignment:
+Finally, we can introduce the \emph{assignment axiom}: for $P$ over $X$ to be true after $X \leftarrow e$, $P$ must be true over $e$ before the assignment:
 \begin{figure}[H]
     \centering
     \begin{prooftree}
@@ -1534,7 +1534,7 @@ To prove that $P$ -- true before a loop -- still holds after the loop, we can pr
     \end{prooftree}
 \end{figure}
 
-\noindent In practice, we would rather prove the triple $\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{Q}$. To do so, it is sufficient to invent an assertion $I$ that:
+In practice, we would rather prove the triple $\hoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{Q}$. To do so, it is sufficient to invent an assertion $I$ that:
 \begin{itemize}
     \item holds when the loop starts: $P\implies I$
     \item is invariant by the body $s$: $\hoare{I\land e}{s}{I}$
@@ -1719,7 +1719,7 @@ In what follows, $A\equiv B$ means that formulas $A$ and $B$ are equivalent. It 
         \wlp(c, P) \lor \wlp(d, Q) \equiv \wlp(c, P\lor Q)
     \end{equation*}
 
-    \noindent Note that $\implies$ is always true, while $\impliedby$ is only true for deterministic, error-free programs.
+    Note that $\implies$ is always true, while $\impliedby$ is only true for deterministic, error-free programs.
 \end{property}
 
 \begin{property}[Monotonicity]
@@ -1863,7 +1863,7 @@ It has the following meaning: if $P$ holds before prog is executed, then prog al
         \infer1[Loop]{\sqhoare{P}{\textnormal{\textbf{while} e \textbf{do} s}}{P\land\lnot e}}
     \end{prooftree}    
 \end{figure}
-\noindent in which we require $(W, \prec)$ to be a well-founded ordering. This ensures that we cannot decrease infinitely by $\prec$ in $W$. In general, we simply use $(\N, <)$, even though lexicographic orders and ordinals can also come handy. Intuitively, in addition to the loop invariant $P$, we invent an expression $u$ that strictly decreases by $s$. Such a $u$ is called a \emph{ranking function}; often, $\lnot e\implies u=0$: $u$ counts the number of steps until termination.
+in which we require $(W, \prec)$ to be a well-founded ordering. This ensures that we cannot decrease infinitely by $\prec$ in $W$. In general, we simply use $(\N, <)$, even though lexicographic orders and ordinals can also come handy. Intuitively, in addition to the loop invariant $P$, we invent an expression $u$ that strictly decreases by $s$. Such a $u$ is called a \emph{ranking function}; often, $\lnot e\implies u=0$: $u$ counts the number of steps until termination.
 
 To simplify, we can decompose a proof of total correctness into two proofs. The first proof is a proof of partial correctness $\hoare{P}{c}{Q}$, ignoring termination. The second one is a proof of termination, meaning $\sqhoare{P}{c}{\true}$, ignoring the specification. We must still include the precondition $P$ as the program may not terminate for all inputs. This decomposition can be justified by:
 \begin{figure}[H]
@@ -2389,7 +2389,7 @@ An approach is bottom-up reasoning: we construct a proof tree ending in $\emptys
         \infer1{\Gamma\vdash\textbf{local } X \textbf{ in } s}
     \end{prooftree}
 \end{figure}
-\noindent where $t$ is assumed to be a free variable. We need to guess a good $t$, i.e. a type for $X$, that makes the proof work. Similarly, to type $\Gamma\vdash e_1=e_2 : \textbf{bool}$, we also have to choose between $\Gamma\vdash e_1:\textbf{bool}$ and $\Gamma\vdash e_1:\textbf{int}$. In other words, we would need to know the types of the variables, which we will use to deduce the types of the expressions.
+where $t$ is assumed to be a free variable. We need to guess a good $t$, i.e. a type for $X$, that makes the proof work. Similarly, to type $\Gamma\vdash e_1=e_2 : \textbf{bool}$, we also have to choose between $\Gamma\vdash e_1:\textbf{bool}$ and $\Gamma\vdash e_1:\textbf{int}$. In other words, we would need to know the types of the variables, which we will use to deduce the types of the expressions.
 
 A common solution in programming languages is to ask the programmer to add type information to all variables declarations: we change the syntax of declaration statements into:
 \begin{figure}[H]
@@ -2454,7 +2454,7 @@ which maps to an expression the type of the expression (possibly a type variable
         \forall \diamond\in\{=, \neq\}, \quad \tau_e(e_1\diamond e_2) &:= (\textbf{bool}, C_1\cup C_2\cup\{t_1=t_2\})
     \end{aligned}
 \end{equation*}
-\noindent Typing $e_1=e_2$ and $e_1\neq e_2$ reduces to ensuring an equal type for $e_1$ and $e_2$.
+Typing $e_1=e_2$ and $e_1\neq e_2$ reduces to ensuring an equal type for $e_1$ and $e_2$.
 
 \paragraph*{Statements}
 Similarly, we inductively define $\tau_s$ of the form:
