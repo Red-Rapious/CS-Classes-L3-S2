@@ -108,8 +108,8 @@ Care must be taken when selecting the function space to avoid overfitting\footno
 
 The distribution $\nu$ is unknown to the statistician; it's a matter of learning it from the data.
 
-\begin{definition}[Learning rule]
-    A \emph{learning rule} $\A$ is a function that associates to training data $D_n$ a prediction function $\hatf_n$:
+\begin{definition}[Learning algorithm]
+    A \emph{learning algorithm} -- or \emph{learning rule} -- $\A$ is a function that associates to training data $D_n$ a prediction function $\hatf_n$:
     \begin{equation*}
         \begin{aligned}
             \A: \bigcup_{n\in\N} (\X\times\Y)^n &\longrightarrow \Y^\X\\
@@ -1469,13 +1469,11 @@ Kernel functions admits many characterizations, which we will now present.
 In this calss we will introduce the main elements of PAC Learning. Probably Apporximately Correct Learning is a theoretical and mathematical framework for analysing machine learning algorithms. Such framework allows, for instance, to evaluate the complexity of a problem in the context of supervised learning. It was introduced by Leslie Valiant in 1984.
 
 \subsection{Introduction}
-\begin{definition}[Learning algorithm]
-    Formally, a \emph{learning algorithm} is a function $\A$ that maps a training set $D_n$ to an estimator $\hatf_n : \X\to\Y$:
+Recall that a \emph{learning algorithm} -- or \emph{learning rule} -- is a function $\A$ that maps a training set $D_n$ to an estimator $\hatf_n : \X\to\Y$:
     \begin{equation*}
         \A : \bigcup_{n\in\N}(\X\times\Y)^n \longmapsto \Y^\X
     \end{equation*}
     We denote $\hatf_n := \A(D_n)$ the estimator, which is a random variable in $\Y^\X$, since it depends on the dataset $D_n$.
-\end{definition}
 \begin{remark}
     Sometimes, the prediction set can differ from the actual output set. For instance, binary classification in $\{0, 1\}$ can be replaced by predictions in $[0, 1]$. We used this technique previously by introducing Hinge and Logistic losses to extend the binary loss and obtain a convex optimization problem.
 \end{remark}
