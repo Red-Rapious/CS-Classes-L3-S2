@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 slides
+figures
 nt_toolbox
 *.mat
 
