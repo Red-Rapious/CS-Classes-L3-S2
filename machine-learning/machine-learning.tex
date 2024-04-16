@@ -1573,6 +1573,34 @@ We will first recall some results that will be useful for the proof.
 
 \subsection{Consistency and Learning rates for Empirical Risk Minimization}
 \subsubsection{Introduction}
+The goal of this section is to prove consistency and learning rates for empirical risk minimization. A key step in this process is to decompose the excess risk as:
+\begin{equation*}
+    \exrisk(\hatf_n) := \E[\risk(\hatf_n)]-\risk(f^*) = 
+    \underbrace{\left(
+        \E[\risk(\hatf_n)]-\inf_{f\in\mathcal{F}}\risk(f)
+    \right)}_{\textnormal{Estimation error}} + 
+    \underbrace{\left(
+        \inf_{f\in\mathcal{F}}\risk(f)-\risk(f^*)
+    \right)}_{\textnormal{Approximation error}}
+\end{equation*}
+
+The leftmost term is called the \emph{variance term} or \emph{estimation error}. It depends on $D_n$, $\mathcal{F}$, $\hatf_n$, and can be bounded with mild or no assumption on the data distribution $\nu$. We are going to prove such results in this chapter.
+
+The rightmost term is called the \emph{bias term} or \emph{approximation error}, and depends on $f^*$ and $\mathcal{F}$, but not on $\hatf_n$ or $D_n$. To control it, we must make some assumptions on $\nu$. While it is possible to prove its consistency without assumptions, hypothesis are needed to guarantee rates of convergence.
+
+The picture below shows the effect of the capacity $|\mathcal{F}|$ on the variance term, bias term and total excess risk, for a fixed dataset. In particular, one can observe two important regimes: \emph{underfitting} and \emph{overfitting}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/capacity.png}
+    \caption{Effect of the capacity on bias and variance}
+\end{figure}
+
+The regime is in a regime of \emph{underfitting} when the cpacity of the hypothesis space is too small, i.e.~the chosen functions are not able to approximate well $f^*$, but at the same time there are only few functions in $\mathcal{F}$, the variance is therefore small.
+
+On the other side, when we select a very large hypothesis space, there likely exists a function $f\in\mathcal{F}$ very close to $f^*$, inducing a small bias -- but at the same time, since $|\mathcal{F}|$ is big, the variance is large. 
+
+Obviously, there are cases that are not represented by the graph above, consider for example the luck case $\mathcal{F}=\{f^*\}$, or more generally $\mathcal{F}=\{f^*\}\cup\mathcal{F}_0$.
 
 \subsubsection{Bounding the variance term: PAC bounds}
 
