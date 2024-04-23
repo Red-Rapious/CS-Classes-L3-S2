@@ -7,7 +7,7 @@
 
 \begin{document}
 \begin{abstract}
-    This document is Antoine Groudiev's class notes while following the class \emph{Introduction to Machine Learning} (Apprentissage Statistique) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes written by Pierre Gaillard, Alessandro Rudi, and Umut \c{S}im\c{s}ekli. 
+    This document is Antoine Groudiev's class notes while following the class \emph{Introduction to Machine Learning} (Apprentissage Statistique) at the Computer Science Department of ENS Ulm. It is freely inspired by the class notes written by Francis Bach, Pierre Gaillard, Alessandro Rudi, and Umut \c{S}im\c{s}ekli. 
 \end{abstract}
 
 \section{An overview of Machine Learning}
@@ -31,9 +31,9 @@
 %\begin{definition}[Regression]
 %    Features $x\in\R^d$, labels $y\in\R$. To tackle such problem, we look for a parametrized function $f_\theta(x_i)\simeq y_i$ for some $f_\theta$ in a function space
 %    \begin{equation*}
-%        \mathcal{F} = \{f_\theta : \theta\in\Theta\}
+%        \F = \{f_\theta : \theta\in\Theta\}
 %    \end{equation*}
-%    Our goal is therefore to find the best function in $\mathcal{F}$ such that $f$ "fits" the training data. For example, we can say that $f$ "fits" the training data when
+%    Our goal is therefore to find the best function in $\F$ such that $f$ "fits" the training data. For example, we can say that $f$ "fits" the training data when
 %    \begin{equation*}
 %        \frac{1}{n}\sum_{i=1}^n (f(x_i)-y_i)^2
 %    \end{equation*}
@@ -50,9 +50,9 @@
 %
 %Therefore, for a regression problem, we might choose:
 %\begin{equation*}
-%    f^\star=\argmin_{f\in\mathcal{F}}\frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i)
+%    f^\star=\argmin_{f\in\F}\frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i)
 %\end{equation*}
-%In the parametric case, when $\mathcal{F}=\{f_\theta : \theta\in\Theta\}$, we might minimize with respect to $\theta$:
+%In the parametric case, when $\F=\{f_\theta : \theta\in\Theta\}$, we might minimize with respect to $\theta$:
 %\begin{equation*}
 %    \theta^\star=\argmin_{\theta\in\Theta}\frac{1}{n}\sum_{i=1}^n l(f(x_i), y_i)
 %\end{equation*}
@@ -90,16 +90,16 @@
 \subsection{Introduction}
 In this chapter, we will study the simple but still widely used problem of \emph{Linear Least Square Regression}. We are given a set of points, which we assume to be sampled from some distribution: there exists some function which generated these points, and we want to retrieve or at least approximate this unknown function. To do so, we will naturally look for the function which best fits the points; nevertheless, assuming that it is unlikely that the function is overly-complicated, we will only approximate it using \emph{linear function}. Finally, to choose which linear function \say{fits best} the data, we will introduce the mean square error, which we will minimize to find our linear approximation function.
 
-Formally, our objective is to find a function $f$ such that it explains well the distribution $(y_i)_{1\leq i\leq n}$ as a function of $(x_i)_{1\leq i\leq n}$, that is $y_i\sim f(x_i)$. To do this, we can choose a \emph{function space} $\mathcal{F}$ and solve the empirical risk minimization problem:
+Formally, our objective is to find a function $f$ such that it explains well the distribution $(y_i)_{1\leq i\leq n}$ as a function of $(x_i)_{1\leq i\leq n}$, that is $y_i\sim f(x_i)$. To do this, we can choose a \emph{function space} $\F$ and solve the empirical risk minimization problem:
 \begin{equation*}
-    \hatf_n \in \argmin_{f\in\mathcal{F}} \hat{R}_n(f) := \argmin_{f\in\mathcal{F}} \frac{1}{n}\sum_{i=1}^n (y_i-f(x_i))^2
+    \hatf_n \in \argmin_{f\in\F} \hat{R}_n(f) := \argmin_{f\in\F} \frac{1}{n}\sum_{i=1}^n (y_i-f(x_i))^2
 \end{equation*}
 \begin{wrapfigure}[12]{l}{0.34\textwidth}
     \includegraphics[width=0.3\textwidth]{images/overfitting.png}
     \caption{Example of overfitting}
 \end{wrapfigure}
 
-Care must be taken when selecting the function space to avoid overfitting\footnote{We say that the function \emph{overfits} the data when it corresponds too closely to the specific set of data (i.e.~on the training data), such that it fails to fit additional data (i.e.~test data).}: for example, if we were to choose $\mathcal{F}:=\R_d[X]$ for some $d\in\N$, it is in our best interest to keep $d$ small to avoid getting a function $f$ which fits perfectly the points but diverges between them. Although the empirical mean square error $\hat{R}_n$ decreases when the function space $\mathcal{F}$ becomes larger (i.e.~larger polynomial degrees), the $\hatf_n$ estimator loses its predictive power. $\hatf_n$ will not necessarily perform well on new data. In what follows, we will consider the linear function space, containing functions of the form $f:x\mapsto ax+b$, which is the simplest.
+Care must be taken when selecting the function space to avoid overfitting\footnote{We say that the function \emph{overfits} the data when it corresponds too closely to the specific set of data (i.e.~on the training data), such that it fails to fit additional data (i.e.~test data).}: for example, if we were to choose $\F:=\R_d[X]$ for some $d\in\N$, it is in our best interest to keep $d$ small to avoid getting a function $f$ which fits perfectly the points but diverges between them. Although the empirical mean square error $\hat{R}_n$ decreases when the function space $\F$ becomes larger (i.e.~larger polynomial degrees), the $\hatf_n$ estimator loses its predictive power. $\hatf_n$ will not necessarily perform well on new data. In what follows, we will consider the linear function space, containing functions of the form $f:x\mapsto ax+b$, which is the simplest.
 
 \subsection{General setup and notations for supervised learning}
 \begin{definition}[Training data set]
@@ -145,7 +145,7 @@ In practice, the statistician cannot compute the risk, since one cannot acces th
         \draw[domain=0.55:6.8, samples=50, color=teal, thick] plot (\x, 2.5/\x + 0.2*\x^0.5) node[above] {Training error};
         \draw[domain=0.6:6.8, samples=50, color=cyan, thick] plot (\x, 2.5/\x + 1*\x^0.5) node[above] {Expected error};
         \draw[dotted, very thick] (2.3, 2.6) -- (2.3, 0) node[below] {Best choice};
-        \draw[->, thick] (0,0) -- (7,0) node[below] {Complexity of $\mathcal{F}$};
+        \draw[->, thick] (0,0) -- (7,0) node[below] {Complexity of $\F$};
         \draw[->, thick] (0,0) -- (0,6) node[above] {Error};
 
         \draw[->, color=orange, thick] (5, 5) -- (7, 5) node[above, pos=0.5] {Overfitting};
@@ -158,7 +158,7 @@ However, one must be careful about overfitting, the case where $\emrisk_n(f)$ is
 \begin{definition}[Linear model]
     When $\X=\R^d$ and $\Y=\R$, the simplest interesting function space is the set of affine functions. To ease the notation, we assume that the frist components of the inputs is 1 so that it is sufficient to consider linear functions. Therefore, the function space is:
     \begin{equation}
-        \mathcal{F}:=\set{x\mapsto \theta^\tp x}{\theta\in\R^d}
+        \F:=\set{x\mapsto \theta^\tp x}{\theta\in\R^d}
     \end{equation}
     i.e.~linear functions parametrized by $\theta\in\R^d$.
 \end{definition}
@@ -630,9 +630,9 @@ We will now see notions of convex analysis to solve convex optimization problems
 
 Convexity is a crucial notion in many fields of mathematics and computer science. In machine learning, convexity creates well-defined problems with efficient solutions. A typical example is the problem of \emph{empirical risk minimization}:
 \begin{equation*}
-    \hatf_n\in\argmin_{f\in\mathcal{F}}\frac{1}{n}\sum_{i=1}^n\ell(f(X_i), Y_i)+\lambda\Omega(f)
+    \hatf_n\in\argmin_{f\in\F}\frac{1}{n}\sum_{i=1}^n\ell(f(X_i), Y_i)+\lambda\Omega(f)
 \end{equation*}
-where $D_n=\set{(X_i, Y_i)}{i\in\iset{1}{n}}$ is the data set, $\mathcal{F}$ is a \emph{convex} set of predictors $f:\X\to\R$, for all $y'\in\Y$, $y\mapsto\ell(y, y')$ is a convex loss function, and $\Omega$ is a convex penaly (such as $\norm{\cdot}_2$, $\norm{\cdot}_1$, \dots).
+where $D_n=\set{(X_i, Y_i)}{i\in\iset{1}{n}}$ is the data set, $\F$ is a \emph{convex} set of predictors $f:\X\to\R$, for all $y'\in\Y$, $y\mapsto\ell(y, y')$ is a convex loss function, and $\Omega$ is a convex penaly (such as $\norm{\cdot}_2$, $\norm{\cdot}_1$, \dots).
 
 Convexity will be useful to analyze bot statistical properties of the solution $\hatf_n$ and its generalization error:
 \begin{equation*}
@@ -1195,7 +1195,7 @@ Recall that when $f$ is $\mu$-stricly convex, we have:
 This will be used in the next theorem.
 
 \begin{theorem}
-    Let $f:\R^d\to\R$ be a $\mu$-stricly convex function with $L$-Lipschitz continuous gradients. Let $\gamma\in\openseg{0, 1/2L}$, and choose a constant step-size $\gamma_t=\gamma$ for $t\in\N$. Denote by $x^*$ the global optimum of $f$. Finally, let $x_0\in\R^d$ and $T\in\N$. Then:
+    Let $f:\R^d\to\R$ be a $\mu$-stricly convex function with $L$-Lipschitz continuous gradients. Let $\gamma\in\openseg{0, 1/2L}$, and choose a constant step-size $\gamma_t:=\gamma$ for $t\in\N$. Denote by $x^*$ the global optimum of $f$. Finally, let $x_0\in\R^d$ and $T\in\N$. Then:
     \begin{equation*}
         \norm{x_T-x^*}^2\leq(1-\gamma\mu)^T\norm{x_0-x^*}^2
     \end{equation*}
@@ -1219,9 +1219,9 @@ the choice of $T=\frac{\gamma\mu}\log(\norm{x_0-x^*}^2/\epsilon)$ gives:
 
 \begin{corollary}
     Under the same hypothesis on $f$, $\gamma$, we have:
-    \begin{equation*}
+    \begin{equation}
         \norm{x_T-x^*} \xrightarrow[T\to+\infty]{} 0
-    \end{equation*}
+    \end{equation}
     Therefore, in this case, the Gradient Descent algorithm converges.
 \end{corollary}
 
@@ -1230,7 +1230,7 @@ In this section, we will introduce Stochastic Gradient Descent. In some cases, e
 
 The algorithm is useful to find the global minimum of conex functions of the form
 \begin{equation*}
-    f(x)=\E_\theta\;g(x, \theta), \where \E_\theta g(x, \theta)=\int_\Omega\;g(x,\theta)\dd p(\theta)
+    f(x)=\E_\theta\left[g(x, \theta)\right], \where \E_\theta\left[g(x, \theta)\right]=\int_\Omega g(x,\theta)\dd p(\theta)
 \end{equation*}
 where $p$ is a probability distribution over $\Omega$ and $g:\R^d\times\Omega\to\R$.
 
@@ -1238,8 +1238,8 @@ where $p$ is a probability distribution over $\Omega$ and $g:\R^d\times\Omega\to
     We consider $f$ of the form:
     \begin{equation*}
         f(x) = \frac{1}{n}\sum_{i=1}^n L(x, \theta_i), \where \begin{cases}
-            L(x, \theta_i)=\ell(x^\tp z_i, y_i)\\
-            \theta_i=(z_i, y_i)
+            \theta_i=(z_i, y_i)\\
+            L(x, \theta_i)=\ell(x^\tp z_i, y_i)
         \end{cases}
     \end{equation*}
 \end{example}
@@ -1251,10 +1251,10 @@ The algorithm is similar to classical gradient descent, but the iteration step i
 \end{equation*}
 As previously, $\gamma_t$ is a sequence of step sizes and $x_0$ is given; moreover, specifically for stochastic GD, $\theta_t$ is independently and identically distributed according to $p$. 
 
-Note that, by linearity of the integral $\nabla f(x)=\E_\theta \nabla_x g(x,\theta)$, so:
+Note that, by linearity of the integral $\nabla f(x)=\E_\theta\left[\nabla_x g(x,\theta)\right]$, thus:
 \begin{equation*}
     \begin{aligned}
-        \E_\theta x_t &= x_{t-1}-\gamma_t\nabla_xg(x_{t-1},\theta_t)\\
+        \E_\theta[x_t] &= x_{t-1}-\gamma_t\nabla_xg(x_{t-1},\theta_t)\\
         &=x_{t-1} - \gamma_t\nabla f(x_{t-1})
     \end{aligned}
 \end{equation*}
@@ -1263,7 +1263,7 @@ Intuitively, the SGD seems to behave in expectation like gradient descent. Let's
 \begin{definition}[Variance of the estimator of the gradient]
     We define the \emph{variance of the estimator of the gradient} as:
     \begin{equation*}
-        \sigma^2(x):=\E_\theta\norm{\nabla f(x)-\nabla_x g(x,\theta)}^2
+        \sigma^2(x):=\E_\theta\left[\norm{\nabla f(x)-\nabla_x g(x,\theta)}^2\right]
     \end{equation*}
 \end{definition}
 
@@ -1274,7 +1274,7 @@ Intuitively, the SGD seems to behave in expectation like gradient descent. Let's
     \end{equation*}
     Under such assumptions, we have that:
     \begin{equation*}
-        \E_{\theta_1,\dots,\theta_T}\norm{x_T-x^*}^2 \leq (1-\mu\gamma)^T\norm{x_0-x^*}^2+\frac{\gamma}{\mu}\sigma^2
+        \E_{\theta_1,\dots,\theta_T}\left[\norm{x_T-x^*}^2\right] \leq (1-\mu\gamma)^T\norm{x_0-x^*}^2+\frac{\gamma}{\mu}\sigma^2
     \end{equation*}
 \end{theorem}
 \begin{proof}
@@ -1284,7 +1284,7 @@ Intuitively, the SGD seems to behave in expectation like gradient descent. Let's
 \begin{corollary}[Convergence of SGD]
     Under the same assumptions:
     \begin{equation*}
-        \E_{\theta_1,\dots,\theta_T}\norm{x_T-x^*}^2 \xrightarrow[T\to+\infty]{} 0
+        \E_{\theta_1,\dots,\theta_T}\left[\norm{x_T-x^*}^2\right] \xrightarrow[T\to+\infty]{} 0
     \end{equation*}
     Hence, stochastic gradient descent converges in expectation towards the global minimum.
 \end{corollary}
@@ -1321,9 +1321,9 @@ The goal of kernel methods is therefore to go beyond these limitations while kee
 \begin{example}[Polynomial multivariate regression of degree $r$]
     We consider $x\in\R^d$ and
     \begin{equation*}
-        \phi(x)=(x_1^{\alpha_1}, \dots, x_d^{\alpha_d})
+        \phi(x)=(x_1^{\alpha_1}, \dots, x_d^{\alpha_d}) \where \sum_{i=1}^d \alpha_i=r
     \end{equation*}
-    with $\sum_{i=1}^d \alpha_i=r$. In this situation, $p=\binom{d+r-1}{r}$ might be too big for an explicit representation to be feasible;
+    In this situation, $p=\binom{d+r-1}{r}$ might be too big for an explicit representation to be feasible.
 \end{example}
 
 \begin{example}[Generic set of functions]
@@ -1367,14 +1367,14 @@ in the form of $\hat{w} = \sum_{i=1}^n \alpha_i\phi(x_i)$, with $\alpha_i\in\R$.
     \end{equation*}
 \end{corollary}
 
-Note that there is no assumption on $\ell$, and in particular, no convexity assumption. This result is extendable to Hilbert spaces (RKHS), as we will see in the next section.
+Note that there is no assumption on $\ell$, and in particular, no convexity assumption. This result is extendable to Hilbert spaces (RKHS\footnote{\emph{Reproducing kernel Hilbert space}, a specific kind of Hilbert space which is often used in machine learning.}), as we will see in the next section.
 
 \subsubsection{Finite dimensional representation of the learning problem}
 Using the representer theorem, we know that the minimum of $\hat{L}$ is of the form $w=\sum_{i=1}^n \alpha_i\phi(x_i)$; we can therefore directly optimize this characterization, i.e.~we can then write:
 \begin{equation*}
     \min_{w\in\R^r} \frac{1}{n} \sum_{i=1}^n \ell(y_i, w^\tp\phi(x_i)) + \frac{\lambda}{2} w^\tp w = \min_{\alpha\in\R^n} \frac{1}{n}\sum_{i=1}^n \ell(y_i, (K\alpha)_i) + \frac{\lambda}{2}\alpha^\tp K\alpha
 \end{equation*}
-where $K$ is an $n\times n$ matrix with values
+where $K\in\mathscr{M}_n(\R)$ with values
 \begin{equation*}
     K_{i, j} = \phi(x_i)^\tp \phi(x_j).
 \end{equation*}
@@ -1433,11 +1433,11 @@ Kernel functions admits many characterizations, which we will now present.
 \end{property}
 
 \begin{theorem}[Aronsazjn]
-    $k$ is a positive definite kernel if and only if there exists a Hilbert space $\mathcal{F}$, and $\phi:X\to\mathcal{F}$ such that
+    $k$ is a positive definite kernel if and only if there exists a Hilbert space $\F$, and $\phi:X\to\F$ such that
     \begin{equation*}
         \forall x, y\in X, \quad k(x, y) = \trace{\phi(x), \phi(y)}
     \end{equation*}
-    If such objects exist, $\mathcal{F}$ is called the \emph{feature space} and $\phi$ the \emph{feature map}.
+    If such objects exist, $\F$ is called the \emph{feature space} and $\phi$ the \emph{feature map}.
 \end{theorem}
 
 \begin{property}
@@ -1519,9 +1519,9 @@ Not all algorithms learn at the same rate: for a given $n\in\N^*$, some algorith
 \subsection{Empirical Risk Minimization}
 A classical way to estimate $f^*$ is via \emph{empirical risk minimization}. This is the approach we used in the specific examples of linear and logistic regressions. We will now define it more formally.
 
-Let $\mathcal{F}$ be a set of functions called \emph{function space} containing some candidate estimators of choice. The estimator is defined as:
+Let $\F$ be a set of functions called \emph{function space} containing some candidate estimators of choice. The estimator is defined as:
 \begin{equation*}
-    \hatf_n := \argmin_{f\in\mathcal{F}} \emrisk_n(f) \where \emrisk_n(f) = \frac{1}{n}\sum_{i=1}^n\ell(y_i, f(x_i))
+    \hatf_n := \argmin_{f\in\F} \emrisk_n(f) \where \emrisk_n(f) = \frac{1}{n}\sum_{i=1}^n\ell(y_i, f(x_i))
 \end{equation*}
 As before, $\emrisk_n$ is the empirical risk, which measures the average error performed by $f$ on the training set. The intuition is that $\emrisk_n(f)$ approximates $\risk(f)$ -- the expected error -- increasingly better when $n$ goes to infinity. A crucial question we need to address is to understand under which conditions \emph{empirical risk minimization} is a learning algorithm and has learning rates.
 
@@ -1529,20 +1529,22 @@ As before, $\emrisk_n$ is the empirical risk, which measures the average error p
 We will first recall some results that will be useful for the proof.
 \subsubsection{Results on random variables}
 \begin{lemma}[Union bound]
-    Let $\mathcal{F}$ be a finite set indexing a family of sets $(A_f)_{f\in\mathcal{F}}$, then:
+    Let $\F$ be a finite set indexing a family of sets $(A_f)_{f\in\F}$, then:
     \begin{equation*}
-        \P\left(\bigcup_{f\in\mathcal{F}}A_f\right)\leq\sum_{f\in\mathcal{F}}\P(A_f)
+        \P\left(\bigcup_{f\in\F}A_f\right)\leq\sum_{f\in\F}\P(A_f)
     \end{equation*}
 \end{lemma}
 
 \begin{lemma}[Supremum of random variables]
-    Let $t>0$ and $\mathcal{F}$ be a finite set indexing real random variables $(u_f)_{f\in\mathcal{F}}$, we have:
+    \label{lem:sup-rand-var}
+    Let $t>0$ and $\F$ be a finite set indexing real random variables $(u_f)_{f\in\F}$, we have:
     \begin{equation*}
-        \P(\sup_{f\in\mathcal{F}}|u_f|>t) \leq \sum_{f\in\mathcal{F}} \P(|u_f|>t)
+        \P(\sup_{f\in\F}|u_f|>t) \leq \sum_{f\in\F} \P(|u_f|>t)
     \end{equation*}
 \end{lemma}
 
 \begin{property}
+    \label{prop:prob-maj}
     Let $X$ be a random variable and let $f, g$ be real functions, with $t\in\R$ such that $f(X)\geq g(X)>t$ almost surely, then:
     \begin{equation*}
         \P(g(X)>t)\leq\P(f(X)>t)
@@ -1577,18 +1579,18 @@ The goal of this section is to prove consistency and learning rates for empirica
 \begin{equation*}
     \exrisk(\hatf_n) := \E[\risk(\hatf_n)]-\risk(f^*) = 
     \underbrace{\left(
-        \E[\risk(\hatf_n)]-\inf_{f\in\mathcal{F}}\risk(f)
+        \E[\risk(\hatf_n)]-\inf_{f\in\F}\risk(f)
     \right)}_{\textnormal{Estimation error}} + 
     \underbrace{\left(
-        \inf_{f\in\mathcal{F}}\risk(f)-\risk(f^*)
+        \inf_{f\in\F}\risk(f)-\risk(f^*)
     \right)}_{\textnormal{Approximation error}}
 \end{equation*}
 
-The leftmost term is called the \emph{variance term} or \emph{estimation error}. It depends on $D_n$, $\mathcal{F}$, $\hatf_n$, and can be bounded with mild or no assumption on the data distribution $\nu$. We are going to prove such results in this chapter.
+The leftmost term is called the \emph{variance term} or \emph{estimation error}. It depends on $D_n$, $\F$, $\hatf_n$, and can be bounded with mild or no assumption on the data distribution $\nu$. We are going to prove such results in this chapter.
 
-The rightmost term is called the \emph{bias term} or \emph{approximation error}, and depends on $f^*$ and $\mathcal{F}$, but not on $\hatf_n$ or $D_n$. To control it, we must make some assumptions on $\nu$. While it is possible to prove its consistency without assumptions, hypothesis are needed to guarantee rates of convergence.
+The rightmost term is called the \emph{bias term} or \emph{approximation error}, and depends on $f^*$ and $\F$, but not on $\hatf_n$ or $D_n$. To control it, we must make some assumptions on $\nu$. While it is possible to prove its consistency without assumptions, hypothesis are needed to guarantee rates of convergence.
 
-The picture below shows the effect of the capacity $|\mathcal{F}|$ on the variance term, bias term and total excess risk, for a fixed dataset. In particular, one can observe two important regimes: \emph{underfitting} and \emph{overfitting}.
+The picture below shows the effect of the capacity $|\F|$ on the variance term, bias term and total excess risk, for a fixed dataset. In particular, one can observe two important regimes: \emph{underfitting} and \emph{overfitting}.
 
 \begin{figure}[H]
     \centering
@@ -1596,15 +1598,88 @@ The picture below shows the effect of the capacity $|\mathcal{F}|$ on the varian
     \caption{Effect of the capacity on bias and variance}
 \end{figure}
 
-The regime is in a regime of \emph{underfitting} when the cpacity of the hypothesis space is too small, i.e.~the chosen functions are not able to approximate well $f^*$, but at the same time there are only few functions in $\mathcal{F}$, the variance is therefore small.
+The regime is in a regime of \emph{underfitting} when the cpacity of the hypothesis space is too small, i.e.~the chosen functions are not able to approximate well $f^*$, but at the same time there are only few functions in $\F$, the variance is therefore small.
 
-On the other side, when we select a very large hypothesis space, there likely exists a function $f\in\mathcal{F}$ very close to $f^*$, inducing a small bias -- but at the same time, since $|\mathcal{F}|$ is big, the variance is large. 
+On the other side, when we select a very large hypothesis space, there likely exists a function $f\in\F$ very close to $f^*$, inducing a small bias -- but at the same time, since $|\F|$ is big, the variance is large. 
 
-Obviously, there are cases that are not represented by the graph above, consider for example the luck case $\mathcal{F}=\{f^*\}$, or more generally $\mathcal{F}=\{f^*\}\cup\mathcal{F}_0$.
+Obviously, there are cases that are not represented by the graph above, consider for example the lucky case $\F=\{f^*\}$, or more generally $\F=\{f^*\}\cup\F_0$.
 
 \subsubsection{Bounding the variance term: PAC bounds}
+As explained above, the estimator $\hatf_n$ is a random variable. A way to deal with this randomness is to consider the expectation of $\risk(\hatf_n)$, but this is limited: it only makes statements about the risk on average. A more precise control over the excess risk can be stated in terms of a probabilistic statemet: a PAC -- Probably Approximately Correct -- bound.
+
+\begin{definition}[$(\epsilon, \delta)$-PAC]
+    We say that $\hatf_n$ is $\epsilon$-accurate with confidence $1-\delta$ of $(\epsilon, \delta)$-PAC when:
+    \begin{equation}
+        \P_{D_n}\left(\risk(\hatf_n) - \inf_{f\in\F}\risk(f)>\epsilon\right) < \delta
+    \end{equation}
+\end{definition}
+
+Note that:
+\begin{equation*}
+    \risk(\hatf_n)-\inf_{f\in\F}\risk(f) = \underbrace{\left[\risk(\hatf_n)-\inf_{f\in\F}\emrisk_n(f)\right]}_{\rho_1} + \underbrace{\left[\inf_{f\in\F}\emrisk_n(f)-\inf_{f\in\F}\risk(f)\right]}_{\rho_2}
+\end{equation*}
+
+By the definition of $\hatf_n$, which is the minimum of $\emrisk_n(\hatf_n)$ over $\F$, then for the first term $\rho_1$ we have:
+\begin{equation*}
+    \rho_1 := \risk(\hatf_n)-\inf_{f\in\F}\emrisk_n(f) = \risk(\hatf_n)-\emrisk_n(\hatf_n) \leq \sup_{f\in\F} |\risk(f)-\emrisk_n(f)|
+\end{equation*}
+
+For the second term $\rho_2$, using the inverse triangular inequality, we have:
+\begin{equation*}
+    \rho_2:=\inf_{f\in\F}\emrisk_n(f)-\inf_{f\in\F}\risk(f) \leq \sup_{f\in\F}|\risk(f)-\emrisk_n(f)|
+\end{equation*}
+
+Therefore, 
+\begin{equation*}
+    \risk(\hatf_n)-\inf_{f\in\F}\risk(f) = \rho_1+\rho_2 \leq 2\sup_{f\in\F}|\risk(f)-\emrisk_n(f)|
+\end{equation*}
 
 \subsubsection{Bounds in probability}
+In the following, we assume that $\F$ is finite and $\ell$ is bounded, that is:
+\begin{equation*}
+    |\F|<+\infty \quad \textnormal{and} \quad \exists M, \forall y, y'\in\Y, \:\: |\ell(y, y')|\leq M
+\end{equation*}
+
+Under these assumptions, forall $t>0$, we have by Property \ref{prop:prob-maj}:
+\begin{equation*}
+    \begin{aligned}
+        \P\left(\risk(\hatf_n)-\inf_{f\in\F}\risk(f)>2t\right) &\leq \P\left(2\sup_{f\in\F}|\risk(f)-\emrisk_n(f)>2t\right) \\
+        &\leq \sum_{f\in\F}\P\left(2\left|\risk(f)-\emrisk_n(f)\right|>2t\right) \\
+        &= \sum_{f\in\F}\P\left(\left|\risk(f)-\emrisk_n(f)\right|>t\right)
+    \end{aligned}
+\end{equation*}
+where the last step is due to Lemma \ref{lem:sup-rand-var}. To further bound the inequality above, we need to study the probability of the even $\left|\risk(f)-\emrisk_n(f)\right|>t$. Given $f\in\F$, let:
+\begin{equation*}
+    \forall i\in\iset{1}{n}, \quad v_i := \ell(y_i, f(x_i)) - \risk(f)
+\end{equation*}
+Therefore, we have:
+\begin{equation*}
+    \left|\emrisk_n(f)-\risk(f)\right| = \left|\frac{1}{n}\sum_{i=1}^nv_i\right|
+\end{equation*}
+
+Notice that $\E[v_i]=0$ and that the $(v_i)_i$ are independent and identically distributed. Moreover, using the assumption that $\ell$ is borned, we have that $|v_i|\leq M$ almost surely and that $\E[v_i^2]\leq M^2$. Therefore, applying the Bernstein inequality, we have:
+\begin{equation*}
+    \P\left(\left|\frac{1}{n}\sum_{i=1}^n v_i\right|>t\right) \leq 2\exp\left(-\frac{t^2n}{2(M^2+Mt)}\right)
+\end{equation*}
+
+Therefore, 
+\begin{equation*}
+    \begin{aligned}
+        \P_{D_n}\left(\risk(\hatf_n)-\inf_{f\in\F}\risk(f)>2t\right) &\leq \P_{D_n}\left(2\sup_{f\in\F}\left|\risk(f)-\emrisk_n(f)\right|>2t\right) \\
+        &\leq \sum_{f\in\F}\P_{D_n}\left(2\sup_{f\in\F}\left|\risk(f)-\emrisk_n(f)\right|>2t\right) \\
+        &\leq \sum_{f\in\F}2\exp\left(-\frac{t^2n}{2(M^2+Mt)}\right) = 2|\F|\exp\left(-\frac{t^2n}{2(M^2+Mt)}\right)
+    \end{aligned}
+\end{equation*}
+
+Now, note that when $t\leq M$, then $\exp\left(-\frac{t^2n}{2(M^2+Mt)}\right) \leq \exp\left(-\frac{t^2n}{M^2}\right)$. Let $\delta\in]0, 1[$, and when $n\leq \log \frac{2|\F|}{\delta}$, select $t=\sqrt{\frac{M^2\log \frac{2|\F|}{\delta}}{n}}$. Thus, we have $t\leq M$ and the following $(t, \delta)$-PAC bound holds:
+\begin{equation*}
+    \P_{D_n}\left(\risk(\hatf_n)-\inf_{f\in\R}\risk(f) > \sqrt{\frac{4M^2\log \frac{2|\F|}{\delta}}{n}}\right) \leq \delta
+\end{equation*}
+
+Equivalently, the following holds with probability at least $1-\delta$:
+\begin{equation*}
+    \risk(\hatf_n)-\inf_{f\in\R}\risk(f) \leq \sqrt{\frac{4M^2\log \frac{2|\F|}{\delta}}{n}}
+\end{equation*}
 
 \subsection{Bounding the Bias}
 
