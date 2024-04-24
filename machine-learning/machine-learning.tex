@@ -1594,7 +1594,21 @@ The picture below shows the effect of the capacity $|\F|$ on the variance term, 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{images/capacity.png}
+    %\includegraphics[width=0.6\textwidth]{images/capacity.png}
+    \begin{tikzpicture}[scale=1]
+        \draw[->, very thick] (0,0) -- (10,0) node[right] {capacity};
+        \draw[->, very thick] (0,0) -- (0,6);
+
+        \draw[dashed, thick] (5.4, 6) -- (5.4, 0) node[below] {optimal capacity};
+
+        \draw[domain=1.2:9.2, samples=75, very thick, red] plot (\x, {\x*\x*0.25-2.5*\x+25*0.25+1.8-exp(\x*0.48-3.5)}) node [above] {generalization error};
+        \draw[domain=0.8:9.5, samples=75, very thick, blue, dotted] plot (\x, {exp(-\x*0.5+2)+0.2}) node [above] {bias};
+        \draw[domain=0.8:9.4, samples=75, very thick, teal, dotted] plot (\x, {exp(\x*0.37-2.3)+0.2});
+        \node[teal] at (1.5, 1) {variance};
+
+        \node at (3.5, 5) {underfitting zone};
+        \node at (7.1, 5) {overfitting zone};
+    \end{tikzpicture}
     \caption{Effect of the capacity on bias and variance}
 \end{figure}
 
