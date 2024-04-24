@@ -1682,6 +1682,33 @@ Equivalently, the following holds with probability at least $1-\delta$:
 \end{equation*}
 
 \subsection{Bounding the Bias}
+Bias term depends on the specific properties of the function $f^*$ that we try to learn, and the function space $\F$ that we have chosen. Assumptions must be done on these two objects, to quantify the bias term.
+
+\begin{example}
+    Let $\X=\R, \Y=\R$. We assume that the loss function $\ell$ satisfies the following property for some $C>0$:
+    \begin{equation*}
+        \forall y, y', y'', \quad |\ell(y', y)-\ell(y'', y)|\leq C|y'-y''|
+    \end{equation*}
+    Furthermore, we assume that the function $f^*:[-1, 1]\to\R$ can be decomposed as a power series:
+    \begin{equation*}
+        f^*(x) = \sum_{k=0}^{+\infty}\beta_kx^k
+    \end{equation*}
+    for a sequence $(\beta_k)_{k\in\N}$ such that $S:=\sum_{k=0}^{+\infty}\beta_k<+\infty$. Let $R>0$, $p\in\N$, and define:
+    \begin{equation*}
+        \F := \set{x\mapsto \sum_{k=1}^p\alpha_kx^k}{\alpha_k\in[-R, R]}
+    \end{equation*}
+    
+    Denote by $f_p$ the function $f_p:x\mapsto \sum_{k=1}^p\beta_kx^k$. When $R\geq S$, $f_p\in\F$, then:
+    \begin{equation*}
+        \begin{aligned}
+            \inf_{f\in\F}\risk(f)-\risk(f^*) \leq 
+            \risk(f_p)-\risk(f^*) &= \E[\ell(f_p(x), y)-\ell(f^*(x), y)]\\
+            &\leq C\cdot \E\left[\left|f_p(x)-f^*(x)\right|\right] \\
+            &\leq C\cdot \E\left[\sum_{k=p+1}^{+\infty}\beta_kx^k\right] \\
+            &\leq C\cdot \sum_{k=p+1}^{+\infty}|\beta^k|
+        \end{aligned}
+    \end{equation*}
+\end{example}
 
 %\subsection{Optional exercises}
 
