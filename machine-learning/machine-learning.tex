@@ -1750,7 +1750,37 @@ The $k$-nearest neighbours classifier works as follows. Given a new input $x\in\
 The $k$-nearest neighbor classifier is quite popular because it is simple to code and to understand; it has nice theoretical guarantess as soon as $k$ is appropriately chosen and performs reasonably well in low dimensional spaces. 
 
 \subsubsection{Assumptions and notations}
+In the following, unless stated otherwise, $\E$ and $\P$ are according to $(X, Y)\sim\nu$.
 
+For simplicity, we will asumme in the following that we are in the binary case: $L=1$ (two classes), $\Y=\{0, 1\}$. For each $l\in\Y$, we denote by $\mu_l$ the law of $X$ given $Y$ under $\nu$ and $p_l$ the marginal distribution of $Y$:
+\begin{equation*}
+    \begin{cases}
+        \mu_l = (X | Y=l) \\
+        p_l = \P(Y=l)
+    \end{cases}
+\end{equation*}
+We assume that $\mu_l$ is absolutely continuous with respect to Lebesgue measure on $\R^d$. We denote by $f_l$ its density, and for each $x\in\R^d$, we denote by
+\begin{equation*}
+    \eta(x) := \P(Y=1|X=x)
+\end{equation*}
+
+\begin{lemma}
+    For any classifier $g:\R^d\longrightarrow\Y$:
+    \begin{equation*}
+        \risk(g) = \E[\eta(X)\cdot\ind_{g(x)=0}+(1-\eta(X))\cdot\ind_{g(X)=1}]
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    \begin{equation*}        
+        \begin{aligned}
+            \risk(g) &= \E[\ind_{g(X)\neq Y}]\\
+            &= \E\left[\E[\ind_{g(X)\neq Y}|X]\right] \\
+            &= \E\left[\E[\ind_{g(X)\neq 1}|X, Y = 1]\cdot\P(Y=1|X) + \E[\ind_{g(X)\neq Y}|X, Y=0]\cdot\P(Y=0|X)\right]\\
+            &= \E\left[\E[\ind_{g(X)\neq 1}|X, Y = 1]\cdot\eta(X) + \E[\ind_{g(X)\neq Y}|X, Y=0]\cdot(1-\eta(X))\right]\\
+            &= \E\left[\ind_{g(X)=0}\cdot\eta(X) + \ind_{g(X)=1}\cdot(1-\eta(X))\right]
+        \end{aligned}
+    \end{equation*}
+\end{proof}
 
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
