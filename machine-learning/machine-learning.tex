@@ -1769,6 +1769,7 @@ We assume that $\mu_l$ is absolutely continuous with respect to Lebesgue measure
     \begin{equation*}
         \risk(g) = \E[\eta(X)\cdot\ind_{g(x)=0}+(1-\eta(X))\cdot\ind_{g(X)=1}]
     \end{equation*}
+    This is a simple decomposition of the risk of the classifier between the cases when $Y=1$ or $Y=0$.
 \end{lemma}
 \begin{proof}
     \begin{equation*}        
@@ -1781,6 +1782,81 @@ We assume that $\mu_l$ is absolutely continuous with respect to Lebesgue measure
         \end{aligned}
     \end{equation*}
 \end{proof}
+
+\subsection{Classifiers and estimators}
+\subsubsection{The optimal Bayes classifier}
+Notice that a random classifier sampling $g(X)=0$ and $g(X)=1$ with probability $1/2$ has an expected risk $\risk(g)=1/2$. Our goal is therefore to build a non-trivial classifier that outperforms this expected error. If the function $\eta$ was known, one could define the Bayes classifier as follows:
+\begin{equation*}
+    g^*(X) = \begin{cases*}
+        1 & if $\eta(X)\geq1/2$\\
+        0 & otherwise
+    \end{cases*}
+\end{equation*}
+
+\begin{definition}[Consistency]
+    We say that an estimator $\hat{g}_n$ is \emph{consistent} when:
+    \begin{equation*}
+        \E_{(X_i, Y_i)\sim\nu}\left[\risk(\hat{g}_n)\right] \xrightarrow[n\to+\infty]{}\risk^*
+    \end{equation*}
+\end{definition}
+
+\begin{lemma}
+    The risk of the Bayes classifier is
+    \begin{equation*}
+        \risk^* := \risk(g^*) = \E[\min(\eta(X), 1-\eta(X))]
+    \end{equation*}
+    Furthermore, for any classifier $g$, we have:
+    \begin{equation*}
+        \risk(g)-\risk^* = \E\left[|2\eta(X)-1|\cdot\ind_{g(X)\neq g^*(X)}\right] \geq 0
+    \end{equation*}
+    This implies that the Bayes classifier is optimal, meaning that it minimizes its risk:
+    \begin{equation*}
+        \risk^* = \min_{g:\R^d\to\{0, 1\}}\risk(g)
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    % TODO
+\end{proof}
+
+Therefore, if $\eta$ was known, one could compute the optimal classifier $g^*$. In practice, $\eta$ is unknown, and one should therefore estimate it.
+
+\subsubsection{Plug-in estimator}
+\begin{definition}[Estimator]
+    An estimator $\hat{\eta}_n$ of $\eta$ is a function of the observation $D_n=(X_i, Y_i)_{i\in\iset{1}{n}}$ of the form:
+    \begin{equation*}
+        \hat{\eta}_n : \R^d \longrightarrow [0, 1]
+    \end{equation*}
+    where $\hat{\eta}_n$ does depend on the data set $D_n$.
+\end{definition}
+
+\begin{definition}[Plug-in estimator]
+    Given an estimator $\hat{\eta}_n$ of $\eta$, we can build the \emph{plug-in estimator} as follows:
+    \begin{equation}
+        \hat{g}_n(x) := \begin{cases*}
+            1 & if $\hat{\eta}_n(x) \geq 1/2$\\
+            0 & otherwise
+        \end{cases*}
+    \end{equation}
+\end{definition}
+
+The intuition is that if $\hat{\eta}_n$ is close enough to $\eta$, then $\hat{g}_n$ is also close to $g^*$ and $\risk{\hat{g}_n}$ will be close to $\risk^*$. This is formalized by the following Lemma:
+\begin{lemma}
+    Given a plug-in estimator $\hat{g}_n$, we have:
+    \begin{equation*}
+        0\leq\risk(\hat{g}_n) - \risk^* \leq 2\cdot\E\left[|\eta(X)-\hat{\eta}_n(X)| \big| D_n\right]
+    \end{equation*}
+\end{lemma}
+\begin{proof}
+    % TODO
+\end{proof}
+
+This shows that for $\hat{\eta}_n = \eta$, $\hat{g}_n = g^*$, the optimal Bayes classifier. Furthermore, if $\hat{\eta}_n\simeq\eta$, then $\hat{g}_n\simeq g^*$. Therefore, if we could build from the data an estimator $\hat{\eta}_n$ of $\eta$ such that
+\begin{equation*}
+    \forall x\in\R^d, \quad \E\left[|\eta(X)-\hat{\eta}_n(X)| \big| D_n\right] \xrightarrow[n\to+\infty] 0
+\end{equation*}
+then the associated plug-in classifier would be consistent. The reverse if not true: estimating $\eta$ is harder than estimating $g^*$, since $\eta$ is real-valued while $g^*$ can only take two values. We will show that the $k$-nearest neighbors is consistent if the number of neighbors grows appropriately ($k$ is a function of $n$). This is not the case when the number of neighbors is fixed ($k$ independent of $n$).
+
+\subsection{The \mathpdf{k}-nearest neighbors classifier (\mathpdf{k}-NN)}
 
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
