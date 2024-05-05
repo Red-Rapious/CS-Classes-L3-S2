@@ -1745,6 +1745,7 @@ The $k$-nearest neighbours classifier works as follows. Given a new input $x\in\
     \centering
     \includegraphics[width=0.8\textwidth]{images/knn.jpeg}
     \caption{$k$-NN for different values of $k$}
+    \label{fig:knn}
 \end{figure}
 
 The $k$-nearest neighbor classifier is quite popular because it is simple to code and to understand; it has nice theoretical guarantess as soon as $k$ is appropriately chosen and performs reasonably well in low dimensional spaces. 
@@ -1857,6 +1858,41 @@ This shows that for $\hat{\eta}_n = \eta$, $\hat{g}_n = g^*$, the optimal Bayes 
 then the associated plug-in classifier would be consistent. The reverse if not true: estimating $\eta$ is harder than estimating $g^*$, since $\eta$ is real-valued while $g^*$ can only take two values. We will show that the $k$-nearest neighbors is consistent if the number of neighbors grows appropriately ($k$ is a function of $n$). This is not the case when the number of neighbors is fixed ($k$ independent of $n$).
 
 \subsection{The \mathpdf{k}-nearest neighbors classifier (\mathpdf{k}-NN)}
+The $k$-NN classifier classifies a new input $x$ with the majority class among its $k$-nearest neighbors, as can be seen in Figure \ref{fig:knn}. Formally, we denote by $\bar{X}_i(x)$ the $i$-th nearest neighbor of $x\in\R^d$ among the inputs $X_i$ (using the Euclidean distance -- that is $\ell_2$ or $\norm{\cdot}_2$). The $\bar{X}_i(x)$ are such that:
+\begin{equation*}
+    \norm{x-\bar{X}_1(x)}_2 \leq \norm{x-\bar{X}_2(x)}_2 \leq \dots \leq \norm{x-\bar{X}_n(x)}_2
+\end{equation*}
+We denote by $\bar{Y}_i(x)$ the class associated with $\bar{X}_i(x)$, which is known -- we are solving a supervised learning problem.
+
+\begin{definition}[$k$-NN estimator]
+    The estimator associated to the $k$-NN algorithm is the average of the classes among the $k$-nearest neighbors:
+    \begin{equation}
+        \hat{\eta}_n^k(x) := \frac{1}{k} \sum_{i=1}^k\bar{Y}_i(x)
+    \end{equation}
+\end{definition}
+
+\begin{definition}[$k$-NN classifier]
+    The $k$-NN classifier is the plug-in estimator associated to the $k$-NN estimator $\hat{\eta}_n^k(x)$:
+    \begin{equation}
+        \hat{g}_n^k(x) := \begin{cases*}
+            1 & if $\frac{1}{k} \sum_{i=1}^k\bar{Y}_i(x)\geq 1/2$\\
+            0 & otherwise
+        \end{cases*}
+    \end{equation}
+\end{definition}
+
+\begin{definition}[Asymptotic risk of the $k$-NN classifier]
+    The \emph{asymptotic risk} of the $k$-NN classifier is the limit risk of $\hat{g}_n^k(x)$:
+    \begin{equation*}
+        \risk_{k\textnormal{-NN}} := \lim_{n\to+\infty}\E_{(X_i, Y_i)\sim\nu}[\risk(\hat{g}_n^k)]
+    \end{equation*}
+\end{definition}
+
+\subsubsection{The nearest neighbor classifier (1-NN)}
+
+\subsubsection{Inconsistency of the \mathpdf{k}-NN classifier for fixed \mathpdf{k}}
+
+\subsubsection{Consistency of nearest neighbors making \texorpdfstring{$k\rightarrow+\infty$}{k→+∞}}
 
 \section{Unsupervised Learning}
 As described in the introduction of this course, Machine Learning is divided into three main categories: Supervised Learning, Unsupervised Learning, and Reinforcement Learning. In this chapter, we will analyze \emph{Unsupervised Learning}: while Supervised Learning provided a dataset containing both features ($x_i$) and labels ($y_i$); in Unsupervised Learning, the dataset contains only features $x_i$.
