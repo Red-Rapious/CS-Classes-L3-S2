@@ -2117,6 +2117,75 @@ In the following, we assume that we are given some model $\Pc$ indexed by $\thet
 \end{remark}
 
 \subsection{Maximum likelihood estimation}
+\subsubsection{Definition and example}
+The idea behind maximum likelihood estimation is to choose the most probable parameter $\theta\in\Theta$ for the observed data. Assume that $\Y$ is discrete and that $Y\sim p_{\theta_*}\dd\mu$ for some $\theta_*\in\Theta$. Then, for any observation $y_i$, the probability that $Y=y_i$ equals $p_{\theta_*}(y_i)$:
+\begin{equation*}
+    \P(Y=y_i) = p_{\theta_*}(y_i)
+\end{equation*}
+Similarly, the probability of observering $(y_1, \dots, y_n)\in\Y^n$ if all the samples were independently sampled from $p_\theta$ is $\prod_{i=1}^m p_\theta(y_i)$. Hence, the high level idea of maximum likelihood estimation will be to maximize this probability over $\theta\in\Theta$. This is formalized by the definition of the likelihood, which also holds for non-discret set $\Y$.
+
+\begin{definition}[Likelihood]
+    Let $\Pc = \set{p_\theta\dd\mu}{\theta\in\Theta}$ be a parametric model and $y\in\Y$. Given the outcome $y\in\Y$, the \emph{likelihood} is the function:
+    \begin{equation}
+        \theta \longmapsto p_\theta(y)
+    \end{equation}
+    The likelihood $L(\cdot|D_n)$ of a dataset $D_n=(y_1, \dots, y_n)$ is the function:
+    \begin{equation}
+        L(\cdot|D_n) : \theta \longmapsto \prod_{i=1}^m p_\theta(y_i)
+    \end{equation}
+\end{definition}
+
+\begin{definition}[Maximum likelihood estimator]
+    The \emph{maximum likelihood estimator (MLE)} is the parameter which maximizes the likelihood, i.e.:
+    \begin{equation}
+        \hat{\theta}_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n p_\theta(y_i)
+    \end{equation}
+\end{definition}
+
+In practice, maximizing a sum is easier than to maximize a product. Since $\log$ is an increasing function, the maximum likelihood estimator also maximizes the \emph{$\log$-likelihood}:
+\begin{equation}
+    \hat{\theta}_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n \log p_\theta(y_i)
+\end{equation}
+
+\begin{example}[Bernoulli model]
+    For $\Y\{0, 1\}$ and $\Theta=[0, 1]$, we define the Bernoulli model as:
+    \begin{equation*}
+        p_\theta(y) = \theta^y(1-\theta)^{(1-y)}
+    \end{equation*}
+    Assuming that $D_n$ was generated from a Bernoulli distribution of parameter $\theta_*$; then, the maximum likelihood estimator is:
+    \begin{equation*}
+        \hat{\theta}_n\in\argmin_{0\leq\theta\leq1} \frac{1}{n} \sum_{i=1}^n \left[y_i\log\theta + (1-y_i)\log(1-\theta)\right]
+    \end{equation*}
+    Denoting $\bar{y}_n := \sum_{i=1}^ny_i$ the empirical average, we solve:
+    \begin{equation*}
+        \frac{\dd\log L(\theta|D_n)}{\dd\theta} \biggr\rvert_{\theta=\hat{\theta}_n} = 0 \implies \frac{\bar{y}_n}{\hat{\theta}_n} - \frac{1-\bar{y}_n}{1-\hat{\theta}_n} \implies \hat{\theta}_n = \bar{y}_n
+    \end{equation*} 
+    Therefore, the maximum likelihood estimator is in this case the empirical mean.
+\end{example}
+
+\subsubsection{Link with empirical risk minimization}
+In this chapter, we studied density estimation, in which the goal is to find the density of the distribution which generated the data. This can be connected to empirical risk minimization: assuming that the density belongs to the model $\Pc$, the possible densities are $p_\theta$, for some $\theta\in\Theta$. We can define a loss function for this setting to be the negative log-likelihood:
+\begin{equation}
+    \begin{aligned}
+        \ell : \Theta\times\Y &\longrightarrow \R^+ \\
+        (\theta, y) &\longmapsto -\log p_\theta(y)
+    \end{aligned}
+\end{equation}
+The risk -- or generalization error -- is then:
+\begin{equation}
+    \risk(\theta) = - \E_Y\left[\log p_\theta(Y)\right]
+\end{equation}
+
+In particular, if $Y\sim p_{\theta_*}\dd\mu$, for some $\theta_*\in\Theta$, $\theta_*$ minimizes the risk and the objective is to recover $\theta_*$. The empirical risk is then, by definition:
+\begin{equation}
+    \hat{\risk}_n(\theta) = -\frac{1}{n}\sum_{i=1}^n \log p_\theta(y_i)
+\end{equation}
+
+Therefore, the empirical risk minimizer matches the maximum likelihood estimator.
+
+\subsubsection{Link with Kullback-Leibler divergence}
+
+\subsubsection{Conditional modeling}
 
 \subsection{Maximum a posteriori}
 
