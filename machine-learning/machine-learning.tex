@@ -2074,11 +2074,53 @@ This being done, we can define the \emph{empirical covariance matrix}, which is 
 \end{equation*}
 Similarly to the theoretical setting, we can use the normlized eigenvectors associated to the largest eigenvalues to construct a matrix maximizing the variance.
 
-\section{Model-Based Machine Learning}
+\section{Probabilistic models and Maximum Likelihood}
+\subsection{Introduction}
+In probabilistic modeling, we are given a set of observations $D_n=(y_1, \dots, y_n)$ in $\Y$ that we assume to be generated from some unknown i.i.d.~distribution. As always, the objective is to find a probabilistic model that explains well the data, by estimating the density of the underlying distribution. If possible, we would like the model to predict well new data and to be able to incorporate prior knowledge and assumptions.
 
-\section{Maximum Likelihood}
+Let $\mu$ denote some reference measure on the output set $\Y$. Typically, $\mu$ is the counting measure if $\Y\subseteq\N$ or the Lebesgue measure if $\Y\subseteq\R^d$.
 
-\section{MCMC Sampling}
+\begin{definition}[Parametric model]
+    Let $d\geq1$ and $\Theta\subseteq\R^d$ by a set of parameters. A parametric model $\Pc$ is a set of probability distributions taking value in $\Y$ with a density with respect to $\mu$ and indexed by $\Theta$:
+    \begin{equation}
+        \Pc = \set{p_\theta\dd\mu}{\theta\in\Theta}
+    \end{equation}
+\end{definition}
+
+Here are a few examples of statistical parametric models based on well known family distributions.
+\begin{example}[Binomial model]
+    For $\Y=\N$ and $\Theta=[0, 1]$:
+    \begin{equation*}
+        p_\theta(k) = \binom{n}{k}\theta^k(1-\theta)^{n-k}
+    \end{equation*}
+\end{example}
+
+\begin{example}[Gaussian model]
+    For $\Y=\R$ and $\Theta=\R\times\R_+$, where we traditionnaly denote elements of $\Theta$ as $(\mu, \sigma)$, the parameters of the normal distribution:
+    \begin{equation*}
+        p_{(\mu, \sigma)}(x) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
+    \end{equation*}
+\end{example}
+
+\begin{example}[Multidimensional\footnote{Also known as \emph{multivariate}.} Gaussian model]
+    For $\Y=\R$ and $\Theta=\R^d\times S_d^+(\R)$\footnote{$S_d^+(\R)$ denotes the set of semi-definite positive matrices. In particular, such matrices $M$ are invertible, and the associated bilinear form is positive: $\forall x\in\R^d, x^\tp Mx$.}, where we traditionnaly denote elements of $\Theta$ as $(\mu, \Sigma)$, the parameters of the normal distribution:
+    \begin{equation*}
+        p_{(\mu, \Sigma)}(x) = \frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}} \exp\left(-\frac{1}{2}(x-\mu)^\tp\Sigma^{-1}(x-\mu)\right)
+    \end{equation*}
+\end{example}
+Other parametric models include the \href{https://en.wikipedia.org/wiki/Exponential_distribution}{exponential model} on $\Y=\R_+$, the \href{https://en.wikipedia.org/wiki/Bernoulli_distribution}{Bernoulli model} on $\Y=\{0, 1\}$, \dots
+
+In the following, we assume that we are given some model $\Pc$ indexed by $\theta\in\Theta$, and we assume that the data $D_n$ is independently generated from $p_{\theta_*}\in\Pc$ for some unknown parameter $\theta_*$. We would like to recover the best parameter $\theta_*$ from the data. 
+
+\begin{remark}
+    In practice, the data might come from a distribution which is not in $\Pc$: this is called misspecification, but we will not enter into further details in this chapter.
+\end{remark}
+
+\subsection{Maximum likelihood estimation}
+
+\subsection{Maximum a posteriori}
+
+\section{Posterior sampling using MCMC and SGLD}
 
 \section{Neural Networks}
 
