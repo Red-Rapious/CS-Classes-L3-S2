@@ -2211,7 +2211,7 @@ $\KL(p_\theta||p_{\theta_*})$ can also be interpreted as the excess risk of the 
     \end{equation}    
 \end{property}
 
-\begin{property}
+\begin{property}[Separation]
     \begin{equation}
         \KL(p||p) = 0
     \end{equation}
@@ -2228,6 +2228,96 @@ $\KL(p_\theta||p_{\theta_*})$ can also be interpreted as the excess risk of the 
 Note that the KL divergence is often seen as a distance, but it does fill the requirements, since it is not symmetric and does not satisfy the triangular inequality.
 
 \subsubsection{Conditional modeling}
+Until now, we considered the problem of density estimation when the data set has only outputs $y_i\in\Y$. Howerver, the principle of maximum likelihood can be extended to couples of inputs $D_n=\{(x_1, y_1), \dots, (x_n, y_n)\}\in\X\times\Y$. Then, we can distinguish two different modeling: generative and conditional modeling.
+
+\paragraph*{Generative modeling}
+We aim at estimating the density of couples of input and ouputs $(X, Y)$ among a family of densities on $\X\times\Y$:
+\begin{equation*}
+    (x, y) \longmapsto p_\theta(x, y)
+\end{equation*}
+In this case, the risk and the empirical risk are:
+\begin{equation*}
+    \begin{cases}
+        \risk(\theta)=-\E[\log p_\theta(X, Y)]\\
+        \emrisk_n(\theta) = -\frac{1}{n}\sum_{i=1}^n\log p_\theta(x_i, y_i)
+    \end{cases}
+\end{equation*}
+Estimating the density can be useful to generate some new samples.
+
+\paragraph*{Conditional modeling}
+We aim at estimating the density of an ouput $Y$ \emph{given $X$}. The densities now are on $\Y$ only:
+\begin{equation*}
+    y \longmapsto p_\theta(\cdot|x)
+\end{equation*}
+but do depend on the inputs. The risk and the empirical risk with negative log-likelihood are:
+\begin{equation*}
+    \begin{cases}
+        \risk(\theta)=-\E[\log p_\theta(Y|X)]\\
+        \emrisk_n(\theta) = -\frac{1}{n}\sum_{i=1}^n\log p_\theta(y_i|x_i)
+    \end{cases}
+\end{equation*}
+This is useful if one wants to predict the distribution or the value of a new ouput $Y$ given an input $X$.
+
+\subsubsection{Linear regression as conditional modeling}
+Unlike Hinge loss, logistic loss has a probabilist interpretaton. Consider $(X, Y)\sim\Pc$ a pair of input-output random variables in $\R^d\times\{0, 1\}$. In binary classification, the objective is to predict the probability that $Y=1$ given the input $X$. In other words, we want to estimate:
+\begin{equation*}
+    \P(Y=1|X) = x \mapsto \P(Y=1|X=x)
+\end{equation*}
+from observations $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}\subseteq\R^d\times\{0, 1\}$, that were independently generated from $\Pc$. The issue is that linear predictions of the form $\theta^\tp x_i$ belongs to $\R$, while our model needs to output probabilities with values in the range $[0, 1]$. Therefore, the \emph{sigmoid} function is often used, which maps $\R$ to $[0, 1]$.
+
+\begin{definition}[Sigmoid function]
+    The sigmoid function $\sigma$ is defined by:
+    \begin{equation}
+        \begin{aligned}
+            \sigma : \R &\longrightarrow [0, 1]\\
+            z &\longmapsto \frac{1}{1+e^{-z}}
+        \end{aligned}
+    \end{equation}
+\end{definition}
+
+\begin{property}
+    The following identity holds: $\sigma(-z)=1-\sigma(z)$
+\end{property}
+
+\begin{property}[Derivative of sigmoid]
+    The derivative of sigmoid is: $\sigma'(z)=\sigma(z)\sigma(-z)$
+\end{property}
+
+Logistic regression assumes the underlying probabilistic model:
+\begin{equation*}
+    \P(Y=1|X)=\sigma(\theta^\tp X)
+\end{equation*}
+It is worth pointing out that this probabilistic model is satisfied for many natural models: for instance, if $X|Y=1$ and $X|Y=0$ follow independent Gaussian distributions, this model is satsfied.
+
+We can define the family of possible densities (with respect to the countable measure) on $\{0, 1\}$ considered here:
+\begin{equation}
+    \label{eq:parametric-model}
+    p_\theta(y|x) = \sigma(\theta^\tp x)^y\left(1-\sigma(\theta^\tp x)\right)^{1-y} = \begin{cases*}
+        1-\sigma(\theta^\tp x) & if $y=0$\\
+        \sigma(\theta^\tp x) & otherwise
+    \end{cases*}
+\end{equation}
+indexed by $\theta\in\R^d$. We recall that similarly to linear regression, to ease the notation, the intercept (to make affine predictions) may be included into the input $X$ by adding the constant 1 as the first coefficient.
+
+\begin{property}
+    Assume that the $(x_i, y_i)$ are realizations of i.i.d.~random variables. Then, the logistic regression estimator \begin{equation*}
+        \hat{\theta} \in\argmin_{\theta\in\R^d} \sum_{i=1}^n \ell(\theta^\tp x_i, y_i) \where \ell(x, y) := y\log\sigma(\theta^\tp x) + (1-y)\log\sigma(-\theta^\tp x)
+    \end{equation*}
+    matches the definition of the maximum likelihood estimator of $\theta\in\R^d$ with parametric model \eqref{eq:parametric-model}.
+\end{property}
+
+\begin{proof}
+    The conditional log-likelihood can be written:
+    \begin{equation*}
+        \begin{aligned}
+            \log L(\cdot|D_n) &= \sum_{i=1}^n \log p_\theta(y_i|x_i)\\
+            &= \sum_{i=1}^n \log\left(\sigma(\theta^\tp x)^y\left(1-\sigma(\theta^\tp x)\right)^{1-y}\right)\\
+            &= \sum_{i=1}^n y\log\left(\sigma(\theta^\tp x)\right) + (1-y)\log\left(1-\sigma(\theta^\tp x)\right)\\
+            &= \sum_{i=1}^n \ell(\theta^\tp x_i, y_i)
+        \end{aligned}
+    \end{equation*}
+    where $\ell$ is the logistic loss defined above.
+\end{proof}
 
 \subsection{Maximum a posteriori}
 
