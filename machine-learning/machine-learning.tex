@@ -2148,7 +2148,7 @@ In practice, maximizing a sum is easier than to maximize a product. Since $\log$
 \end{equation}
 
 \begin{example}[Bernoulli model]
-    For $\Y\{0, 1\}$ and $\Theta=[0, 1]$, we define the Bernoulli model as:
+    For $\Y=\{0, 1\}$ and $\Theta=[0, 1]$, we define the Bernoulli model as:
     \begin{equation*}
         p_\theta(y) = \theta^y(1-\theta)^{(1-y)}
     \end{equation*}
@@ -2184,6 +2184,48 @@ In particular, if $Y\sim p_{\theta_*}\dd\mu$, for some $\theta_*\in\Theta$, $\th
 Therefore, the empirical risk minimizer matches the maximum likelihood estimator.
 
 \subsubsection{Link with Kullback-Leibler divergence}
+The Kullback-Leibler divergence is a measure of dissimilarity between two probability distributions.
+
+\begin{definition}
+    Let $p\dd\mu$ and $q\dd\mu$ be two probability distributions with $p\ll q$\footnote{We say that $q$ is \emph{absolutely continuous with respect to $p$}, meaning that $q(A)=0\implies p(A)=0$}. The \emph{Kullback-Leibler divergence from $q$ to $q$} is defined as:
+    \begin{equation}
+        \KL(p||q) := \E_{Y\sim p\dd\mu} \left[\log\frac{p(Y)}{q(Y)}\right] = \int_{\Y}p(y)\log\frac{p(y)}{q(y)}\dd\mu(y)
+    \end{equation}
+\end{definition}
+
+The Kullback-Leibler divergence has two interpretations. In information theorey, it can be seen as the difference of symbols needed to encode $D_n$ under a code optimized for $p\dd\mu$ compared to a code optimized for $q\dd\mu$. 
+
+$\KL(p_\theta||p_{\theta_*})$ can also be interpreted as the excess risk of the measure $p_\theta\dd\mu$ when the data follows distribution $p_{\theta_*}\dd\mu$ for the negative log-likelihood loss function. Assume that the data $D_n$ was generated form $p_\theta$. Then, the excess risk can be written:
+\begin{equation*}
+    \begin{aligned}
+        \risk(\theta)-\risk(\theta_*) &= -\E_{Y\sim p_{\theta_*}\dd\mu}\left[\log p_\theta(Y)\right] + \E_{Y\sim p_{\theta_*}\dd\mu}\left[\log p_{\theta_*}(Y)\right]\\
+        &= \E_{Y\sim p_{\theta_*}\dd\mu}\left[\log \frac{p_{\theta_*}(Y)}{p_\theta(Y)}\right]\\
+        &=: \KL(p_{\theta_*}||p_\theta)
+    \end{aligned}
+\end{equation*}
+
+\begin{property}[Positivity]
+    By Jensen's inequality:
+    \begin{equation}
+        \KL(p||q) \geq 0
+    \end{equation}    
+\end{property}
+
+\begin{property}
+    \begin{equation}
+        \KL(p||p) = 0
+    \end{equation}
+    Therefore, $p_{\theta_*}$ minimizes the risk and maximizes the likelihood.
+\end{property}
+
+\begin{property}[Discrete case]
+    If $\Y$ is discrete and $\mu$ is the counting measure, we have:
+    \begin{equation}
+        \KL(p||q) = \sum_{y\in\Y}p(y)\log\frac{p(y)}{q(y)}
+    \end{equation}
+\end{property}
+
+Note that the KL divergence is often seen as a distance, but it does fill the requirements, since it is not symmetric and does not satisfy the triangular inequality.
 
 \subsubsection{Conditional modeling}
 
