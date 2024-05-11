@@ -2138,13 +2138,13 @@ Similarly, the probability of observering $(y_1, \dots, y_n)\in\Y^n$ if all the 
 \begin{definition}[Maximum likelihood estimator]
     The \emph{maximum likelihood estimator (MLE)} is the parameter which maximizes the likelihood, i.e.:
     \begin{equation}
-        \hat{\theta}_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n p_\theta(y_i)
+        \htheta_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n p_\theta(y_i)
     \end{equation}
 \end{definition}
 
 In practice, maximizing a sum is easier than to maximize a product. Since $\log$ is an increasing function, the maximum likelihood estimator also maximizes the \emph{$\log$-likelihood}:
 \begin{equation}
-    \hat{\theta}_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n \log p_\theta(y_i)
+    \htheta_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n \log p_\theta(y_i)
 \end{equation}
 
 \begin{example}[Bernoulli model]
@@ -2154,11 +2154,11 @@ In practice, maximizing a sum is easier than to maximize a product. Since $\log$
     \end{equation*}
     Assuming that $D_n$ was generated from a Bernoulli distribution of parameter $\theta_*$; then, the maximum likelihood estimator is:
     \begin{equation*}
-        \hat{\theta}_n\in\argmin_{0\leq\theta\leq1} \frac{1}{n} \sum_{i=1}^n \left[y_i\log\theta + (1-y_i)\log(1-\theta)\right]
+        \htheta_n\in\argmin_{0\leq\theta\leq1} \frac{1}{n} \sum_{i=1}^n \left[y_i\log\theta + (1-y_i)\log(1-\theta)\right]
     \end{equation*}
     Denoting $\bar{y}_n := \sum_{i=1}^ny_i$ the empirical average, we solve:
     \begin{equation*}
-        \frac{\dd\log L(\theta|D_n)}{\dd\theta} \biggr\rvert_{\theta=\hat{\theta}_n} = 0 \implies \frac{\bar{y}_n}{\hat{\theta}_n} - \frac{1-\bar{y}_n}{1-\hat{\theta}_n} \implies \hat{\theta}_n = \bar{y}_n
+        \frac{\dd\log L(\theta|D_n)}{\dd\theta} \biggr\rvert_{\theta=\htheta_n} = 0 \implies \frac{\bar{y}_n}{\htheta_n} - \frac{1-\bar{y}_n}{1-\htheta_n} \implies \htheta_n = \bar{y}_n
     \end{equation*} 
     Therefore, the maximum likelihood estimator is in this case the empirical mean.
 \end{example}
@@ -2259,11 +2259,11 @@ but do depend on the inputs. The risk and the empirical risk with negative log-l
 This is useful if one wants to predict the distribution or the value of a new ouput $Y$ given an input $X$.
 
 \subsubsection{Linear regression as conditional modeling}
-Unlike Hinge loss, logistic loss has a probabilist interpretaton. Consider $(X, Y)\sim\Pc$ a pair of input-output random variables in $\R^d\times\{0, 1\}$. In binary classification, the objective is to predict the probability that $Y=1$ given the input $X$. In other words, we want to estimate:
+Unlike Hinge loss, logistic loss has a probabilist interpretaton. Consider $(X, Y)\sim\Pc$ a pair of input-output random variables in $\R^d\times\{0, 1\}$. In binary classification, the objective is to predict the probability that $Y=1$ given the input $X$. In other words, we want to estimate $\P(Y=1|X)$, that is:
 \begin{equation*}
-    \P(Y=1|X) = x \mapsto \P(Y=1|X=x)
+    x \longmapsto \P(Y=1|X=x)
 \end{equation*}
-from observations $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}\subseteq\R^d\times\{0, 1\}$, that were independently generated from $\Pc$. The issue is that linear predictions of the form $\theta^\tp x_i$ belongs to $\R$, while our model needs to output probabilities with values in the range $[0, 1]$. Therefore, the \emph{sigmoid} function is often used, which maps $\R$ to $[0, 1]$.
+from observations $D_n=\set{(x_i, y_i)}{i\in\iset{1}{n}}\subseteq\R^d\times\{0, 1\}$, that were independently generated from $\Pc$. The issue is that linear predictions of the form $\theta^\tp x_i$ belong to $\R$, while our model needs to output probabilities with values in the range $[0, 1]$. Therefore, the \emph{sigmoid} function is often used, which maps $\R$ to $[0, 1]$.
 
 \begin{definition}[Sigmoid function]
     The sigmoid function $\sigma$ is defined by:
@@ -2301,7 +2301,7 @@ indexed by $\theta\in\R^d$. We recall that similarly to linear regression, to ea
 
 \begin{property}
     Assume that the $(x_i, y_i)$ are realizations of i.i.d.~random variables. Then, the logistic regression estimator \begin{equation*}
-        \hat{\theta} \in\argmin_{\theta\in\R^d} \sum_{i=1}^n \ell(\theta^\tp x_i, y_i) \where \ell(x, y) := y\log\sigma(\theta^\tp x) + (1-y)\log\sigma(-\theta^\tp x)
+        \htheta \in\argmin_{\theta\in\R^d} \sum_{i=1}^n \ell(\theta^\tp x_i, y_i) \where \ell(x, y) := y\log\sigma(\theta^\tp x) + (1-y)\log\sigma(-\theta^\tp x)
     \end{equation*}
     matches the definition of the maximum likelihood estimator of $\theta\in\R^d$ with parametric model \eqref{eq:parametric-model}.
 \end{property}
@@ -2320,6 +2320,45 @@ indexed by $\theta\in\R^d$. We recall that similarly to linear regression, to ea
 \end{proof}
 
 \subsection{Maximum a posteriori}
+If the dimension $d$ of the parameter space $\Theta$ is too large compared to the number of samples $n$, the maximum likelihood estimator (MLE) may lead to poor performance. Similarly to least square linear regression without regularization, MLE overfits when $d>n$. A second limitation is that no prior knowledge on the parameters $\theta$ is included. Let us detail this using an example.
+
+\begin{example}
+    We consider the multinomial model where each observation is a discrete observation in $k$ classes $\{1, \dots, k\}$. Each class $j\in\{1, \dots, k\}$ is samples with a probability $\theta^*_j$, and we aim at retrieving these probabilities. We define for convenience the output set:
+    \begin{equation*}
+        \Y=\set{y\in\{0, 1\}^k}{\sum_{i=1}^ky_i=1}
+    \end{equation*}
+    An observation $y$ is sucht that $y(j)=1$ if it is in class $j\in\{1, \dots, k\}$, and 0 otherwise. The multinomial model consists of densities of the form:
+    \begin{equation*}
+        p_\theta : y\in\Y\longmapsto\prod_{j=1}^k\theta_j^{y(j)} \where \theta\in[0, 1]^k, \quad \sum_{j=1}^k\theta_j=1
+    \end{equation*} 
+    In other words, the probability of an observation to be in class $j$ equals $\theta_j$, since only one term of the product is different from 1. The dimension of the parameter space is $d=k-1$ --  we choose $k$ coefficients for $\theta$, with 1 constraint. The MLE is:
+    \begin{equation*}
+        \htheta_j = \argmax_{\theta_j} \frac{1}{n}\sum_{i=1}^n y_i(j)\log\theta_j = \frac{n_j}{n} \where n_j = \sum_{i=1}^n y_i(j)
+    \end{equation*}
+    $n_j$ is the number of occurence of class $j$ in the data set. If $k>n$, many classes $j$ are never observed and estimated with 0. This can happen, for example, when we are trying to associate probabilities to words, each word being its own class, but the number of possible words $k$ is much larger than the number of words in the dataset text. The log-loss of these options is infinite, and so is the risk $\risk(\theta)$. We say that the model is overestimating.
+\end{example}
+
+This problem can be solved by adding a regularization, which can also be seen from a Bayesian point of view as a prior distribution over the possible distributions $\theta$. This is what Maximum a Posteriori (MAP) does. The idea behind MAP is to see the parameter $\theta$ as a random variable taking values in $\Theta$, and to choose the most probable value $\htheta^{\textnormal{MAP}}$ for the observed data. Given the data set $D_n$, the MAP can be formalized as the solution of:
+\begin{equation*}
+    \htheta_n^{\textnormal{MAP}}\in\argmax_{\theta\in\Theta}p(\theta|D_n)
+\end{equation*}
+where $p(\theta|D_n)$ is the density of the posterior distribution of the model given the data. In discrete model space $\Theta$, the MAP is exactly the most probable model. To calculate the posterior distribution we use the Bayes rule:
+\begin{equation*}
+    p(\theta|D_n) = \frac{p(D_n|\theta)\cdot p(\theta)}{p(D_n)}
+\end{equation*}
+where:
+\begin{itemize}
+    \item $D_n$ is a random data set
+    \item $p(D_n|\theta)$ is the probability density of observing $D_n$ is the distribution follows $p_\theta\dd\mu$. This is exactly the likelihood $L(\theta|D_n)$
+    \item $p(\theta)$ is the prior distribution of the model, that this how likely we think it is before seeing the data
+    \item $p(D_n)$ is the marginal distribution of the data
+\end{itemize}
+
+Hence, the MAP is the solution of:
+\begin{equation}
+    \htheta_n^{\textnormal{MAP}} \in \argmax_{\theta\in\Theta} L(\theta|D_n)\cdot p(\theta) = \argmin_{\theta\in\Theta} -\frac{1}{n}\sum_{i=1}^n\log p_\theta(y_i) + \log\frac{1}{p(\theta)}
+\end{equation}
+In some situation, we may not have to prefer one model over another, and one can think of $p(\theta)$ as a constant of the parameter space $\Theta$. Then, the MAP with uniform prior reduces to the MLE. However, this assumption that $p(\theta)$ is constant is problematic, because uniform distribution cannot always be defined if $\Theta$ is not compact. Therefore, it may be better to see MAP as a regularized version of MLE, with a regularization of the form $-\log p(\theta)$, rather than MLE as a particular case of MAP with uniform prior.
 
 \section{Posterior sampling using MCMC and SGLD}
 
