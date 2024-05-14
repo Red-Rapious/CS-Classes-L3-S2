@@ -2361,6 +2361,85 @@ Hence, the MAP is the solution of:
 In some situation, we may not have to prefer one model over another, and one can think of $p(\theta)$ as a constant of the parameter space $\Theta$. Then, the MAP with uniform prior reduces to the MLE. However, this assumption that $p(\theta)$ is constant is problematic, because uniform distribution cannot always be defined if $\Theta$ is not compact. Therefore, it may be better to see MAP as a regularized version of MLE, with a regularization of the form $-\log p(\theta)$, rather than MLE as a particular case of MAP with uniform prior.
 
 \section{Posterior sampling using MCMC and SGLD}
+So far, we have discussed several tasks that arise in statistical leraning, and we expressed most of these tasks by certain optimization problems, such as the empirical risk minimization problem. The Maximum A Posteriori (MAP) estimation problem, introduced in the previous chapter, being one of the examples of such optimization problems, arose natuarally when we limited ourselves to the framework of probabilistic modeling. In this chapter, we will again consider the probabilistic modeling framework, but this time with a different question than the MAP estimation problem.
+
+\subsection{Introduction}
+\subsubsection{Bayesian probabilistic model}
+Let's start by remembering what a Bayesian probabilistic model is. The main idea in Bayesian modeling is to treat the parameter of interest $\theta\in\R^d$ as a random vector that follows a \emph{prior distribution} $p(\theta)$. 
+
+A single observation $y$ is assumed to be a random variable drawn from the \emph{conditional distribution} $p(y|\theta)$. We typically consider $n$ observations $D_n=\{y_1, \dots, y_n\}$, which are i.i.d.~distributed when conditioned on $\theta$. 
+
+We often denote a Bayesian probabilistic model as follows:
+\begin{equation}
+    \begin{aligned}
+        \theta&\sim p(\theta)\\
+        \forall i\in\iset{1}{n}, \quad y_i|\theta&\sim p(y|\theta)
+    \end{aligned}
+\end{equation}
+Under this model, the goal in MAP estimation is to find the value $\htheta_n$ that maximizes the \emph{posterior distribution}:
+\begin{equation}
+    p(\theta|D_n) = \frac{p(D_n|\theta)p(\theta)}{p(D_n)}
+\end{equation}
+
+Since the logarithm function is monotonic and $p(D_n)$ does not depend on $\theta$, the MAP estimation problem can be written in the following form:
+\begin{equation}
+    \htheta_n\in\argmax_\theta \sum_{i=1}^n\log p(y_i|\theta)+\log p(\theta)
+\end{equation}
+
+\subsubsection{Level of uncertainty}
+The MAP estimator can be very useful in practical applications and there is a broad literature for solving this optimization problem for a variety of choices of prior distributions, with various theoretical guarantees. However, in a broad range of applications, a single point estimate can be insufficient, especially for risk-intolerant applications (such as autonomous driving). Hence, it would be of interest to extract more information about our estimate to have an understanding of \emph{the level of uncertainty} in our estimation.
+
+While there are many ways of doing this, here, we will consider the Bayesian approach and try to infer the uncertainty information by making a better use of the posterior distribution. For instance, as a measure of uncertainty, we can consider the posterior variance.
+
+\begin{definition}[Posterior variance]
+    The \emph{posterior variance}, denoted $\sigma^2_{\textnormal{post}}$, is defined by:
+    \begin{equation}
+        \sigma^2_{\textnormal{post}} := \int\norm{\theta-\mu_{\textnormal{post}}}^2 \cdot p(\theta|D_n)\dd\theta 
+        \where \mu_{\textnormal{post}} := \int \theta\cdot p(\theta|D_n)\dd\theta
+    \end{equation}
+    Note that $\mu_{\textnormal{post}}$ is the posterior expectation. Intuitively, if the value of $\sigma^2_{\textnormal{post}}$ is high, we might conclude that there is a high uncertainty in our estimation: the posterior distribution is too widespread. If $\sigma^2_{\textnormal{post}}$ is low, we might be confident in our estimation.
+\end{definition}
+
+In general, the goal in Bayesian statistics is to compute the expectation of a \emph{test function} $f:\R^d\to\R$ under the posterior distribution:
+\begin{equation}
+    \label{eq:test-function-expectation}
+    \bar{f} := \E_{\theta\sim p(\theta|D_n)}[f(\theta)] = \int f(\theta)\cdot p(\theta|D_n)\dd\theta
+\end{equation}
+As opposed to MAP estimation, where the marginal liklihood $p(D_n)$ is irrelevant and can be safely discarded, this task unfortunately needs all the information about the posterior distribution, including $p(D_n)=\int p(D_n|\theta)\cdot p(\theta)\dd\theta$. Therefore, computing these integrals can become very difficult very quickly, especially when $d$ is large.
+
+\subsection{Markov Chain Monte-Carlo (MCMC)}
+There are many ways to approximately compute integrals. In this chapter, we will consider an instance of a powerful family of tools, that is called Markov Chain Monte-Carlo (MCMC) methods. In this section, we will cover the main idea in MCMC and then in the next section, we will introduce the algorithm that is the main topic of this chapter (SGLD).
+
+\subsubsection{Monte-Carlo estimator}
+Let us first consider the following \say{ideal} scenario and assume that we ahve access to an algorithm that can give us independent random samples drawn from the posterior distribution $p(\theta|D_n)$:
+\begin{equation*}
+    \theta_k\sim p(\theta|D_n), \quad \textnormal{for} \: k\in\iset{1}{K}
+\end{equation*}
+If this was the case, we could introduce an estimator to \eqref{eq:test-function-expectation} easily:
+\begin{equation}
+    \label{eq:monte-carlo-estimator}
+    \hatf_K := \frac{1}{K}\sum_{k=1}^K f(\theta_k)
+\end{equation}
+This estimator is called the Monte-Carlo estimator, and under mild integrability assumptions, we would know that:
+\begin{equation*}
+    \hatf_K\xrightarrow[K\to+\infty]{}\bar{f}
+\end{equation*}
+However, this approach introduces a new question: \say{\emph{How can we draw samples from $p(\theta|D_n)$?}}
+
+\subsubsection{Sampling with Markov processes}
+The goal in MCMC methods is to address this question through the theory of Markov processes. Essentially, we will try to \say{design} a Markov process $\theta_t\in\R^d$ -- for either continuous-time $t\in\R_+$ or discrete-time $t\in\N$ -- in such a way that the probability distribution of $\theta_t$ converges to the posterior distribution. Denoting by $q(\theta, t)$ the probability distribution of $\theta_t$, we want:
+\begin{equation*}
+    q(\theta, t) \xrightarrow[t\to+\infty]{} p(\theta|D_n)
+\end{equation*}
+
+If we can manage to design such a Markov process, the above convergence property will imply that, as we keep simulating the Markov process, the probability distribution of the latest sample will get closer and closer to the prosterior distribution. Hence, after simulating the Markov process for a sufficiently long period of time, we can treat the simulated trajectory of the process as \say{approximate samples} drawn from the posterior distribution. Finally, we can use them for approximating $\bar{f}$ by computing a sample average as in \eqref{eq:monte-carlo-estimator}.
+
+\subsection{Stochastic Gradient Langevin Dynamics}
+\subsubsection{The Langevin equation}
+
+\subsubsection{Numerical simulation}
+
+\subsubsection{Stochastic Gradient Langevin Dynamics}
 
 \section{Neural Networks}
 
