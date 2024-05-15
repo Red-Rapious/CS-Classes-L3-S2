@@ -2435,7 +2435,57 @@ The goal in MCMC methods is to address this question through the theory of Marko
 If we can manage to design such a Markov process, the above convergence property will imply that, as we keep simulating the Markov process, the probability distribution of the latest sample will get closer and closer to the prosterior distribution. Hence, after simulating the Markov process for a sufficiently long period of time, we can treat the simulated trajectory of the process as \say{approximate samples} drawn from the posterior distribution. Finally, we can use them for approximating $\bar{f}$ by computing a sample average as in \eqref{eq:monte-carlo-estimator}.
 
 \subsection{Stochastic Gradient Langevin Dynamics}
+The Stochastic Gradient Langevin Dynamics (SGLD) algorithm was relatively recently proposed as an alternative to existing MCMC approaches, where its main goal was to be able to scale up to large-scale, modern machine learning problems. The algorithm is based on the famous Langevin equation, which arose from statistical physics. 
+
+\subsubsection{Notation}
+Before defining the equation, let us introduce some terms, which will ease the overall notation clutter. We will follow the classical Bayesian statistics notation and from now on, we will denote the posterior distribution by using $\pi$, such that $\pi(\theta)=p(\theta|D_n)$.
+
+\begin{definition}[Potential energy function]
+    By analogy to physics, we define the \emph{potential energy function} as:
+    \begin{equation}
+        U(\theta) := - \sum_{i=1}^n \log p(y_i|\theta)-\log p(\theta)
+    \end{equation}
+    Note that this is this opposite of the quantity that we are trying to maximize to find the MAP estimator. We have access to $U$, since we assume that we know both the likelihood function and the prior distribution.
+\end{definition}
+
+\begin{property}[Posterior distribution as a function of the potential energy]
+    With the previous notations, we have:
+    \begin{equation}
+        \pi(\theta) = \frac{\exp(-U(\theta))}{\int \exp\left(-U(\theta')\right)\dd\theta'}
+    \end{equation}
+\end{property}
+
+Even though the marginal likelihood term $p(D_n)$ appears in the denominator, notice that if we want to compute the gradient of $\theta\longmapsto\log\pi(\theta)$ with respect to $\theta$, this term vanishes:
+\begin{equation*}
+    \nabla\log\pi(\theta)=-\nabla U(\theta)
+\end{equation*}
+
+This shows that, even though we do not know what the marginal likelihood is, we can still compute the gradient of $\log\pi$ since we have access to $U$. This is an important property and will form one of the bases of SGLD.
+
 \subsubsection{The Langevin equation}
+\begin{definition}[Brownian motion]
+    The \emph{standard Brownian motion} in $\R^d$ is defined as:
+    \begin{equation}
+        \begin{cases*}
+            B_0=0 & almost surely\\
+            \forall t_0<t_1<\dots<t_N,\quad B_{t_n}-B_{t_{n-1}} & are independent\\
+            \forall s<t, \quad B_t-B_s \textnormal{ and } B_{t-s} & follow the same distribution $\mathcal{N}(0, (t-s)I)$\\
+            B_t & is continuous almost surely
+        \end{cases*}
+    \end{equation}
+\end{definition}
+
+\begin{definition}[Langevin equation]
+    The \emph{Langevin equation} is a Stochastic Differnetial Equation (SDE):
+    \begin{equation}
+        \dd\theta_t = -\nabla U(\theta_t)+\sqrt{2}\dd B_t
+    \end{equation}
+    It is a shorthand notation for the \emph{Markov process} that is defined as follows, which is much more intuitive:
+    \begin{equation}
+        \theta_t = \theta_0 - \int_0^t\nabla U(\theta_s)\dd s+\sqrt{2}B_t
+    \end{equation}
+    for some given initialization $\theta_0$.
+\end{definition}
 
 \subsubsection{Numerical simulation}
 
