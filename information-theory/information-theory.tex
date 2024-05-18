@@ -21,7 +21,7 @@ Let $\X$ be a finite or countable set, and $p := \{p(x) \: | \: x\in \X \}$ be a
 
 \begin{definition}[Shannon's entropy] We define (Shannon's) entropy $H(p)$ of $p$ to be:
 \begin{equation}
-    H(p) := -\sum_{x\in\X}p(x)\log p(x)
+    \boxed{H(p) := -\sum_{x\in\X}p(x)\log p(x)}
 \end{equation}
 with the convention that $0\log 0 = 0$, and $a\log 0 = -\infty$ for $a>0$.
 We will later on discuss the base of the logarithm.
@@ -103,7 +103,7 @@ The entropy $H(p)$ can be interpreted as the \emph{amount of information} carrie
     Let $p$ and $q$ be two probability distributions on $\X$. Then:
     \begin{equation}
         \label{eq:gibbs}
-        H(p) = -\sum_{x\in\X} p(x)\log p(x)  \leq - \sum_{x\in\X} p(x)\log q(x)
+        \boxed{H(p) = -\sum_{x\in\X} p(x)\log p(x)  \leq - \sum_{x\in\X} p(x)\log q(x)}
     \end{equation}
     Moreover, if $H(p)<\infty$, then there is equality in \eqref{eq:gibbs} if and only if $p=q$.
 \end{theorem}
@@ -187,7 +187,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 \begin{property}[Entropy of independent variables]
     Let $X:=(X_1, \dots, X_n)$ be a vector of \emph{idenpendent}, random variables. Then:
     \begin{equation}
-        H(X)=\sum_{i=1}^n H(X_i)
+        \boxed{H(X)=\sum_{i=1}^n H(X_i)}
     \end{equation}
 \end{property}
 
@@ -207,7 +207,7 @@ The right-hand-side of \eqref{eq:gibbs} is called \emph{cross entropy} between $
 \begin{property}[Independence maximizes entropy]
     Let $X:=(X_1, \dots, X_n)$ be a vector of (arbitrary) random variables for some $n\geq 1$. Then:
     \begin{equation}
-        H(X)\leq \sum_{i=1}^n H(X_i)
+        \boxed{H(X)\leq \sum_{i=1}^n H(X_i)}
     \end{equation}
     Moreover, the equality holds if and only if $X_1, \dots, X_n$ are independent.
 \end{property}
@@ -455,9 +455,9 @@ In general, efficient codes will have code-words with variable length, with more
 
 \begin{definition}[Codes uniquely decipherable (UD)]
     A code $c: \X\to\A^\star$ is \emph{uniquely decipherable} (UD) if $\forall k, l \geq 1, \forall x_1\dots x_k\in \X, \forall y_1, \dots, y_l\in \X$,
-    \begin{equation*}
-        c(x_1)*\dots*c(x_k)=c(y_1)*\dots*c(y_l) \implies k=l \land \forall i\in\llbracket 1, k\rrbracket, x_i=y_i
-    \end{equation*}
+    \begin{equation}
+        \boxed{c(x_1)*\dots*c(x_k)=c(y_1)*\dots*c(y_l) \implies k=l \land \forall i\in\llbracket 1, k\rrbracket, x_i=y_i}
+    \end{equation}
 \end{definition}
 
 \begin{remark}
@@ -472,9 +472,9 @@ In general, efficient codes will have code-words with variable length, with more
 
 \begin{definition}[Prefix-free (PF) codes]
     A code $c: \X\to\A^\star$ is \emph{prefix-free (PF)} if
-    \begin{equation*}
-        \nexists x\neq y\in \X, \exists a\in\A^\star,\: c(x)*a=c(y)
-    \end{equation*} 
+    \begin{equation}
+        \boxed{\nexists x\neq y\in \X, \exists a\in\A^\star,\: c(x)*a=c(y)}
+    \end{equation} 
     When such an $a\in\A^\star$ exists, $c(x)$ is said to be a \emph{prefix} of $c(y)$.
 \end{definition}
 
@@ -653,7 +653,7 @@ Kraft's inequality will be our main tool in studying the performance of UD and P
         \item If $c$ is UD then
         \begin{equation}
             \label{eq:kraft-ineq}
-            \sum_{x\in\X} D^{-l(c(x))}\leq 1
+            \boxed{\sum_{x\in\X} D^{-l(c(x))}\leq 1}
         \end{equation}
 
         \item Let $\{l(x)\:|\:x\in\X\}$ be a collection of non-negative integers. If
@@ -1548,25 +1548,25 @@ Universal source coding consists in coding without prior knowledge of the source
 \subsection{Kullback-Leibler divergence}
 \begin{definition}[Kullback-Leibler (KL) divergence]
     The \emph{Kullback-Leibler (KL) divergence} betwween two distributions $p, q$ on $\X$ is defined by:
-    \begin{equation*}
-        D(p, q) := \sum_{x\in\X}p(x)\log\frac{p(x)}{q(x)}
-    \end{equation*}
+    \begin{equation}
+        \boxed{D(p; q) := \sum_{x\in\X}p(x)\log\frac{p(x)}{q(x)}}
+    \end{equation}
     If $\log=\log_b$, we note $D=D_b$.
 \end{definition}
 
 \begin{property}[Relationship to the cross entropy]
-    The following relationship with the \emph{cross entropy} $H(p, q)$ holds:
+    The following relationship with the \emph{cross entropy} $H(p; q)$ holds:
     \begin{equation}
         \label{eq:relationship-cross-entropy}
-        H(p, q) := - \sum_{x\in\X}p(x)\log q(x) = H(p) + D(p, q)
+        H(p; q) := - \sum_{x\in\X}p(x)\log q(x) = H(p) + D(p; q)
     \end{equation}
 \end{property}
 
 \begin{property}[Positivity]
     \begin{equation*}
         \begin{aligned}
-        &D(p, q) \geq 0\\
-        D(p, q) &= 0\iff p=q
+        &D(p; q) \geq 0\\
+        D(p; q) &= 0\iff p=q
         \end{aligned}
     \end{equation*}
 \end{property}
@@ -1577,8 +1577,8 @@ Universal source coding consists in coding without prior knowledge of the source
 \begin{remark}
     \leavevmode
     \begin{itemize}
-        \item KL divergence is not symmetric: in general, $D(p, q)\neq D(q, p)$ and thus is not a distance (metric) on the space of probability measures.
-        \item If $D(p, q)<+\infty$ then $p$ is \emph{absolute continuous} with respect to $q$, denoted by $p << q$, meaning $q(x)=0 \implies p(x)=0$.
+        \item KL divergence is not symmetric: in general, $D(p; q)\neq D(q; p)$ and thus is not a distance (metric) on the space of probability measures.
+        \item If $D(p; q)<+\infty$ then $p$ is \emph{absolute continuous} with respect to $q$, denoted by $p << q$, meaning $q(x)=0 \implies p(x)=0$.
     \end{itemize}
 \end{remark}
 
@@ -1919,9 +1919,9 @@ In what follows, $\X, \Y, \Zc$ denote finite sets.
 
 \begin{definition}[Conditional entropy]
     For a random vector $(X, Y)$ on $\X\times\Y$, we define the \emph{conditional entropy of $X$ given $Y$} by:
-    \begin{equation*}
-        H(X|Y) := H(X, Y)-H(Y)
-    \end{equation*}
+    \begin{equation}
+        \boxed{H(X|Y) := H(X, Y)-H(Y)}
+    \end{equation}
     where $H(X, Y)$ is the joint entropy of the vector $(X, Y)$ and $H(Y)$ is the marginal entropy of $Y$.
 \end{definition}
 
