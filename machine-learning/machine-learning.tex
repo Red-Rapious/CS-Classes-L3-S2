@@ -2144,7 +2144,7 @@ Similarly, the probability of observering $(y_1, \dots, y_n)\in\Y^n$ if all the 
 
 In practice, maximizing a sum is easier than to maximize a product. Since $\log$ is an increasing function, the maximum likelihood estimator also maximizes the \emph{$\log$-likelihood}:
 \begin{equation}
-    \htheta_n\in\argmax_{\theta\in\Theta} \prod_{i=1}^n \log p_\theta(y_i)
+    \htheta_n\in\argmax_{\theta\in\Theta} \sum_{i=1}^n \log p_\theta(y_i)
 \end{equation}
 
 \begin{example}[Bernoulli model]
