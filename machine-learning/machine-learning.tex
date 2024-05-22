@@ -2482,10 +2482,23 @@ This shows that, even though we do not know what the marginal likelihood is, we 
     \end{equation}
     It is a shorthand notation for the \emph{Markov process} that is defined as follows, which is much more intuitive:
     \begin{equation}
+        \label{eq:langevin-int}
         \theta_t = \theta_0 - \int_0^t\nabla U(\theta_s)\dd s+\sqrt{2}B_t
     \end{equation}
     for some given initialization $\theta_0$.
 \end{definition}
+
+Let us illustrate why the Langevin equation is interesting for our purposes. Let us denote the trajectory $(\theta_t)_{\theta\geq0}$ as defined in \eqref{eq:langevin-int} (this is called a \say{solution} of the SDE). We will try to understand how the probablility distribution of $\theta_t$ evolves over time $t$. To do so, let us denote the distribution of $\theta_t$ by the density function $q(\theta, t)$. We will now illustrate that $q(\cdot, t)\to\pi$ as $t\to+\infty$, which is going to be crucial for the reasons that we discussed in the previous section -- this would allow us to sample from distribution $\pi$.
+
+For simplicity, assume that $d=1$. The definition becomes:
+\begin{equation*}
+    \dd\theta_t=-\partial_\theta U(\theta_t)+\sqrt{2}\dd B_t
+\end{equation*}
+To understand how $q(\theta, t)$ evolves, we will use another famous equation, the Fokker-Planck equation, which governs the evolution of $q(\theta, t)$ through the following partial differential equation:
+\begin{equation*}
+    \partial_t q(\theta, t)=\partial_\theta\left[\partial_\theta U(\theta)q(\theta, t)\right]+\partial^2_\theta q(\theta, t)
+\end{equation*}
+This equation characterizes how the \say{change} in $q(\cdot, t)$ behaves, i.e.~$\partial_t q(\theta, t)$. Now, the idea is that if $q(\cdot, t)$ converges to a distribution as $t\to+\infty$, then whenever this limit is reached, there should not be any more changes in $q$. In other words, whenever $q(\cdot, t)$ hits its limit, $\partial_t q(\theta, t)$ has to be equal to 0.
 
 \subsubsection{Numerical simulation}
 
