@@ -2301,7 +2301,7 @@ indexed by $\theta\in\R^d$. We recall that similarly to linear regression, to ea
 
 \begin{property}
     Assume that the $(x_i, y_i)$ are realizations of i.i.d.~random variables. Then, the logistic regression estimator \begin{equation*}
-        \htheta \in\argmin_{\theta\in\R^d} \sum_{i=1}^n \ell(\theta^\tp x_i, y_i) \where \ell(x, y) := y\log\sigma(\theta^\tp x) + (1-y)\log\sigma(-\theta^\tp x)
+        \htheta \in\argmin_{\theta\in\R^d} \sum_{i=1}^n \ell(\theta^\tp x_i, y_i) \where \ell(x, y) := y\log\sigma(x) + (1-y)\log\sigma(-x)
     \end{equation*}
     matches the definition of the maximum likelihood estimator of $\theta\in\R^d$ with parametric model \eqref{eq:parametric-model}.
 \end{property}
@@ -2505,6 +2505,8 @@ This equation characterizes how the \say{change} in $q(\cdot, t)$ behaves, i.e.~
 \subsubsection{Stochastic Gradient Langevin Dynamics}
 
 \section{Neural Networks}
+\subsection{Introduction}
+
 
 \section{Appendix}
 \subsection{Complexity of linear algebra computations}
