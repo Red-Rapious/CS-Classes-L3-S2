@@ -2361,7 +2361,7 @@ Hence, the MAP is the solution of:
 In some situation, we may not have to prefer one model over another, and one can think of $p(\theta)$ as a constant of the parameter space $\Theta$. Then, the MAP with uniform prior reduces to the MLE. However, this assumption that $p(\theta)$ is constant is problematic, because uniform distribution cannot always be defined if $\Theta$ is not compact. Therefore, it may be better to see MAP as a regularized version of MLE, with a regularization of the form $-\log p(\theta)$, rather than MLE as a particular case of MAP with uniform prior.
 
 \section{Posterior sampling using MCMC and SGLD}
-So far, we have discussed several tasks that arise in statistical leraning, and we expressed most of these tasks by certain optimization problems, such as the empirical risk minimization problem. The Maximum A Posteriori (MAP) estimation problem, introduced in the previous chapter, being one of the examples of such optimization problems, arose natuarally when we limited ourselves to the framework of probabilistic modeling. In this chapter, we will again consider the probabilistic modeling framework, but this time with a different question than the MAP estimation problem.
+So far, we have discussed several tasks that arise in statistical learning, and we expressed most of these tasks by certain optimization problems, such as the empirical risk minimization problem. The Maximum A Posteriori (MAP) estimation problem, introduced in the previous chapter, being one of the examples of such optimization problems, arose natuarally when we limited ourselves to the framework of probabilistic modeling. In this chapter, we will again consider the probabilistic modeling framework, but this time with a different question than the MAP estimation problem.
 
 \subsection{Introduction}
 \subsubsection{Bayesian probabilistic model}
@@ -2495,14 +2495,98 @@ For simplicity, assume that $d=1$. The definition becomes:
     \dd\theta_t=-\partial_\theta U(\theta_t)+\sqrt{2}\dd B_t
 \end{equation*}
 To understand how $q(\theta, t)$ evolves, we will use another famous equation, the Fokker-Planck equation, which governs the evolution of $q(\theta, t)$ through the following partial differential equation:
-\begin{equation*}
+\begin{equation}
+    \label{eq:fokker-planck} 
     \partial_t q(\theta, t)=\partial_\theta\left[\partial_\theta U(\theta)q(\theta, t)\right]+\partial^2_\theta q(\theta, t)
-\end{equation*}
+\end{equation}
 This equation characterizes how the \say{change} in $q(\cdot, t)$ behaves, i.e.~$\partial_t q(\theta, t)$. Now, the idea is that if $q(\cdot, t)$ converges to a distribution as $t\to+\infty$, then whenever this limit is reached, there should not be any more changes in $q$. In other words, whenever $q(\cdot, t)$ hits its limit, $\partial_t q(\theta, t)$ has to be equal to 0.
 
+Therefore, we can simply \say{check} if $\pi$ is a limit of $q(\cdot, t)$ by replacing $q(\theta, t)$ with $\pi(\theta)$ in \eqref{eq:fokker-planck}, and observing whether the right-hand side of \eqref{eq:fokker-planck} is equal to 0 or not. Let us apply this procedure:
+\begin{equation*}
+    \begin{aligned}
+        \partial_\theta\left[\partial_\theta U(\theta)\pi(\theta, t)\right]+\partial^2_\theta\pi(\theta, t) &= \partial_\theta[\partial_\theta U(\theta)\pi(\theta)+\partial_\theta\pi(\theta)]\\
+        &= \partial_\theta[\partial_\theta U(\theta)\pi(\theta)-\partial_\theta U(\theta)\pi(\theta)]
+        &= 0
+    \end{aligned}
+\end{equation*}
+since
+\begin{equation*}
+    \begin{aligned}
+        \partial_\theta U(\theta) &= -\partial_\theta\log\pi(\theta)\\
+        &= -\frac{1}{\pi(\theta)}\partial_\theta\pi(\theta)
+    \end{aligned}
+\end{equation*}
+hence:
+\begin{equation*}
+    \partial_\theta\pi(\theta) = -\partial_\theta U(\theta)\pi(\theta)
+\end{equation*}
+
+This shows that if we can simulate the process in \eqref{eq:langevin-int}, and obtain $(\theta_t)_{t\geq0}$, the distribution of $\theta_t$ will get closer and closer to $\pi$, which is our posterior distribution. Hence, if we could simulate the process, we could use $\theta_t$ as an \say{approximate sample} for $\pi$, for $t$ large enough. Given our ultimate goal of approximating expectations by finite averages, such $\theta_t$ can be used conveniently in the samples averages.
+
 \subsubsection{Numerical simulation}
+Unfortunately, an exact simulation of $(\theta_t)_{t\geq0}$ is not possible in general since $t$ is continuous and \eqref{eq:langevin-int} cannot be analytically computed in general. However, we can develop approximate simulation algorithms with nice computational properties. In the stochastic analysis literature, such approximations are called \say{disretizations}, since we would like to \say{discretize}
+the continuous-time process.
+
+One of the most common and also simplest discretization schemes is called the Euler-Maruyama scheme, which is based on the following idea. Given $\theta_0$, let us try to compute $\theta_\eta$, for a very small $\eta$.
+Then, following \eqref{eq:langevin-int}, we have:
+\begin{equation}
+    \theta_\eta=\theta_0-\int_0^\eta\nabla U(\theta_t)\dd t + \sqrt{2}B_\eta
+\end{equation}
+
+Using the definition of the Brownian motion, we know that $\sqrt{2}B_\eta$ is equal in distribution to $\sqrt{2\eta}Z$, where $Z\sim\mathcal{N}(0, I)$, since $B_\eta\sim\mathcal{N}(0, \eta I)$. On the other hand, since we chose $\eta$ very small, we can assume that $\nabla U(\theta_t)$ \say{does not change much} for $t\in[0, \eta]$. Hence, we can replace $\nabla U(\theta_t)$ with $\nabla U(\theta_0)$ in the above equation, giving us:
+\begin{equation*}
+    \begin{aligned}
+        \theta_\eta &\simeq \theta_0 - \int_0^\eta\nabla U(\theta_0)\dd t + \sqrt{2\eta}Z\\
+        &=\theta_0 - \left(\int_0^\eta\dd t\right)\nabla U(\theta_0) + \sqrt{2\eta}Z\\
+        &= \theta_0-\eta\nabla U(\theta_0)+\sqrt{2\eta}Z
+    \end{aligned}
+\end{equation*}
+
+We can now iterate this approach $k$ times, giving us a recursion easily implementable on a computer:
+\begin{equation}
+    \theta_{k\eta} \simeq \theta_{(k-1)\eta}-\eta\nabla U(\theta_{k-1}\eta)+\sqrt{2\eta}Z_k
+\end{equation}
+where $\forall k, Z_k\sim\mathcal{N}(0, I)$.
+To simplify the noation, we can drop the dependence on $\eta$, which finally yields the following recursion:
+\begin{equation}
+    \label{eq:langevin-mc}
+    \theta_k=\theta_{k-1}-\eta\nabla U(\theta_{k-1})+\sqrt{2\eta}Z_k
+\end{equation}
+This recursion is called \emph{Langevin Monte Carlo}, or sometimes the \emph{Unajusted Langevin Algorithm}.
+
+Notice that without the terms $Z_k$ in the above equation, the recursion just reduces to the gradient descent algorithm! Hence, we can view this algorithm as a \say{noisy} version of gradient descent, such that when the \say{correct amount of noise} is added to the iterates, the algorithm starts providing
+approximate samples from the posterior distribution.
+
+Having the recursion \eqref{eq:langevin-mc}, we can now try to approximate the expectations in \eqref{eq:test-function-expectation}. Assume that we have run the recursion in \eqref{eq:langevin-mc} for numerous iterations, say until $k = K_0$, such that we can assume that the distribution of $\theta_k$ is close to the posterior $\pi$. Then, we can generate $K$ more samples to approximate the expectations:
+\begin{equation}
+    \bar{f} = \int f(\theta)\cdot p(\theta|D_n)\dd\theta \simeq \frac{1}{K}\sum_{k=K_0+1}^{K_0+K}f(\theta_k)=:\hatf_K
+\end{equation}
+The initial number of iterations $K_0$ is called the \emph{burn-in period}, where the Markov process is \say{getting ready to sample} for $\pi$.
 
 \subsubsection{Stochastic Gradient Langevin Dynamics}
+Even though the recursion in \eqref{eq:langevin-mc} provides a practical algorithm, its computational complexity can be prohibitively high when the number of data points $n$ is very large, which is the typical case in modern marchine learning applications. To see this, we need to remember the expression of the function $\nabla U$:
+\begin{equation*}
+    \nabla U(\theta)=-\sum_{i=1}^n\nabla\log p(y_i|\theta)-\nabla\log p(\theta)
+\end{equation*}
+Since we need to compute this gradient at \emph{every iteration}, this means that we need to compute the gradient of the $\log$-likelihood for $n$ different data points at every iteration. Clearly, this can be both problematic and unnecessary when $n$ is very large.
+
+The idea in \emph{Stochastic Gradient Langevin Dynamics} (SGLD) is to address this issue by replacing $\nabla U$ with an unbiased estimator, which is much simpler to compute. More precisely, it replaces $\nabla U$ with the \say{stochastic gradient}, that is the gradient of the following function:
+\begin{equation}
+    \hat{U}_k(\theta) := -\frac{n}{n}\sum_{i\in\Omega_k}\log p(y_i|\theta)-\log p(\theta)
+\end{equation}
+where $\Omega_k\subseteq\iset{1}{n}$ is a random data subsample that is drawn either with or without replacement, and $b=|\Omega_k|$ denotes the number of elements in $\Omega_k$, and is typically much smaller than $n$. Notice that when conditioned on $\theta$, $\nabla \hat{U}_k(\theta)$ is an unbiased estimator of $\nabla U(\theta)$, i.e.~:
+\begin{equation*}
+    \forall k, \quad \E[\nabla \hat{U}_k(\theta)|\theta] = \nabla U(\theta)
+\end{equation*}
+
+By replacing $\nabla U$ with $\nabla \hat{U}_k$ in \eqref{eq:langevin-mc}, we only need to compute the gradients of $b$ terms instead of $n$ terms at each iteration. This finally gives us the recursion of the SGLD algorithm:
+\begin{equation}
+    \label{eq:sgld}
+    \theta_k = \theta_{k-1}-\eta\nabla\hat{U}_h(\theta_{k-1})+\sqrt{2\eta}Z_k
+\end{equation}
+We can define the SGLD estimator $\hatf$ as before, using sampled $\theta_k$ from \eqref{eq:sgld} instead of \eqref{eq:langevin-mc}.
+
+A final remark on this topic is that, since we are making a series of approximations, it is no longer guaranteed that the distribution of $\theta_k$ converges to $\pi$. Namely, we discretized the processe, and replaced the true gradient with the stochastic gradient. Clearly, at each step we introduce a certain amount of error. However, fortunately, it has been well-studied that this error can be controlled when $\eta$ is small enough and $b$ is large enough.
 
 \section{Neural Networks}
 \subsection{Introduction}
