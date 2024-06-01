@@ -2590,7 +2590,78 @@ A final remark on this topic is that, since we are making a series of approximat
 
 \section{Neural Networks}
 \subsection{Introduction}
+This chapter will introduce some basic elements about neural networks. More information can be found in the class about Deep Learning, given during first semester of second year.
 
+In the past classes, the main focus has been on methods to learn from $n$ observations $(x_i, y_i)_{i\in\iset{1}{n}}$, where $x_i\in\X$ -- the input space -- and $y_i\in\Y$ -- the output or label space.
+
+A large class of methods relies on minimizing a regularized empirical risk with respect to a function $f:\X\to\R$, where the following cost function is minimized:
+\begin{equation*}
+    \frac{1}{n}\sum_{i=1}^n \ell(y_i, f(x_i))+\Omega(f)
+\end{equation*}
+where $\ell:\Y\times\R\to\R$ is a loss function, and $\Omega(f)$ is a regularization term. Typical examples are regression or classification, studied in the previous chapters. The class of functions that we have considered so far were affine functions -- which are simple to implement and fast to train, but which can solve only linear problems -- and non-linear functions through kernel methods -- which allow non-linear predictions but have a large complexity.
+
+All the classes can be described by the \emph{prototypical model}.
+\begin{definition}[Prototypical model]
+    A class of functions follows a prototypical model if all its elements can be described as a linear combination of non-linear parametric functions $\sigma$, i.e.~of the form:
+    \begin{equation*}
+        f(x)=\sum_{i=1}^M\alpha_i\sigma(x, w_i)
+    \end{equation*}
+    where the $w_i$ are the parameters.
+\end{definition}
+In the case of kernel methods, $M=n$, $\sigma$ is the kernel, and $w_i=x_i$. The goal of this final chapter is to explore another class of functions for non-linear predictions, namely neural networks. It sets the cornerstone of Deep Learning, a vast field with numerous applications.
+
+\subsection{A single neuron}
+\subsubsection{Background}
+At the beginings of computer science, scientists tried to replicate actual biological neurons using computers. The first artificial neuron model was presented by McCulloch and Pitts in 1942. 
+\begin{definition}[Artificial neuron model]
+    An artificial neuron is a function of the form:
+    \begin{equation*}
+        f(x)=\sigma(w^\tp x+b)
+    \end{equation*}    
+    with $\sigma$ a non-linear and typically non-decreasing function, called the \emph{activation function}.
+\end{definition}
+
+Typical activation functions are:
+\begin{itemize}
+    \item Sigmoid: $\sigma(u)=1/(1+e^{-u})$
+    \item Step: $\sigma(u)=\ind_{u>0}$
+    \item Rectified Linear Unit (ReLU): $\sigma(u)=(u)_+=\max(,u, 0)$
+\end{itemize}
+
+\begin{definition}[Perceptron]
+    The \emph{perceptron} is an algorithm used to train a single neuron using a stochastic gradient descent update rule.
+\end{definition}
+
+\subsubsection{Logistic regression using sigmoid activation and cross-entropy loss}
+If $\sigma$ is the sigmoid function, 
+\begin{equation*}
+    f(x):=\sigma(w^\tp x+b)\in]0, 1[
+\end{equation*}
+can be seen as a probability. It is therefore natural to consider the model on $Y\in{-1, 1}$ where:
+\begin{equation*}
+    p(Y=1|x)=\sigma(w^\tp x+b)
+\end{equation*}
+thus:
+\begin{equation*}
+    p(y|x)=\sigma(y\cdot(w^\tp x+b))
+\end{equation*}
+Solving for the maximum likelihood -- or equivalently, using cross-entropy:
+\begin{equation*}
+    \ell(x, y) := -\ind_{y=1}\log p(Y=1|x) - \ind_{y=1}\log p(Y=-1|x)
+\end{equation*}
+then the loss to minimize is exactly:
+\begin{equation*}
+    -\log\sigma(y\cdot(w^\tp x+b)) = \log(1+\exp(-y\cdot(w^\tp x+b)))
+\end{equation*}
+which is exactly logistic regression.
+
+As a consequence, neural networks as we just saw -- that is, without hidden layers -- are reduced to linear predictors. The last layers of deeper networks will be treated in practice in the same way: for classification, cross-entropy loss, and for regression, no activation function.
+
+\subsubsection{Gradient and SGD}
+
+\subsection{One hidden layer}
+
+\subsection{Multiple hidden layers}
 
 \section{Appendix}
 \subsection{Complexity of linear algebra computations}
