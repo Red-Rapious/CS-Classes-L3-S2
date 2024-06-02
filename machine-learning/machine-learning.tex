@@ -2618,7 +2618,7 @@ At the beginings of computer science, scientists tried to replicate actual biolo
     \begin{equation*}
         f(x)=\sigma(w^\tp x+b)
     \end{equation*}    
-    with $\sigma$ a non-linear and typically non-decreasing function, called the \emph{activation function}.
+    with $\sigma$ a non-linear and typically non-decreasing function, called the \emph{activation function}. $w$ is often called the \emph{weight} and $b$ the \emph{bias}.
 \end{definition}
 
 Typical activation functions are:
@@ -2658,10 +2658,175 @@ which is exactly logistic regression.
 As a consequence, neural networks as we just saw -- that is, without hidden layers -- are reduced to linear predictors. The last layers of deeper networks will be treated in practice in the same way: for classification, cross-entropy loss, and for regression, no activation function.
 
 \subsubsection{Gradient and SGD}
+Similarly to methods we previously encountered, parameters $w$ and $b$ are learned using (stochastic) gradient descent. The gradient of:
+\begin{equation*}
+    \ell(y, f(x)) = L_y(f(x, w, b)) = L_y(\sigma(w^\tp x + b))
+\end{equation*}
+can be computed using the chain rule\footnote{Recall that the chain rule states that $(f\circ g)' = (f'\circ g)\cdot g'$}. Denoting $f=x\mapsto\sigma(w^\tp x+b)$, we have:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial[L_y\circ f]}{\partial w} &= L_y'(f(x, w, b))\frac{\partial f}{w} = L'(f(x, w, b)) \sigma'(w^\tp x+b)x\\
+        \frac{\partial[L_y\circ f]}{\partial b} &= L_y'(f(x, w, b))\frac{\partial f}{b} = L'(f(x, w, b)) \sigma'(w^\tp x+b)
+    \end{aligned}
+\end{equation*}
+
+\paragraph*{Batch gradient}
+To compute the gradient using the dataset, a first approach is to use Batch gradient, in which the gradient is computed using the entire dataset. The full gradient is the average of the gradients of all the data points.
+
+If we define the regularized empirical loss $J(w, b)$ to be:
+\begin{equation}
+    J(w, b) := \frac{1}{n}\sum_{i=1}^n L_{y_i}(\sigma(w^\tp x_i + b)) + \Omega(w, b)
+\end{equation}
+where $\Omega(w, b)$ is some regularization term, we have the following derivatives for $J$:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial J}{\partial w} &= \frac{1}{n}\sum_{i=1}^n L_{y_i}'(f(x, w, b)) \cdot \sigma'(w^\tp x_i+b)\cdot x_i + \frac{\partial\Omega}{\partial w}\\
+        \frac{\partial J}{\partial b} &= \frac{1}{n}\sum_{i=1}^n L_{y_i}'(f(x, w, b)) \cdot \sigma'(w^\tp x_i+b) + \frac{\partial\Omega}{\partial b}
+    \end{aligned}
+\end{equation*}
+
+This naive algorithm requires access to the entire dataset at each iteration:
+\begin{equation*}
+    \begin{aligned}
+        w&\longleftarrow w - \gamma\frac{\partial J}{\partial w}\\
+        b&\longleftarrow b - \gamma\frac{\partial J}{\partial b}
+    \end{aligned}
+\end{equation*}
+where, as seen in the expression of the derivatives of $J$, all the dataset points are used. This is obviously quite costly and most of the time unnecessary.
+
+\paragraph*{Mini-batches stochastic gradient descent}
+The idea of stochastic gradient descent using mini-batches is to consider at each iteration a set $I\subseteq\iset{1}{n}$ which will represent the indices of the dataset points which will actually be used in the computation of the gradient. This allows to reduce to computational cost of a single iteration.
+
+If we define $J_I(w, b)$, the regularized empirical loss over the mini-batch $I$, to be:
+\begin{equation}
+    J_I(w, b) := \frac{1}{|I|}\sum_{i\in I} L_{y_i}(\sigma(w^\tp x_i + b)) + \Omega(w, b)
+\end{equation}
+the derivatives of $J_I$ are as simple to express:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial J_I}{\partial w} &= \frac{1}{|I|}\sum_{i\in I} L_{y_i}'(f(x, w, b)) \cdot \sigma'(w^\tp x_i+b)\cdot x_i + \frac{\partial\Omega}{\partial w}\\
+        \frac{\partial J_I}{\partial b} &= \frac{1}{|I|}\sum_{i\in I} L_{y_i}'(f(x, w, b)) \cdot \sigma'(w^\tp x_i+b) + \frac{\partial\Omega}{\partial b}
+    \end{aligned}
+\end{equation*}
+
+A step of the stochastic gradient descent then takes a similar form:
+\begin{equation*}
+    \begin{aligned}
+        w&\longleftarrow w - \gamma\frac{\partial J_I}{\partial w}\\
+        b&\longleftarrow b - \gamma\frac{\partial J_I}{\partial b}
+    \end{aligned}
+\end{equation*}
+for some $I$, randomly-chosen at each iteration.
+
+Note that in general, SGD does not converge with constant step size. It needs a decreasing step size to be able to converge. Furthermore, due to the lack of convexity of the loss function, we cannot guarantee that there is convergence to a global optimum.
 
 \subsection{One hidden layer}
+\subsubsection{Motivation}
+\begin{definition}[XOR problem]
+    A class $\mathcal{C}$  of functions of the form:
+    \begin{equation*}
+        f:\R^2\longrightarrow\R
+    \end{equation*}
+    solves the \emph{\textnormal{XOR} problem} when a function in this class is equal to the XOR function, that is:
+    \begin{equation*}
+        \exists f\in\mathcal{C}, \forall x, y\in\{0, 1\}, \quad f(x, y) = x \oplus y
+    \end{equation*}
+\end{definition}
+
+\begin{property}
+    A single neuron -- and, more generally, linear regressions -- cannot solve the XOR problem.
+\end{property}
+
+This shows that many \say{interesting} functions cannot be solved using single neurons, hence the need to build more complicated architectures of neural \emph{networks}.
+
+\subsubsection{Definition of hidden layers}
+To be able to solve problems such as the XOR problem, we introduce a \emph{hidden layer}: our network is now composed of two layers, the hidden layer and the output layer. The idea will be to feed the result of the hidden neuron to the output layer -- which we already had in the simple neuron model.
+
+Formally, we introduce a new variable $h$ such that, for $x\in\R^d$, $h\in\R^m$, $y\in\R$, where $m$ is the size of the hidden layer, which have the following relationship:
+\begin{equation*}
+    \begin{aligned}
+        h&=\sigma[(W_h)^\tp x +B_h]\\
+        y&=\sigma[(w_o)^\tp h +b_o]
+    \end{aligned}
+\end{equation*}
+where $W_h\in\mathscr{M}_{d, m}$, $B_h\in\R^m$, $w_o\in\R^m$ and $b_o\in\R$. 
+
+Computing the output $y$ requires a \emph{forward pass}: we start by computing $h$, and use the result of $h$ to compute $y$. Schematically, this is done from left (input) to right (output), so the computation is done \emph{forward}, as opposed to \emph{backward} computations, which are also used, and start by the output and moves back to the input.
+
+\subsubsection{Gradient through backpropagation}
+Once again, the derivatives of the output with respect to the weights and biases of both layers can be computed using the chain rule.
+
+\paragraph*{Respect to the output layer}
+The derivatives of $y$ with respect to parameters of the output layers are quite similar to the single neuron model, since the output layer is simply a single neuron using the hidden layer as input. It can be computed in one step:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial y}{\partial w_o} &= \sigma'[(w_o)^\tp h + b_o]\cdot h\\
+        \frac{\partial y}{\partial b_o} &= \sigma'[(w_o)^\tp h + b_o]
+    \end{aligned}
+\end{equation*}
+
+\paragraph*{Respect to the hidden layer}
+The derivatives with respect to parameters of the hidden layer can be computed in two steps using chain rule: we will start by computing the derivatives of the hidden layer $h$, and apply chain rule to connect it to the derivative of the output layer.
+Denoting by $W_{h, i}\in\R^d$ the $i$-the input (or hidden) weight:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial h_i}{\partial W_{h, i}} &= \sigma'[(W_{h, i})^\tp x + B_{h, i}]\cdot x\\
+        \frac{\partial y}{\partial B_{h, i}} &= \sigma'[(W_{h, i})^\tp x + B_{h, i}]
+    \end{aligned}
+\end{equation*}
+
+Then, applying chain rule to the output layer:
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial y}{\partial W_{h, i}} &= \sum_{j=1}^m \frac{\partial y}{\partial h_j} \cdot \frac{\partial h_j}{\partial W_{h, i}} = \sigma'[(w_o)^\tp h + b_o](w_{o, i}) \cdot \frac{\partial h_i}{\partial W_{h, i}}\\
+        \frac{\partial y}{\partial B_{h, i}} &= \sum_{j=1}^m \frac{\partial y}{\partial h_j} \cdot \frac{\partial h_j}{\partial B_{h, i}} = \sigma'[(w_o)^\tp h + b_o](w_{o, i}) \cdot \frac{\partial h_i}{\partial B_{h, i}}
+    \end{aligned}
+\end{equation*}
+The exact expression of the derivative can therefore be found using the intermediate computation of the derivatives of the hidden layer.
+
+Note that all these operations are vectorized, and are therefore adapted to GPUs. This is one of the reason of the rapid development of neural networks at the beginning of the 2000s: the arrival of GPUs -- which are well-fitted to train neural networks -- enabled fast and powerful computations for deep learning.
+
+\subsubsection{Approximation properties}
+It can be shown that neural networks with one hidden layer solve the XOR problem. In fact, this result can be generalized to the \emph{Universal approximation theorem}, stating that any continuous function can be approximated up to arbitrary precision using a neural network with sufficiently many hidden neurons.
+
+\subsubsection{Link with kernel methods}
+When no activation is used as the output layer, we have:
+\begin{equation*}
+    \begin{aligned}
+        h &= \sigma[(W_h)^\tp x+B_h]\\
+        y &= (w_o)^\tp h + b_o
+    \end{aligned}
+\end{equation*}
+
+This corresponds to a linear classifier with feature vector:
+\begin{equation*}
+    \Phi(x) = \frac{1}{\sqrt{m}}\sigma[(W_h)^\tp x + B_h]
+\end{equation*}
+parametrized by $W_h$ and $B_h$, with kernel:
+\begin{equation*}
+    k(x, x') = \frac{1}{m}\sum_{i=1}^n \sigma[(W_{h, i})^\tp x+B_{h, i}] \cdot \sigma[(W_{h, i})^\tp x' + B_{h, i}]
+\end{equation*}
+Note that the feature vector is of finite dimensiond and \emph{learned from data}.
+
+With random i.i.d.~weights $W_{h, i}\in\R^m$ and $B_{h, i}\in\R$:
+\begin{equation*}
+    k(x, x') = \E\left[\sigma[(W_h)^\tp x+B_h]\cdot \sigma[(W_h)^\tp x' + B_h]\right]
+\end{equation*}
+This can be computed in closed for some simple distributions of weights. Therefore, an infinite number of random input weights lead to a kernel method.
 
 \subsection{Multiple hidden layers}
+Similarly to the appending of a hidden layer, we can add as many hidden layers as we wish. Both the evaluation process and the differentiation using backpropagation are quite similar. For instance, two hidden layers can be expressed as:
+\begin{equation*}
+    \begin{aligned}
+        y &= \sigma(W_1^\tp \sigma(W_2^\tp \sigma(W_3^\tp x))) = f_1\circ f_2\circ f_3(x)\\
+        y &= f_1(\theta_1, y_2)\\
+        y_2 &= f_2(\theta_2, y_3)\\
+        y_4 &= f_3(\theta_3, x)
+    \end{aligned}
+\end{equation*}
+Likewise, gradient of $y$ with respect to the weights of the hidden layers can be expressed using chain rule.
+
+Different theorems show the approximation properties of multi-layers neural networks. These are out of the scope of this class, and are mostly technicals: the ground idea is that any function can be approximated using enough hidden layers of large enough sizes. This is the reason of the versitality of neural netwoks in machine learning: they are quite efficient to train (using SGD and GPUs), and can in theory solve any problem, that is, approximate any function.
 
 \section{Appendix}
 \subsection{Complexity of linear algebra computations}
