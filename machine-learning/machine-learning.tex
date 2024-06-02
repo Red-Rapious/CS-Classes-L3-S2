@@ -2637,7 +2637,7 @@ If $\sigma$ is the sigmoid function,
 \begin{equation*}
     f(x):=\sigma(w^\tp x+b)\in]0, 1[
 \end{equation*}
-can be seen as a probability. It is therefore natural to consider the model on $Y\in{-1, 1}$ where:
+can be seen as a probability. It is therefore natural to consider the model on $Y\in\{-1, 1\}$ where:
 \begin{equation*}
     p(Y=1|x)=\sigma(w^\tp x+b)
 \end{equation*}
@@ -2733,6 +2733,13 @@ Note that in general, SGD does not converge with constant step size. It needs a 
     \end{equation*}
 \end{definition}
 
+\begin{figure}[H]
+    \captionsetup{justification=centering}
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/xor-problem.png}
+    \caption{OR and XOR functions -- note that for the XOR problem,\\ no linear separation can distinguish green and red points}
+\end{figure}
+
 \begin{property}
     A single neuron -- and, more generally, linear regressions -- cannot solve the XOR problem.
 \end{property}
@@ -2741,6 +2748,38 @@ This shows that many \say{interesting} functions cannot be solved using single n
 
 \subsubsection{Definition of hidden layers}
 To be able to solve problems such as the XOR problem, we introduce a \emph{hidden layer}: our network is now composed of two layers, the hidden layer and the output layer. The idea will be to feed the result of the hidden neuron to the output layer -- which we already had in the simple neuron model.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=2.2cm,y=1.4cm]
+
+        \readlist\Nnod{2,4,1} % number of nodes per layer
+        % \Nnodlen = length of \Nnod (i.e. total number of layers)
+        % \Nnod[1] = element (number of nodes) at index 1
+        \foreachitem \N \in \Nnod{ % loop over layers
+          % \N     = current element in this iteration (i.e. number of nodes for this layer)
+          % \Ncnt  = index of current layer in this iteration
+          \foreach \i [evaluate={\x=\Ncnt; \y=\N/2-\i+0.5; \prev=int(\Ncnt-1);}] in {1,...,\N}{ % loop over nodes
+            \node[nnnode] (N\Ncnt-\i) at (\x,\y) {
+                \ifnum\Ncnt=1 
+                    $x_\i$ 
+                \fi
+                \ifnum\Ncnt=2 
+                    $h_\i$ 
+                \fi
+                \ifnum\Ncnt=3
+                    $y$
+                \fi};
+            \ifnum\Ncnt>1 % connect to previous layer
+              \foreach \j in {1,...,\Nnod[\prev]}{ % loop over nodes in previous layer
+                \draw[thick, ->] (N\prev-\j) -- (N\Ncnt-\i); % connect arrows directly
+              }
+            \fi % else: nothing to connect first layer
+          }
+        }
+      \end{tikzpicture}
+    \caption{Neural network with one hidden layer}
+\end{figure}
 
 Formally, we introduce a new variable $h$ such that, for $x\in\R^d$, $h\in\R^m$, $y\in\R$, where $m$ is the size of the hidden layer, which have the following relationship:
 \begin{equation*}
