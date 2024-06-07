@@ -1981,7 +1981,7 @@ The intuition is that we want to preserve as much \say{diversity} in the output 
     To generalize this procedure to $p'$ dimensions, we take the $p'$ eigenvectors associated to the $p'$ largest eigenvalues. Another approach would be to use \emph{deflation}, defined by the following algorithm:
     \begin{enumerate}
         \item Find $w$ using the largest eigenvalue.
-        \item Project the data onto $\Span(w)$.
+        \item Project the data onto $\Span(w)^\perp$.
         \item Start at Step 1.
     \end{enumerate}
 \end{remark}
