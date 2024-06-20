@@ -445,7 +445,53 @@ More precisely, we will consider linear functions $f$ of the form:
 This assumes that the data is \emph{linearly separable}, meaning that it can be well-explained by a linear separation.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{images/linearly-separable.png}
+
+    \begin{minipage}{0.45\textwidth}
+        \caption*{Linearly separable data}
+        \begin{tikzpicture}[scale=0.8]
+            \draw[->, thick] (0,0) -- (7,0) node[below] {$x_1$};
+            \draw[->, thick] (0,0) -- (0,6) node[left] {$x_2$};
+
+            \draw[-, thick] (6, 0.5) -- (1.5, 5.5) node[above] {$x^\tp\beta=0$};
+
+            \foreach \i\j in {1/1,1.5/2,2.5/2,4/1.5,0.8/4,2.7/3.4, 1.4/4.8, 1.2/3}
+            {
+                \node at (\i, \j) [circle,fill,inner sep=1.8pt, color=cyan]{};
+            }
+
+            \foreach \i\j in {4.8/3.7, 5.3/4.4, 3.6/4.7, 5.6/2.9, 4.2/3.4, 5.4/2.1, 4.9/4.8}
+            {
+                \node at (\i, \j) [circle,fill,inner sep=1.8pt, color=orange]{};
+            }
+
+            \node at (3, 0.5) [color=cyan] {$x^\tp\beta<0$};
+            \node at (5, 5.5) [color=orange] {$x^\tp\beta>0$};
+        \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \caption*{Non-linearly separable data}
+        \begin{tikzpicture}[scale=0.8, use Hobby shortcut]
+            \draw[->, thick] (0,0) -- (7,0) node[below] {$x_1$};
+            \draw[->, thick] (0,0) -- (0,6) node[left] {$x_2$};
+
+            \draw[closed, thick, scale=1.3] (2.5,1) .. (3.5,2.5) .. (3,3) .. (1.5,3.5);
+
+            \foreach \i\j in {3.4/2.3,2/4,3.3/3.6,2.1/2.1,1.7/3.4}
+            {
+                \node at (\i, \j) [circle,fill,inner sep=1.8pt, color=cyan]{};
+            }
+
+            \foreach \i\j in {5/3.4,1/1.3,3/0.4,6.4/2.4,0.5/4.8,3.7/4.8, 2.3/5.2,0.6/3.5,5.2/2.3,1.2/0.2}
+            {
+                \node at (\i, \j) [circle,fill,inner sep=1.8pt, color=orange]{};
+            }
+
+            \node at (5, 1) {$f(x)=0$};
+            \node at (2.9, 2.9) [color=cyan] {$f(x)<0$};
+            \node at (6, 5) [color=orange] {$f(x)>0$};
+        \end{tikzpicture}
+    \end{minipage}
+    
     \caption{Data that can or cannot be well-explained by a linear separation}
 \end{figure}
 If the data does not seem to be linearly separable, we can use similar tricks as the one introduced for linear regression (polynomial regression, kernel regression, splines, \dots). We will dive into more details in an upcoming chapter about kernels.
