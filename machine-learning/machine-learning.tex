@@ -2758,7 +2758,7 @@ Formally, we introduce a new variable $h$ such that, for $x\in\R^d$, $h\in\R^m$,
         y&=\sigma[(w_o)^\tp h +b_o]
     \end{aligned}
 \end{equation*}
-where $W_h\in\mathscr{M}_{d, m}$, $B_h\in\R^m$, $w_o\in\R^m$ and $b_o\in\R$. 
+where $W_h\in\mathscr{M}_{d, m}(\R)$, $B_h\in\R^m$, $w_o\in\R^m$ and $b_o\in\R$. 
 
 Computing the output $y$ requires a \emph{forward pass}: we start by computing $h$, and use the result of $h$ to compute $y$. Schematically, this is done from left (input) to right (output), so the computation is done \emph{forward}, as opposed to \emph{backward} computations, which are also used, and start by the output and moves back to the input.
 
